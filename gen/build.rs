@@ -30,6 +30,36 @@ fn write_markdown_file<P: AsRef<Path>>(
     Ok(())
 }
 
+fn generate_pdf(
+    input_md: &str,
+    output_pdf: &str,
+    pdf_engine: Option<&str>,
+) -> std::io::Result<()> {
+    let mut command = Command::new("pandoc");
+    command
+        .arg("-t")
+        .arg("beamer")
+        .arg(input_md)
+        .arg("-o")
+        .arg(output_pdf);
+
+    if let Some(engine) = pdf_engine {
+        command.arg(format!("--pdf-engine={}", engine));
+    }
+
+    let output = command.output()?;
+
+    if !output.status.success() {
+        eprintln!("pandoc failed for {}: {:?}", input_md, output);
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!("pandoc command failed for {}", input_md),
+        ));
+    }
+
+    Ok(())
+}
+
 fn main() -> std::io::Result<()> {
     println!("cargo:rerun-if-changed=../lib/src/lib.rs");
 
@@ -41,40 +71,8 @@ fn main() -> std::io::Result<()> {
     write_json_file("events.json", &events)?;
     write_markdown_file("events.md", &events)?;
 
-    // Generate PDF slides using pandoc
-    let output = Command::new("pandoc")
-        .arg("-t")
-        .arg("beamer")
-        .arg("events.md")
-        .arg("-o")
-        .arg("events.pdf")
-        .output()?;
-
-    if !output.status.success() {
-        eprintln!("pandoc failed: {:?}", output);
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "pandoc command failed",
-        ));
-    }
-
-    // Generate PDF for rules.md
-    let output_rules = Command::new("pandoc")
-        .arg("-t")
-        .arg("beamer")
-        .arg("rules.md")
-        .arg("-o")
-        .arg("rules.pdf")
-        .arg("--pdf-engine=xelatex")
-        .output()?;
-
-    if !output_rules.status.success() {
-        eprintln!("pandoc for rules.md failed: {:?}", output_rules);
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "pandoc command for rules.md failed",
-        ));
-    }
+    generate_pdf("events.md", "events.pdf", None)?;
+    generate_pdf("rules.md", "rules.pdf", Some("xelatex"))?;
 
     Ok(())
 }

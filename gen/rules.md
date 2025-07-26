@@ -13,14 +13,14 @@ After all submissions are collected, we will analyze the distributions.
 On 2026-01-01, I will determine your scores.  Your score on one particular event with 
 submitted probability $p$ is defined as:
 
-$
+$$
 \text{score}(p) =
 \begin{cases}
 \ln p - \ln 0.5 & \text{if the event occurred} \\
 \ln (1 - p) - \ln 0.5 & \text{otherwise}
 \end{cases}
-$
+$$
 
 \begin{center}
-\includegraphics[width=0.3\linewidth]{gen/desmos-graph.png}
+\includegraphics[width=0.3\linewidth]{desmos-graph.png}
 \end{center}
