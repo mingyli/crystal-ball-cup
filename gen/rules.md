@@ -8,7 +8,8 @@ of 2025.
 
 No discussion is allowed except for clarifying questions. 
 
-You may not consult external resources.
+You may not consult external resources. You may not collude with each other to affect the 
+outcome of any event before 2026-01-01.
 
 ## Scoring
 
@@ -26,3 +27,9 @@ $$
 \begin{center}
 \includegraphics[width=0.3\linewidth]{desmos-graph.png}
 \end{center}
+
+## Retrospective
+
+On some day early next year we will reconvene to evaluate our 2025 predictions 
+and make predictions for 2026.
+

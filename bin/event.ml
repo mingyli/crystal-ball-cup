@@ -22,10 +22,27 @@ let all =
          material, adjudicated by the Writer's Branch of the Academy of Motion Picture \
          Arts and Sciences."
     }
-  ; { short = "A major U.S. political figure dies, causing a stock market closure"
+  ; { short = "The winner of the 2025 US Open Men's Singles tournament is under 25"
     ; precise =
-        "A major political figure dies, causing a major stock exchange, such as Nasdaq \
-         or NYSE, to cease trading on some date before 2026-01-01."
+        "The winner of the US Open tennis tournament is under 25 years of age, \
+         determined on the date of the Men's Final."
+    }
+  ; { short = "Sam Bankman-Fried is pardoned"
+    ; precise =
+        "Sam Bankman-Fried receives a presidential pardon from President Donald Trump on \
+         some date before 2026-01-01."
+    }
+  ; { short = "A major U.S. political figure dies"
+    ; precise =
+        "The death of a major political figure causes a National Market System stock \
+         exchange, such as Nasdaq or NYSE, to cease trading on some date before \
+         2026-01-01."
+    }
+  ; { short = "More than five participants play chess on a random November date"
+    ; precise =
+        "On a randomly selected date in November, I will poll the group via mailing \
+         list. If more than five respondents claim to have completed a full game of \
+         chess in a specified twenty-four hour period, then this event resolves to true."
     }
   ]
 ;;
