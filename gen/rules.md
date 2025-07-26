@@ -1,4 +1,4 @@
-# 2025 Crystal Ball Cup
+# 2025 Crystal Ball Cup Rules
 
 ## Format
 

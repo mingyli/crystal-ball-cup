@@ -6,3 +6,17 @@
   (with-stdout-to
    events.md
    (run ../bin/main.exe markdown))))
+
+(rule
+ (target events.pdf)
+ (deps events.md)
+ (mode promote)
+ (action
+  (run pandoc -t beamer events.md -o events.pdf --pdf-engine=xelatex)))
+
+(rule
+ (target rules.pdf)
+ (deps rules.md desmos-graph.png)
+ (mode promote)
+ (action
+  (run pandoc -t beamer rules.md -o rules.pdf --pdf-engine=xelatex)))
