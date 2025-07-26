@@ -62,6 +62,8 @@ fn generate_pdf(
 
 fn main() -> std::io::Result<()> {
     println!("cargo:rerun-if-changed=../lib/src/lib.rs");
+    println!("cargo:rerun-if-changed=gen/rules.md");
+    println!("cargo:rerun-if-changed=gen/desmos-graph.png");
 
     let events: Vec<Event> = EVENTS
         .iter()

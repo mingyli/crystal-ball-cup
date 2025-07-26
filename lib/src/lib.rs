@@ -27,7 +27,7 @@ pub struct ConstEvent {
 /// The canonical list of events, defined at compile time.
 pub const EVENTS: &[ConstEvent] = &[
     ConstEvent {
-        short: "Zohran Mamdani will win the NYC mayoral election",
+        short: "Zohran Mamdani wins the NYC mayoral election",
         precise: "Zohran Mamdani is elected mayor in the 2025 New York City \
                   election on some date before 2026-01-01 via consensus of \
                   credible reporting and official information from New York \
@@ -44,8 +44,8 @@ pub const EVENTS: &[ConstEvent] = &[
                   Picture Arts and Sciences.",
     },
     ConstEvent {
-        short: "The death of a major U.S. political figure causes a stock \
-                market closure",
+        short: "A major U.S. political figure dies, causing a stock market \
+                closure",
         precise: "A major political figure dies, causing a major stock \
                   exchange, such as Nasdaq or NYSE, to cease trading on some \
                   date before 2026-01-01.",
