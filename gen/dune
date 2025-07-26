@@ -1,0 +1,8 @@
+(rule
+ (target events.md)
+ (deps ../bin/main.exe)
+ (mode promote)
+ (action
+  (with-stdout-to
+   events.md
+   (run ../bin/main.exe markdown))))
