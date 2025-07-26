@@ -1,2 +1,3 @@
 [workspace]
 members = ["bin", "lib", "gen"]
+resolver = "2"

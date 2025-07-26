@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use mylib::{Event, ConstEvent, EVENTS};
+use mylib::{Event, EVENTS};
 use serde_json;
 
 #[derive(Parser)]
@@ -18,7 +18,8 @@ enum Command {
 }
 
 fn main() {
-    // At runtime, convert the compile-time definitions into the runtime Event type.
+    // At runtime, convert the compile-time definitions into the runtime Event
+    // type.
     let events: Vec<Event> = EVENTS
         .iter()
         .map(|const_event| Event::new(const_event.short, const_event.precise))

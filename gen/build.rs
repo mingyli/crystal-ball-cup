@@ -20,13 +20,13 @@ fn write_markdown_file<P: AsRef<Path>>(
 ) -> std::io::Result<()> {
     let mut file = File::create(filename)?;
     writeln!(file, "# Events")?;
-    writeln!(file, "")?;
 
-    for event in events {
-        writeln!(file, "## {}", event.short)?;
-        writeln!(file, "")?;
+    for (i, event) in events.iter().enumerate() {
+        writeln!(file, "\n## {}", event.short)?;
         writeln!(file, "{}", event.precise)?;
-        writeln!(file, "")?;
+        if i < events.len() - 1 {
+            writeln!(file, "")?;
+        }
     }
 
     Ok(())
