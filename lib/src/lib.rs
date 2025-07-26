@@ -34,20 +34,20 @@ pub const EVENTS: &[ConstEvent] = &[
                   City.",
     },
     ConstEvent {
-        short: "The top grossing domestic film of Q4 is based on an original \
-                screenplay",
-        precise: "The top grossing domestic film of month October, November, \
-                  or December according to Box Office Mojo is based on an \
-                  original screenplay, where an original screenplay is \
-                  defined as one not based upon previously published \
-                  material, adjudicated by the Writer's Branch of the Academy \
-                  of Motion Picture Arts and Sciences.",
+        short: "The top grossing domestic film of 2025Q4 is based on an \
+                original screenplay",
+        precise: "The top grossing domestic film of October, November, or \
+                  December, according to Box Office Mojo, is based on an \
+                  original screenplay. \n\nAn original screenplay is defined \
+                  as one not based upon previously published material, \
+                  adjudicated by the Writer's Branch of the Academy of Motion \
+                  Picture Arts and Sciences.",
     },
     ConstEvent {
         short: "The death of a major U.S. political figure causes a stock \
                 market closure",
-        precise: "A major political figure dies, causing any major stock \
-                  exchange, such as NASDAQ or NYSE, to cease trading on \
-                 some date before 2026-01-01.",
+        precise: "A major political figure dies, causing a major stock \
+                  exchange, such as Nasdaq or NYSE, to cease trading on some \
+                  date before 2026-01-01.",
     },
 ];

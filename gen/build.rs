@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
+use std::process::Command;
 
 use mylib::{Event, EVENTS};
 
@@ -19,14 +20,11 @@ fn write_markdown_file<P: AsRef<Path>>(
     events: &[Event],
 ) -> std::io::Result<()> {
     let mut file = File::create(filename)?;
-    writeln!(file, "# Events")?;
+    writeln!(file, "# 2025 Crystal Ball Cup")?;
 
-    for (i, event) in events.iter().enumerate() {
+    for event in events.iter() {
         writeln!(file, "\n## {}", event.short)?;
         writeln!(file, "{}", event.precise)?;
-        if i < events.len() - 1 {
-            writeln!(file, "")?;
-        }
     }
 
     Ok(())
@@ -42,6 +40,23 @@ fn main() -> std::io::Result<()> {
 
     write_json_file("events.json", &events)?;
     write_markdown_file("events.md", &events)?;
+
+    // Generate PDF slides using pandoc
+    let output = Command::new("pandoc")
+        .arg("-t")
+        .arg("beamer")
+        .arg("events.md")
+        .arg("-o")
+        .arg("events.pdf")
+        .output()?;
+
+    if !output.status.success() {
+        eprintln!("pandoc failed: {:?}", output);
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "pandoc command failed",
+        ));
+    }
 
     Ok(())
 }
