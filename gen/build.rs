@@ -58,5 +58,23 @@ fn main() -> std::io::Result<()> {
         ));
     }
 
+    // Generate PDF for rules.md
+    let output_rules = Command::new("pandoc")
+        .arg("-t")
+        .arg("beamer")
+        .arg("rules.md")
+        .arg("-o")
+        .arg("rules.pdf")
+        .arg("--pdf-engine=xelatex")
+        .output()?;
+
+    if !output_rules.status.success() {
+        eprintln!("pandoc for rules.md failed: {:?}", output_rules);
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "pandoc command for rules.md failed",
+        ));
+    }
+
     Ok(())
 }
