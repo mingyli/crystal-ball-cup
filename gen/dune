@@ -1,22 +1,22 @@
 (rule
  (target events.md)
  (deps ../bin/main.exe)
- (mode promote)
  (action
   (with-stdout-to
    events.md
    (run ../bin/main.exe markdown))))
 
 (rule
- (target events.pdf)
- (deps events.md)
- (mode promote)
+ (targets slides.md)
+ (deps rules.md events.md)
  (action
-  (run pandoc -t beamer events.md -o events.pdf --pdf-engine=xelatex)))
+  (with-stdout-to
+   slides.md
+   (run cat rules.md events.md))))
 
 (rule
- (target rules.pdf)
- (deps rules.md desmos-graph.png)
+ (targets slides.pdf)
+ (deps slides.md)
  (mode promote)
  (action
-  (run pandoc -t beamer rules.md -o rules.pdf --pdf-engine=xelatex)))
+  (run pandoc -t beamer slides.md -o slides.pdf --pdf-engine=xelatex)))

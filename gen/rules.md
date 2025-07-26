@@ -1,17 +1,19 @@
-# 2025 Crystal Ball Cup Rules
+# 2025 Crystal Ball Cup 
 
 ## Format
 
 You will be presented with a series of hypothetical events. For each event, you will have 
-**one minute** to submit a probability $p \in [0, 1]$ of the event occurring before the end
-of 2025. No discussion is allowed except for clarifying questions. 
+**one minute** to submit a probability $p \in [0, 1]$ that the event occurs before the end
+of 2025. 
 
-After all submissions are collected, we will analyze the distributions.
+No discussion is allowed except for clarifying questions. 
+
+You may not consult external resources.
 
 ## Scoring
 
-On 2026-01-01, I will determine your scores.  Your score on one particular event with 
-submitted probability $p$ is defined as:
+On 2026-01-01, I will compute your score to be the mean of your scores across all events. 
+Your score on one event with submitted probability $p$ is defined as:
 
 $$
 \text{score}(p) =

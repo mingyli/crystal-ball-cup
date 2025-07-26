@@ -5,7 +5,7 @@ let markdown_command =
   @@
   let%map_open.Command () = return () in
   fun () ->
-    print_endline "# 2025 Crystal Ball Cup\n";
+    print_endline "# Events\n";
     List.iter Event.all ~f:(fun event ->
       Printf.printf "## %s\n" (Event.short event);
       Printf.printf "%s\n\n" (Event.precise event))
