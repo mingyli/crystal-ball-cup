@@ -2,7 +2,6 @@
 
 ## Format
 
-
 You will be presented with a series of hypothetical events. For each event, you will have 
 **one minute** to submit a probability $p \in [0, 1]$ of the event occurring before the end
 of 2025. No discussion is allowed except for clarifying questions. 
@@ -22,15 +21,6 @@ $$
 \end{cases}
 $$
 
-<!-- <img src="desmos-graph.png" alt="scoring">
-<img src="desmos-graph.svg" alt="scoring">
-<img src="gen/desmos-graph.png" alt="scoring">
-<img src="gen/desmos-graph.svg" alt="scoring"> -->
-<!-- ![](desmos-graph.png){ width=60% } -->
-<!-- ![](gen/desmos-graph.png){ width=60% } -->
-<!-- :::{.center}
-![](gen/desmos-graph.png){ width=60% }
-::: -->
 \begin{center}
 \includegraphics[width=0.3\linewidth]{gen/desmos-graph.png}
 \end{center}
