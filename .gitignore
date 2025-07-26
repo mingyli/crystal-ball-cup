@@ -26,3 +26,32 @@ target
 /target
 
 .DS_Store
+
+# OCaml/Dune specific ignores
+_build/
+*.install
+*.opam
+*.cmi
+*.cmx
+*.cmo
+*.cma
+*.cmxs
+*.cmt
+*.cmti
+*.o
+*.a
+*.so
+*.dll
+*.exe
+*~
+#*#
+*.log
+*.bak
+*.annot
+*.depend
+*.inferred
+*.merlin
+*.mll.d
+*.mly.d
+*.native
+*.byte
