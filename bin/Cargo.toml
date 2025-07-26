@@ -1,0 +1,18 @@
+[package]
+name = "crystal-ball-cup"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "ex"
+path = "main.rs"
+
+[dependencies]
+clap = { version = "4.5.4", features = ["derive"] }
+serde_json = "1.0.117"
+serde = { version = "1.0.203", features = ["derive"] }
+mylib = { path = "../lib" }
+
+[build-dependencies]
+mylib = { path = "../lib" }
+serde_json = "1.0.117"
