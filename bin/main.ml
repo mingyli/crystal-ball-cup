@@ -6,9 +6,9 @@ let markdown_command =
   let%map_open.Command () = return () in
   fun () ->
     print_endline "# Events\n";
-    List.iter Event.all ~f:(fun event ->
-      Printf.printf "## %s\n" (Event.short event);
-      Printf.printf "%s\n\n" (Event.precise event))
+    List.iteri Event.all ~f:(fun i event ->
+      print_endline [%string "## %{i+1#Int}. %{Event.short event}"];
+      print_endline [%string "%{Event.precise event}\n"])
 ;;
 
 let sexp_command =

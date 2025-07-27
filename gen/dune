@@ -16,7 +16,7 @@
 
 (rule
  (targets slides.pdf)
- (deps slides.md)
+ (deps slides.md desmos-graph.png)
  (mode promote)
  (action
   (run pandoc -t beamer slides.md -o slides.pdf --pdf-engine=xelatex)))

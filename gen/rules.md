@@ -3,7 +3,7 @@
 ## Format
 
 You will be presented with a series of hypothetical events. For each event, you will have 
-**one minute** to submit a probability $p \in [0, 1]$ that the event occurs before the end
+one minute to submit a probability $p \in [0, 1]$ that the event occurs before the end
 of 2025. 
 
 No discussion is allowed except for clarifying questions. 
