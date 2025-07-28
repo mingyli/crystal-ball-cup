@@ -19,10 +19,19 @@ let sexp_command =
     List.iter Event.all ~f:(fun event -> print_s ~mach:() [%sexp (event : Event.t)])
 ;;
 
+let json_command =
+  Command.basic ~summary:"Print events in json format"
+  @@
+  let%map_open.Command () = return () in
+  fun () ->
+    let yojson = `List (List.map Event.all ~f:Event.to_yojson) in
+    print_endline (Yojson.Safe.pretty_to_string yojson)
+;;
+
 let command =
   Command.group
     ~summary:"Crystal Ball Cup"
-    [ "markdown", markdown_command; "sexp", sexp_command ]
+    [ "markdown", markdown_command; "sexp", sexp_command; "json", json_command ]
 ;;
 
 let () = Command.run command

@@ -4,7 +4,7 @@ type t =
   { short : string
   ; precise : string
   }
-[@@deriving fields, sexp]
+[@@deriving fields, sexp, yojson]
 
 let all =
   [ { short = "Nintendo announces a new Super Smash Bros. game"
