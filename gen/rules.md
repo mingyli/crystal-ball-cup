@@ -25,7 +25,7 @@ $$
 $$
 
 \begin{center}
-\includegraphics[width=0.3\linewidth]{desmos-graph.png}
+\includegraphics[width=0.3\linewidth]{score.png}
 \end{center}
 
 ## Retrospective
