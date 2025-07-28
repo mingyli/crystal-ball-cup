@@ -7,7 +7,7 @@ type t =
 [@@deriving fields, sexp]
 
 let all =
-  [ { short = "New Super Smash Bros. game announced"
+  [ { short = "Nintendo announces a new Super Smash Bros. game"
     ; precise = "Nintendo announces a new Super Smash Bros. game on or before 2025-12-31."
     }
   ; { short = "Zohran Mamdani wins the NYC mayoral election"
@@ -20,7 +20,7 @@ let all =
     ; precise =
         "The top grossing domestic film of Q4 2025 (October through December), according \
          to Box Office Mojo, is based on an original screenplay—meaning not adapted from \
-         existing material—as determined by Oscar eligibility or expert consensus (e.g. \
+         existing material—as determined by Oscar eligibility or expert consensus (e.g., \
          Writer's Branch of the Academy of Motion Picture Arts and Sciences)."
     }
   ; { short = "A young man wins the 2025 US Open Men's Singles tournament"
@@ -30,8 +30,7 @@ let all =
     }
   ; { short = "Sam Bankman-Fried is pardoned"
     ; precise =
-        "Sam Bankman-Fried receives a presidential pardon on some date on or before \
-         2025-12-31."
+        "Sam Bankman-Fried receives a presidential pardon on or before 2025-12-31."
     }
   ; { short = "More than five participants play chess on a random November date"
     ; precise =
@@ -41,7 +40,7 @@ let all =
     }
   ; { short = "There is an unplanned market closure"
     ; precise =
-        "A National Market System stock exchange (e.g. NYSE or Nasdaq) is closed for an \
+        "A National Market System stock exchange (e.g., NYSE or Nasdaq) is closed for an \
          unscheduled full-day trading halt on or before 2025-12-31, due to an \
          extraordinary event (e.g., natural disaster or death of a political figure)."
     }
@@ -52,7 +51,7 @@ let all =
     }
   ; { short = "Life is discovered beyond Earth"
     ; precise =
-        "A credible space agency (e.g. NASA, ESA) confirms the discovery of life beyond \
+        "A credible space agency (e.g., NASA, ESA) confirms the discovery of life beyond \
          Earth on or before 2025-12-31, as reported by a consensus of scientific or \
          governmental sources."
     }
@@ -68,6 +67,10 @@ let all =
          project on or before 2025-12-31, confirmed via official statements or major \
          news outlets."
     }
+  ; { short = "Faker wins 2025 League of Legends World Championship"
+    ; precise =
+        "Lee \"Faker\" Sang-hyeok wins the 2025 League of Legends World Championship."
+    }
   ; { short = "California experiences a large earthquake"
     ; precise =
         "An earthquake with magnitude 7.0 or greater and an epicenter within California \
@@ -76,13 +79,8 @@ let all =
     }
   ; { short = "Our most listened-to artist is a solo female artist"
     ; precise =
-        "Across all participants’ 2025 Spotify Wrapped Top Artists lists, the artist \
-         with the highest total number of appearances is a solo female artist."
-    }
-  ; { short = "New York City has a white Christmas"
-    ; precise =
-        "At least one inch of snow is on the ground in Central Park on December 25, as \
-         measured by the National Weather Service."
+        "The artist with the most appearances across all participants' 2025 Spotify \
+         Wrapped Top Artists lists is a solo female artist."
     }
   ; { short = "Jerome Powell remains Chair of the Federal Reserve"
     ; precise =
@@ -100,8 +98,22 @@ let all =
     }
   ; { short = "More than three participants change employment status"
     ; precise =
-        "More than three participants hold different employment statuses on December 31 \
-         compared to September 1."
+        "More than three participants hold different employment statuses on September 1 \
+         compared to December 31. A change in employment status includes switching \
+         employers, becoming unemployed, or gaining employment."
+    }
+  ; { short =
+        "The winner of the 2025 Breeders' Cup Classic has previously won a Breeders' Cup \
+         race"
+    ; precise =
+        "The winner of the 2025 Breeders' Cup Classic is a horse that has previously won \
+         any Breeders' Cup race in an earlier year, as confirmed by the official race \
+         results published by the Breeders’ Cup or other recognized racing authority."
+    }
+  ; { short = "New York City has a white Christmas"
+    ; precise =
+        "At least one inch of snow is on the ground in Central Park on December 25, as \
+         measured by the National Weather Service."
     }
   ]
 ;;
