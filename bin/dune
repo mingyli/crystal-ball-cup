@@ -1,5 +1,5 @@
 (executable
  (name main)
- (libraries core yojson)
+ (libraries core crystal yojson)
  (preprocess
-  (pps ppx_jane ppx_deriving_yojson)))
+  (pps ppx_jane)))

@@ -1,4 +1,5 @@
 open! Core
+open Crystal
 
 let markdown_command =
   Command.basic ~summary:"Print events in markdown format"
