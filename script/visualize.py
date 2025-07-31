@@ -28,6 +28,7 @@ fig = go.Figure()
 
 # Get unique questions for y-axis setup
 questions = sorted(df_long["Question"].unique())
+respondents = df_long["Username"].unique()
 
 # --- Add the Violin Traces (Density Plots) ---
 for q in questions:
@@ -45,9 +46,25 @@ for q in questions:
         hoverinfo='none' # Hide hover info for the violins
     ))
 
-# --- Add Scatter Traces for Each Respondent (Initially Hidden) ---
-respondents = df_long["Username"].unique()
+# --- Add Background Scatter Traces (Always Visible, Transparent) ---
+# These are all responses, always visible
+fig.add_trace(go.Scatter(
+    x=df_long['Response'],
+    y=df_long['Question'],
+    mode='markers',
+    name='All Responses',
+    marker=dict(color='red', size=6, symbol='circle', opacity=0.4),
+    visible=True,
+    hovertemplate=
+    '<b>Respondent</b>: %{customdata}<br>' +
+    '<b>Question</b>: %{y}<br>' +
+    '<b>Response</b>: %{x:.2f}' +
+    '<extra></extra>',
+    customdata=df_long['Username']
+))
 
+# --- Add Highlight Scatter Traces for Each Respondent (Controlled by Dropdown) ---
+# These are initially hidden and become visible when selected
 for respondent in respondents:
     respondent_df = df_long[df_long["Username"] == respondent]
     fig.add_trace(go.Scatter(
@@ -55,7 +72,7 @@ for respondent in respondents:
         y=respondent_df['Question'],
         mode='markers',
         name=respondent,
-        marker=dict(color='red', size=8, symbol='circle'),
+        marker=dict(color='green', size=8, symbol='circle', opacity=1.0), # Distinct color, full opacity
         visible=False, # Hide by default
         hovertemplate=
         '<b>Respondent</b>: %{customdata}<br>' +
@@ -66,13 +83,34 @@ for respondent in respondents:
     ))
 
 # --- Create the Dropdown Menu ---
-buttons = [dict(label="None",
-                method="restyle",
-                args=["visible", [True] * len(questions) + [False] * len(respondents)])]
+# Calculate trace indices:
+# Violins: 0 to len(questions) - 1
+# Background Scatter: len(questions)
+# Highlight Scatters: len(questions) + 1 to len(questions) + len(respondents)
+
+num_violin_traces = len(questions)
+background_scatter_trace_idx = num_violin_traces
+first_highlight_scatter_trace_idx = num_violin_traces + 1
+
+buttons = [
+    dict(label="None",
+         method="restyle",
+         args=["visible", 
+               [True] * num_violin_traces + # Violins always visible
+               [True] + # Background scatter always visible
+               [False] * len(respondents) # All highlight scatters hidden
+              ])
+]
 
 for i, respondent in enumerate(respondents):
-    visibility_mask = [True] * len(questions) + [False] * len(respondents)
-    visibility_mask[len(questions) + i] = True
+    visibility_mask = (
+        [True] * num_violin_traces + # Violins
+        [True] + # Background scatter
+        [False] * len(respondents) # All highlight scatters initially hidden
+    )
+    
+    # Set the current respondent's highlight scatter to visible
+    visibility_mask[first_highlight_scatter_trace_idx + i] = True
     
     buttons.append(
         dict(label=respondent,
@@ -87,8 +125,23 @@ fig.update_layout(
     height=50 * len(questions) + 200,
     width=1200, # Increased width to accommodate text
     plot_bgcolor='white',
-    xaxis_title="Response",
-    xaxis=dict(range=[0, 1]),
+    xaxis=dict(
+        title="Response",
+        range=[0, 1],
+        showticklabels=True,
+        tickvals=[0, 0.2, 0.4, 0.6, 0.8, 1.0],
+        ticktext=["0", "0.2", "0.4", "0.6", "0.8", "1.0"]
+    ),
+    xaxis2=dict(
+        title="Response",
+        range=[0, 1],
+        anchor="y",
+        overlaying="x",
+        side="top",
+        showticklabels=True,
+        tickvals=[0, 0.2, 0.4, 0.6, 0.8, 1.0],
+        ticktext=["0", "0.2", "0.4", "0.6", "0.8", "1.0"]
+    ),
     yaxis=dict(
         title="", # Remove y-axis title
         tickmode='array',
@@ -114,4 +167,4 @@ fig.update_layout(
 # Save the plot as an HTML file
 fig.write_html("ridge_plot.html")
 
-print("Successfully generated interactive density plot with question descriptions to ridge_plot.html")
+print("Successfully generated interactive density plot with all responses overlaid and dropdown to ridge_plot.html")
