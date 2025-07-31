@@ -165,6 +165,6 @@ fig.update_layout(
 )
 
 # Save the plot as an HTML file
-fig.write_html("ridge_plot.html")
+fig.write_html("../docs/index.html")
 
 print("Successfully generated interactive density plot with all responses overlaid and dropdown to ridge_plot.html")
