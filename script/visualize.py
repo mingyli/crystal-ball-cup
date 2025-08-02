@@ -57,7 +57,6 @@ fig.add_trace(go.Scatter(
     visible=True,
     hovertemplate=
     '<b>Respondent</b>: %{customdata}<br>' +
-    '<b>Question</b>: %{y}<br>' +
     '<b>Response</b>: %{x:.2f}' +
     '<extra></extra>',
     customdata=df_long['Username']
@@ -76,7 +75,6 @@ for respondent in respondents:
         visible=False, # Hide by default
         hovertemplate=
         '<b>Respondent</b>: %{customdata}<br>' +
-        '<b>Question</b>: %{y}<br>' +
         '<b>Response</b>: %{x:.2f}' +
         '<extra></extra>',
         customdata=respondent_df['Username']

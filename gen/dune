@@ -25,7 +25,7 @@
 
 (rule
  (targets slides.pdf)
- (deps slides.md score.png)
+ (deps slides.md score.png form.png)
  (mode promote)
  (action
   (run pandoc -t beamer slides.md -o slides.pdf --pdf-engine=xelatex)))
