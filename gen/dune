@@ -1,11 +1,4 @@
-(rule
- (target events.json)
- (deps ../bin/main.exe)
- (mode promote)
- (action
-  (with-stdout-to
-   events.json
-   (run ../bin/main.exe json))))
+
 
 (rule
  (target events.md)

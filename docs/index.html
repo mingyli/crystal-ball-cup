@@ -28,8 +28,8 @@
 
     <script>
         Promise.all([
-            d3.json('/gen/events.json'),
-            d3.csv('/gen/responses.csv')
+            d3.json('events.json'),
+            d3.csv('responses.csv')
         ]).then(([events, responses]) => {
             const allEvents = [{ id: 'all', short: 'All' }, ...events];
 
