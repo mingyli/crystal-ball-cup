@@ -8,12 +8,13 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            font-variation-settings: 'wdth' 85;
+            font-variation-settings: 'wdth' 55;
         }
+
         main {
-          max-width: 50rem;
-          padding: 2rem;
-          margin: auto;
+            max-width: 50rem;
+            padding: 2rem;
+            margin: auto;
         }
     </style>
 </head>
@@ -23,6 +24,7 @@
         <h1>2025 Crystal Ball Cup</h1>
         <select id="question-dropdown"></select>
         <select id="email-dropdown"></select>
+        <div id="question-description" style="margin-top: 1rem; font-style: italic;"></div>
         <div id="plot"></div>
     </main>
 
@@ -112,9 +114,11 @@
 
                     if (questionId !== 'all') {
                         layout.title = event.short;
+                        d3.select('#question-description').text(event.precise);
                     } else {
                         layout.margin = { l: 20, r: 20, b: 20, t: 20 };
                         layout.height = 100;
+                        d3.select('#question-description').text('');
                     }
 
                     Plotly.newPlot(plotContainer.attr('id'), [trace1, trace2], layout);

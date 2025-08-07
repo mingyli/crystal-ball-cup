@@ -33,7 +33,7 @@ $$
 On some day early next year we will reconvene to evaluate our 2025 predictions 
 and make predictions for 2026.
 
-Rewards and punishments will be decided at a later date this year.
+Spend ten minutes discussing rewards and punishments.
 
 ## Form
 
