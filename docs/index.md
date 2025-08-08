@@ -9,6 +9,10 @@ title: 2025 Crystal Ball Cup
 <script src="https://cdn.plot.ly/plotly-3.0.3.min.js"></script>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <style>
+html {
+    background-color: #f8f9fa;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     font-variation-settings: 'wdth' 55;
@@ -50,8 +54,15 @@ select {
     padding-right: 1rem;
 }
 
+.plot-outcome {
+    width: 80px;
+    font-weight: bold;
+    text-align: right;
+    padding-right: 1rem;
+}
+
 .plot-container {
-    width: calc(100% - 150px);
+    width: calc(100% - 230px); /* 150px for label + 80px for outcome */
 }
 
 @media (max-width: 600px) {
@@ -117,9 +128,12 @@ Promise.all([
             const questionData = responses.map(r => +r[event.id]);
             const allUsernames = responses.map(r => r.Username);
 
+            const outcomeText = event.outcome[0];
+
             let plotContainer;
             if (questionId === 'all') {
                 const row = plotDiv.append('div').attr('class', 'plot-row');
+                row.append('div').attr('class', 'plot-outcome').text(outcomeText);
                 row.append('div').attr('class', 'plot-label').text(event.short);
                 plotContainer = row.append('div').attr('id', 'plot-' + event.id).attr('class', 'plot-container');
             } else {
@@ -163,9 +177,10 @@ Promise.all([
             };
 
             if (questionId !== 'all') {
-                layout.title = event.short;
-                d3.select('#question-description').text(event.precise);
-            } else {
+                        layout.title = event.short;
+                        d3.select('#question-description').text(event.precise);
+                        d3.select('#question-description').append('div').text(`${outcomeText}`).style('font-weight', 'bold');
+                    } else {
                 layout.margin = { l: 20, r: 20, b: 20, t: 20 };
                 layout.height = 100;
                 d3.select('#question-description').text('');
