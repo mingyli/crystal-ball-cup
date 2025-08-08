@@ -29,12 +29,34 @@ main {
 
 h1 {
     text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+header {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+p {
+    margin-block-start: 0.5em;
+    margin-block-end: 0.5em;
+}
+
+.dropdowns-container {
+    display: flex;
+    gap: 1rem; /* Space between dropdowns */
+    margin-bottom: 1rem;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens if needed */
+}
+
+.dropdowns-container select {
+    flex: 1; /* Distribute space equally among dropdowns */
+    min-width: 150px; /* Ensure a minimum width for readability */
 }
 
 select {
-    width: 100%;
     padding: 0.5rem;
-    margin-bottom: 1rem;
     border: 1px solid #ced4da;
     border-radius: 0.25rem;
 }
@@ -91,6 +113,18 @@ select {
     width: calc(100% - 230px); /* 150px for label + 80px for outcome */
 }
 
+.all-dropdowns-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.all-dropdowns-container select {
+    flex: 1; /* Distribute space equally */
+    min-width: 150px; /* Ensure a minimum width for readability */
+}
+
 @media (max-width: 600px) {
     .plot-row {
         flex-direction: column;
@@ -111,6 +145,10 @@ select {
 </style>
 
 <select id="question-dropdown"></select>
+<select id="plot-type-dropdown">
+    <option value="violin">Violin</option>
+    <option value="cdf">CDF</option>
+</select>
 <select id="email-dropdown"></select>
 <div id="question-description" style="margin-top: 1rem; font-style: italic;"></div>
 <div id="plot"></div>
@@ -120,8 +158,13 @@ Promise.all([
     d3.json('events.json'),
     d3.csv('responses.csv')
 ]).then(([events, responses]) => {
+    const FILL_COLOR = 'rgba(0, 128, 0, 0.1)';
+    const LINE_COLOR = 'green';
+    const HIGHLIGHT_COLOR = 'rgba(255, 0, 0, 0.85)';
+    const UNHIGHLIGHT_COLOR = 'rgba(0, 0, 255, 0.1)';
     const allEvents = [{ id: 'all', short: 'All' }, ...events];
 
+    const plotTypeDropdown = d3.select('#plot-type-dropdown');
     const questionDropdown = d3.select('#question-dropdown');
     const emailDropdown = d3.select('#email-dropdown');
 
@@ -141,10 +184,11 @@ Promise.all([
         .text(d => d);
 
     // Set initial dropdown values
+    plotTypeDropdown.property('value', 'violin');
     questionDropdown.property('value', 'all');
     emailDropdown.property('value', 'No user selected');
 
-    const plotData = (questionId, highlightedUsername) => {
+    const plotData = (questionId, highlightedUsername, plotType) => {
         const plotDiv = d3.select('#plot');
         plotDiv.html(''); // Clear previous plot(s)
 
@@ -152,7 +196,7 @@ Promise.all([
 
         questionsToPlot.forEach(event => {
             const questionData = responses.map(r => +r[event.id]);
-                                const allUsernames = responses.map(r => r['Email Address']);
+            const allUsernames = responses.map(r => r['Email Address']);
 
             const outcomeText = event.outcome[0];
             const outcomeClass = `outcome-${outcomeText.toLowerCase()}`;
@@ -168,76 +212,154 @@ Promise.all([
                 plotContainer = plotDiv.append('div').attr('id', 'plot-single');
             }
 
-            const trace1 = {
-                x: questionData,
-                type: 'violin',
-                name: ' ',
-                orientation: 'h',
-                hoverinfo: 'none',
-                box: { visible: false },
-                meanline: { visible: true },
-                side: 'positive',
-                fillcolor: 'rgba(0, 128, 0, 0.1)',
-                line: {
-                    color: 'green'
-                }
-            };
-
-            const colors = allUsernames.map(u => u === highlightedUsername ? 'rgba(255, 0, 0, 0.85)' : 'rgba(0, 0, 255, 0.1)');
-
-            const trace2 = {
-                x: questionData,
-                y: Array(questionData.length).fill(' '),
-                type: 'scatter',
-                mode: 'markers',
-                text: allUsernames,
-                hovertemplate: '%{text}<extra></extra>',
-                marker: {
-                    size: 10,
-                    color: colors
-                }
-            };
-
-            const layout = {
-                showlegend: false,
-                xaxis: { range: [0, 1], fixedrange: true },
-                yaxis: { fixedrange: true },
-            };
-
-            if (questionId !== 'all') {
-                        layout.title = event.short;
-                        d3.select('#question-description').text(event.precise);
-                        d3.select('#question-description').append('div').html(`<span class="outcome-chip">${outcomeText}</span>`).attr('class', outcomeClass).style('font-weight', 'bold');
-                    } else {
-                layout.margin = { l: 20, r: 20, b: 20, t: 20 };
-                layout.height = 100;
-                d3.select('#question-description').text('');
-            }
-
-            Plotly.newPlot(plotContainer.attr('id'), [trace1, trace2], layout, {displayModeBar: false});
-
-            document.getElementById(plotContainer.attr('id')).on('plotly_click', function (data) {
-                if (data.points.length > 0) {
-                    const point = data.points[0];
-                    if (point.curveNumber === 1) { // scatter plot trace
-                        const username = point.text;
-                        emailDropdown.property('value', username);
-                        plotData(questionDropdown.property('value'), username);
+            if (plotType === 'violin') {
+                const trace1 = {
+                    x: questionData,
+                    type: 'violin',
+                    name: ' ',
+                    orientation: 'h',
+                    hoverinfo: 'none',
+                    box: { visible: false },
+                    meanline: { visible: true },
+                    side: 'positive',
+                    fillcolor: FILL_COLOR,
+                    line: {
+                        color: LINE_COLOR
                     }
+                };
+
+                const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
+
+                const trace2 = {
+                    x: questionData,
+                    y: Array(questionData.length).fill(' '),
+                    type: 'scatter',
+                    mode: 'markers',
+                    text: allUsernames,
+                    hovertemplate: '%{text}<extra></extra>',
+                    marker: {
+                        size: 10,
+                        color: colors
+                    }
+                };
+
+                const layout = {
+                    showlegend: false,
+                    xaxis: { range: [0, 1], fixedrange: true },
+                    yaxis: { fixedrange: true },
+                };
+
+                if (questionId !== 'all') {
+                            layout.title = event.short;
+                            d3.select('#question-description').text(event.precise);
+                            d3.select('#question-description').append('div').html(`<span class="outcome-chip">${outcomeText}</span>`).attr('class', outcomeClass).style('font-weight', 'bold');
+                        } else {
+                    layout.margin = { l: 20, r: 20, b: 20, t: 20 };
+                    layout.height = 100;
+                    d3.select('#question-description').text('');
                 }
-            });
+
+                Plotly.newPlot(plotContainer.attr('id'), [trace1, trace2], layout, {displayModeBar: false});
+
+                document.getElementById(plotContainer.attr('id')).on('plotly_click', function (data) {
+                    if (data.points.length > 0) {
+                        const point = data.points[0];
+                        if (point.curveNumber === 1) { // scatter plot trace
+                            const username = point.text;
+                            emailDropdown.property('value', username);
+                            plotData(questionDropdown.property('value'), username, plotTypeDropdown.property('value'));
+                        }
+                    }
+                });
+            } else { // CDF
+                const n = questionData.length;
+                const sortedData = [...questionData].sort(d3.ascending);
+
+                const cdfX = [0, ...sortedData, 1];
+                const cdfY = [0, ...sortedData.map((d, i) => (i + 1) / n), 1];
+
+                const cdfTrace = {
+                    x: cdfX,
+                    y: cdfY,
+                    mode: 'lines',
+                    type: 'scatter',
+                    name: 'CDF',
+                    hoverinfo: 'none',
+                    line: { color: LINE_COLOR },
+                    fill: 'tozeroy',
+                    fillcolor: FILL_COLOR
+                };
+
+                const freqMap = d3.rollup(questionData, v => v.length, d => d);
+                const uniqueSorted = Array.from(freqMap.keys()).sort(d3.ascending);
+                const cdfMap = new Map();
+                let cumulative = 0;
+                for (const val of uniqueSorted) {
+                    cumulative += freqMap.get(val);
+                    cdfMap.set(val, cumulative / n);
+                }
+                const userPointsY = questionData.map(p => cdfMap.get(p));
+
+                const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
+
+                const scatterTrace = {
+                    x: questionData,
+                    y: userPointsY,
+                    mode: 'markers',
+                    type: 'scatter',
+                    text: allUsernames,
+                    hovertemplate: '%{text}<extra></extra>',
+                    marker: {
+                        size: 10,
+                        color: colors
+                    }
+                };
+
+                const layout = {
+                    showlegend: false,
+                    xaxis: { range: [0, 1], fixedrange: true },
+                    yaxis: { range: [0, 1.1], fixedrange: true },
+                };
+
+                if (questionId !== 'all') {
+                    layout.title = event.short;
+                    d3.select('#question-description').text(event.precise);
+                    d3.select('#question-description').append('div').html(`<span class="outcome-chip">${outcomeText}</span>`).attr('class', outcomeClass).style('font-weight', 'bold');
+                } else {
+                    layout.margin = { l: 20, r: 20, b: 20, t: 20 };
+                    layout.height = 100;
+                    d3.select('#question-description').text('');
+                }
+
+                Plotly.newPlot(plotContainer.attr('id'), [cdfTrace, scatterTrace], layout, {displayModeBar: false});
+
+                document.getElementById(plotContainer.attr('id')).on('plotly_click', function (data) {
+                    if (data.points.length > 0) {
+                        const point = data.points[0];
+                        if (point.curveNumber === 1) { // scatter plot trace
+                            const username = point.text;
+                            emailDropdown.property('value', username);
+                            plotData(questionDropdown.property('value'), username, plotTypeDropdown.property('value'));
+                        }
+                    }
+                });
+            }
         });
     };
 
+    plotTypeDropdown.on('change', function () {
+        plotData(questionDropdown.property('value'), emailDropdown.property('value'), this.value);
+    });
+
     questionDropdown.on('change', function () {
-        plotData(this.value, emailDropdown.property('value'));
+        plotData(this.value, emailDropdown.property('value'), plotTypeDropdown.property('value'));
     });
 
     emailDropdown.on('change', function () {
-        plotData(questionDropdown.property('value'), this.value);
+        plotData(questionDropdown.property('value'), this.value, plotTypeDropdown.property('value'));
     });
 
     // Initial plot
-    plotData(questionDropdown.property('value'), emailDropdown.property('value'));
+    plotData(questionDropdown.property('value'), emailDropdown.property('value'), plotTypeDropdown.property('value'));
 });
 </script>
