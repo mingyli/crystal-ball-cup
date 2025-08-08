@@ -146,7 +146,7 @@
                         }
                     };
 
-                    const colors = allUsernames.map(u => u === highlightedUsername ? 'rgba(255, 0, 0, 0.7)' : 'rgba(0, 0, 255, 0.3)');
+                    const colors = allUsernames.map(u => u === highlightedUsername ? 'rgba(255, 0, 0, 0.85)' : 'rgba(0, 0, 255, 0.3)');
 
                     const trace2 = {
                         x: questionData,
@@ -175,7 +175,7 @@
                         d3.select('#question-description').text('');
                     }
 
-                    Plotly.newPlot(plotContainer.attr('id'), [trace1, trace2], layout);
+                    Plotly.newPlot(plotContainer.attr('id'), [trace1, trace2], layout, { displayModeBar: false });
 
                     document.getElementById(plotContainer.attr('id')).on('plotly_click', function (data) {
                         if (data.points.length > 0) {
