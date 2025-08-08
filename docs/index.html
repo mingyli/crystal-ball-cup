@@ -372,7 +372,8 @@ Promise.all([
 
             const layout = {
                 showlegend: false,
-                xaxis: { range: [0, 1] },
+                xaxis: { range: [0, 1], fixedrange: true },
+                yaxis: { fixedrange: true },
             };
 
             if (questionId !== 'all') {
