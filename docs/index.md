@@ -132,7 +132,7 @@ Promise.all([
         .attr('value', d => d.id)
         .text(d => d.short);
 
-    const usernames = ['No user selected', ...responses.map(r => r.Username)];
+    const usernames = ['No user selected', ...responses.map(r => r['Email Address'])];
     emailDropdown.selectAll('option')
         .data(usernames)
         .enter()
@@ -152,7 +152,7 @@ Promise.all([
 
         questionsToPlot.forEach(event => {
             const questionData = responses.map(r => +r[event.id]);
-            const allUsernames = responses.map(r => r.Username);
+                                const allUsernames = responses.map(r => r['Email Address']);
 
             const outcomeText = event.outcome[0];
             const outcomeClass = `outcome-${outcomeText.toLowerCase()}`;
