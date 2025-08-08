@@ -3,18 +3,72 @@
 
 <head>
     <title>2025 Crystal Ball Cup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="https://cdn.plot.ly/plotly-3.0.3.min.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
             font-variation-settings: 'wdth' 55;
+            background-color: #f8f9fa;
+            color: #212529;
         }
 
         main {
             max-width: 50rem;
-            padding: 2rem;
+            padding: 1rem;
             margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+        }
+
+        #plot {
+            width: 100%;
+        }
+
+        .plot-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .plot-label {
+            width: 150px;
+            padding-right: 1rem;
+        }
+
+        .plot-container {
+            width: calc(100% - 150px);
+        }
+
+        @media (max-width: 600px) {
+            .plot-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .plot-label {
+                width: 100%;
+                padding-right: 0;
+                margin-bottom: 0.5rem;
+                font-weight: bold;
+            }
+
+            .plot-container {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -45,7 +99,7 @@
                 .attr('value', d => d.id)
                 .text(d => d.short);
 
-            const usernames = ['All', ...responses.map(r => r.Username)];
+            const usernames = ['No user selected', ...responses.map(r => r.Username)];
             emailDropdown.selectAll('option')
                 .data(usernames)
                 .enter()
@@ -55,7 +109,7 @@
 
             // Set initial dropdown values
             questionDropdown.property('value', 1);
-            emailDropdown.property('value', 'All');
+            emailDropdown.property('value', 'No user selected');
 
             const plotData = (questionId, highlightedUsername) => {
                 const plotDiv = d3.select('#plot');
@@ -69,9 +123,9 @@
 
                     let plotContainer;
                     if (questionId === 'all') {
-                        const row = plotDiv.append('div').style('display', 'flex').style('align-items', 'center');
-                        row.append('div').style('width', '300px').text(event.short);
-                        plotContainer = row.append('div').attr('id', 'plot-' + event.id).style('width', 'calc(100% - 300px)');
+                        const row = plotDiv.append('div').attr('class', 'plot-row');
+                        row.append('div').attr('class', 'plot-label').text(event.short);
+                        plotContainer = row.append('div').attr('id', 'plot-' + event.id).attr('class', 'plot-container');
                     } else {
                         // For a single plot, we can just use the main plot div.
                         plotContainer = plotDiv.append('div').attr('id', 'plot-single');
