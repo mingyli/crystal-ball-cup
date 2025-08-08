@@ -57,8 +57,34 @@ select {
 .plot-outcome {
     width: 80px;
     font-weight: bold;
-    text-align: right;
+    text-align: center;
     padding-right: 1rem;
+}
+
+.outcome-chip {
+    display: inline-block;
+    padding: 0.2em 0.6em;
+    border-radius: 1em;
+    font-size: 0.8em;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+.outcome-pending .outcome-chip {
+    background-color: rgba(128, 128, 128, 0.2);
+    color: rgba(128, 128, 128, 0.8);
+}
+
+.outcome-yes .outcome-chip {
+    background-color: rgba(0, 128, 0, 0.2);
+    color: green;
+}
+
+.outcome-no .outcome-chip {
+    background-color: rgba(255, 0, 0, 0.2);
+    color: red;
 }
 
 .plot-container {
@@ -129,11 +155,12 @@ Promise.all([
             const allUsernames = responses.map(r => r.Username);
 
             const outcomeText = event.outcome[0];
+            const outcomeClass = `outcome-${outcomeText.toLowerCase()}`;
 
             let plotContainer;
             if (questionId === 'all') {
                 const row = plotDiv.append('div').attr('class', 'plot-row');
-                row.append('div').attr('class', 'plot-outcome').text(outcomeText);
+                row.append('div').attr('class', `plot-outcome ${outcomeClass}`).html(`<span class="outcome-chip">${outcomeText}</span>`);
                 row.append('div').attr('class', 'plot-label').text(event.short);
                 plotContainer = row.append('div').attr('id', 'plot-' + event.id).attr('class', 'plot-container');
             } else {
@@ -179,7 +206,7 @@ Promise.all([
             if (questionId !== 'all') {
                         layout.title = event.short;
                         d3.select('#question-description').text(event.precise);
-                        d3.select('#question-description').append('div').text(`${outcomeText}`).style('font-weight', 'bold');
+                        d3.select('#question-description').append('div').html(`<span class="outcome-chip">${outcomeText}</span>`).attr('class', outcomeClass).style('font-weight', 'bold');
                     } else {
                 layout.margin = { l: 20, r: 20, b: 20, t: 20 };
                 layout.height = 100;
