@@ -54,7 +54,8 @@ let all =
       ; precise =
           "On a randomly selected date in November 2025, more than five participants \
            confirm via group poll that they played at least one complete game of chess \
-           on that date."
+           on that date. Participants are those who attended the live event on \
+           2025-08-09."
       ; outcome = Pending
       }
     ; { short = "There is an unplanned market closure"
@@ -106,7 +107,8 @@ let all =
     ; { short = "Our most listened-to artist is a solo female artist"
       ; precise =
           "The artist with the most appearances across all participants' 2025 Spotify \
-           Wrapped Top Artists lists is a solo female artist."
+           Wrapped Top Artists lists is a solo female artist. Participants are those who \
+           attended the live event on 2025-08-09."
       ; outcome = Pending
       }
     ; { short = "Jerome Powell remains Chair of the Federal Reserve"
@@ -130,7 +132,8 @@ let all =
       ; precise =
           "More than three participants hold different employment statuses on September \
            1 compared to December 31. A change in employment status includes switching \
-           employers, becoming unemployed, or gaining employment."
+           employers, becoming unemployed, or gaining employment. Participants are those \
+           who attended the live event on 2025-08-09."
       ; outcome = Pending
       }
     ; { short =
@@ -186,8 +189,8 @@ let%expect_test _ =
     │    │ f Q4 2025 is based on an origina │  2025 (October through December), ac │         │
     │    │ l screenplay                     │ cording to Box Office Mojo, is based │         │
     │    │                                  │  on an original screenplay—meaning │         │
-    │    │                                  │  not adapted from existing material� │         │
-    │    │                                  │ ��as determined by Oscar eligibility │         │
+    │    │                                  │  not adapted from existing material� │         │
+    │    │                                  │ ��as determined by Oscar eligibility │         │
     │    │                                  │  or expert consensus (e.g., Writer's │         │
     │    │                                  │  Branch of the Academy of Motion Pic │         │
     │    │                                  │ ture Arts and Sciences).             │         │

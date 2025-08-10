@@ -178,9 +178,9 @@ Promise.all([
         .attr('value', d => d.id)
         .text(d => d.short);
 
-    const usernames = ['No user selected', ...responses.map(r => r['Email Address'])];
+    const usernames = responses.map(r => r['Email Address']).sort();
     emailDropdown.selectAll('option')
-        .data(usernames)
+        .data(['No user selected', ...usernames])
         .enter()
         .append('option')
         .attr('value', d => d)

@@ -32,7 +32,7 @@
   {
     "id": 6,
     "short": "More than five participants play chess on a random November date",
-    "precise": "On a randomly selected date in November 2025, more than five participants confirm via group poll that they played at least one complete game of chess on that date.",
+    "precise": "On a randomly selected date in November 2025, more than five participants confirm via group poll that they played at least one complete game of chess on that date. Participants are those who attended the live event on 2025-08-09.",
     "outcome": [ "Pending" ]
   },
   {
@@ -80,7 +80,7 @@
   {
     "id": 14,
     "short": "Our most listened-to artist is a solo female artist",
-    "precise": "The artist with the most appearances across all participants' 2025 Spotify Wrapped Top Artists lists is a solo female artist.",
+    "precise": "The artist with the most appearances across all participants' 2025 Spotify Wrapped Top Artists lists is a solo female artist. Participants are those who attended the live event on 2025-08-09.",
     "outcome": [ "Pending" ]
   },
   {
@@ -104,7 +104,7 @@
   {
     "id": 18,
     "short": "More than three participants change employment status",
-    "precise": "More than three participants hold different employment statuses on September 1 compared to December 31. A change in employment status includes switching employers, becoming unemployed, or gaining employment.",
+    "precise": "More than three participants hold different employment statuses on September 1 compared to December 31. A change in employment status includes switching employers, becoming unemployed, or gaining employment. Participants are those who attended the live event on 2025-08-09.",
     "outcome": [ "Pending" ]
   },
   {
