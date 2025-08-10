@@ -5,3 +5,5 @@ type t =
   | Yes
   | No
 [@@deriving sexp, yojson]
+
+val to_string : t -> string

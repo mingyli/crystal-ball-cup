@@ -5,3 +5,9 @@ type t =
   | Yes
   | No
 [@@deriving sexp, yojson]
+
+let to_string = function
+  | Pending -> "Pending"
+  | Yes -> "Yes"
+  | No -> "No"
+;;
