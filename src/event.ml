@@ -8,6 +8,8 @@ type t =
   }
 [@@deriving fields, sexp, yojson]
 
+let score t ~probability = Outcome.score t.outcome ~probability
+
 type unidentified_event =
   { short : string
   ; precise : string

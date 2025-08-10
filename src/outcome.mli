@@ -7,3 +7,4 @@ type t =
 [@@deriving sexp, yojson]
 
 val to_string : t -> string
+val score : t -> probability:float -> float

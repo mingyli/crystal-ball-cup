@@ -1,5 +1,3 @@
-
-
 (rule
  (target events.md)
  (deps ../bin/main.exe)

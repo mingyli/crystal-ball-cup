@@ -123,6 +123,7 @@ select {
 .all-dropdowns-container select {
     flex: 1; /* Distribute space equally */
     min-width: 150px; /* Ensure a minimum width for readability */
+    max-width: 300px;
 }
 
 @media (max-width: 600px) {
@@ -144,12 +145,14 @@ select {
 }
 </style>
 
+<div class="all-dropdowns-container">
 <select id="question-dropdown"></select>
 <select id="plot-type-dropdown">
     <option value="violin">Violin</option>
     <option value="cdf">CDF</option>
 </select>
 <select id="email-dropdown"></select>
+</div>
 <div id="question-description" style="margin-top: 1rem; font-style: italic;"></div>
 <div id="plot"></div>
 
@@ -362,4 +365,126 @@ Promise.all([
     // Initial plot
     plotData(questionDropdown.property('value'), emailDropdown.property('value'), plotTypeDropdown.property('value'));
 });
+</script>
+
+## Standings
+
+<div id="standings-table-container"></div>
+
+<script>
+  // Define standings outside to be accessible for sorting
+  let standings = [];
+  let sortColumn = 'meanScore'; // Default sort column
+  let sortDirection = 'desc'; // Default sort direction
+
+  function renderTable() {
+    const tableContainer = document.getElementById('standings-table-container');
+    tableContainer.innerHTML = ''; // Clear previous table
+
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+
+    const thead = table.createTHead();
+    const headerRow = thead.insertRow();
+
+    const userHeader = headerRow.insertCell();
+    userHeader.textContent = 'User';
+    userHeader.style.border = '1px solid #ddd';
+    userHeader.style.padding = '8px';
+    userHeader.style.textAlign = 'left';
+    userHeader.style.cursor = 'pointer'; // Make it clickable
+    userHeader.onclick = () => sortTable('user');
+
+    const scoreHeader = headerRow.insertCell();
+    scoreHeader.textContent = 'Mean Score';
+    scoreHeader.style.border = '1px solid #ddd';
+    scoreHeader.style.padding = '8px';
+    scoreHeader.style.textAlign = 'left';
+    scoreHeader.style.cursor = 'pointer'; // Make it clickable
+    scoreHeader.onclick = () => sortTable('meanScore');
+
+    // Add sort indicator
+    if (sortColumn === 'user') {
+      userHeader.textContent += (sortDirection === 'asc' ? ' ▲' : ' ▼');
+    } else if (sortColumn === 'meanScore') {
+      scoreHeader.textContent += (sortDirection === 'asc' ? ' ▲' : ' ▼');
+    }
+
+    const tbody = table.createTBody();
+    standings.forEach(item => {
+      const row = tbody.insertRow();
+      const userCell = row.insertCell();
+      userCell.textContent = item.user;
+      userCell.style.border = '1px solid #ddd';
+      userCell.style.padding = '8px';
+      const scoreCell = row.insertCell();
+      scoreCell.textContent = isNaN(item.meanScore) ? 'NaN' : item.meanScore.toFixed(3);
+      scoreCell.style.border = '1px solid #ddd';
+      scoreCell.style.padding = '8px';
+    });
+
+    tableContainer.appendChild(table);
+  }
+
+  function sortTable(column) {
+    if (sortColumn === column) {
+      sortDirection = (sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      sortColumn = column;
+      sortDirection = 'asc'; // Default to ascending for new column
+    }
+
+    standings.sort((a, b) => {
+      let valA = a[column];
+      let valB = b[column];
+
+      // Handle NaN for sorting meanScore
+      if (column === 'meanScore') {
+        if (isNaN(valA) && isNaN(valB)) return 0;
+        if (isNaN(valA)) return sortDirection === 'asc' ? 1 : -1; // NaN to the end
+        if (isNaN(valB)) return sortDirection === 'asc' ? -1 : 1; // NaN to the end
+      }
+
+      if (valA < valB) {
+        return sortDirection === 'asc' ? -1 : 1;
+      }
+      if (valA > valB) {
+        return sortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+
+    renderTable(); // Re-render the table with sorted data
+  }
+
+  fetch('scores.json')
+    .then(response => response.text())
+    .then(text => {
+      const scores = JSON.parse(text.replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"').replace(/Infinity/g, '"__INFINITY__"').replace(/NaN/g, '"__NAN__"'), function(key, value) {
+        if (typeof value === 'string') {
+          if (value === '__INFINITY__') return Infinity;
+          if (value === '__NEGATIVE_INFINITY__') return -Infinity;
+          if (value === '__NAN__') return NaN;
+        }
+        return value;
+      });
+      for (const user in scores) {
+        let totalScore = 0;
+        let eventCount = 0;
+        for (const eventId in scores[user]) {
+          // Convert null back to NaN for calculations if needed, or handle null directly
+          const score = scores[user][eventId] === null ? NaN : scores[user][eventId];
+          totalScore += score;
+          eventCount++;
+        }
+        const meanScore = eventCount > 0 ? totalScore / eventCount : NaN; // Use NaN for 0 events
+        standings.push({ user: user, meanScore: meanScore });
+      }
+
+      // Initial sort (highest mean score first)
+      standings.sort((a, b) => b.meanScore - a.meanScore);
+      renderTable(); // Initial render
+    })
+    .catch(error => console.error('Error fetching scores:', error));
 </script>

@@ -9,7 +9,16 @@
 
 (rule
  (target index.html)
- (deps index.md responses.csv events.json)
+ (deps index.md)
  (mode promote)
  (action
   (run pandoc -s -t html5 index.md -o index.html)))
+
+(rule
+ (target scores.json)
+ (deps ../bin/main.exe responses.csv)
+ (mode promote)
+ (action
+  (with-stdout-to
+   scores.json
+   (run ../bin/main.exe scores -responses responses.csv))))
