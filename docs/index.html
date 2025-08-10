@@ -639,15 +639,16 @@ Promise.all([
         return value;
       });
       for (const user in scores) {
-        let totalScore = 0;
-        let eventCount = 0;
+        let totalSumOfValidScores = 0;
+        let countOfValidScores = 0;
         for (const eventId in scores[user]) {
-          // Convert null back to NaN for calculations if needed, or handle null directly
-          const score = scores[user][eventId] === null ? NaN : scores[user][eventId];
-          totalScore += score;
-          eventCount++;
+          const score = scores[user][eventId];
+          if (!isNaN(score)) {
+            totalSumOfValidScores += score;
+            countOfValidScores++;
+          }
         }
-        const meanScore = eventCount > 0 ? totalScore / eventCount : NaN; // Use NaN for 0 events
+        const meanScore = countOfValidScores > 0 ? totalSumOfValidScores / countOfValidScores : NaN; // Use NaN for 0 events
         standings.push({ user: user, meanScore: meanScore });
       }
 
