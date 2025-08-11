@@ -2,6 +2,8 @@
 title: 2025 Crystal Ball Cup
 ---
 
+<center>[Jump to Standings](#standings)</center>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -159,13 +161,24 @@ select {
 <script>
 Promise.all([
     d3.json('events.json'),
-    d3.csv('responses.csv')
-]).then(([events, responses]) => {
+    d3.csv('responses.csv'),
+    d3.text('scores.json') // Fetch scores.json here
+]).then(([events, responses, scoresText]) => { // Add scoresText to the destructuring
     const FILL_COLOR = 'rgba(0, 128, 0, 0.1)';
     const LINE_COLOR = 'green';
     const HIGHLIGHT_COLOR = 'rgba(255, 0, 0, 0.85)';
     const UNHIGHLIGHT_COLOR = 'rgba(0, 0, 255, 0.1)';
     const allEvents = [{ id: 'all', short: 'All' }, ...events];
+
+    // Parse scores.json once
+    const scores = JSON.parse(scoresText.replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"').replace(/Infinity/g, '"__INFINITY__"').replace(/NaN/g, '"__NAN__"'), function(key, value) {
+        if (typeof value === 'string') {
+            if (value === '__INFINITY__') return Infinity;
+            if (value === '__NEGATIVE_INFINITY__') return -Infinity;
+            if (value === '__NAN__') return NaN;
+        }
+        return value;
+    });
 
     const plotTypeDropdown = d3.select('#plot-type-dropdown');
     const questionDropdown = d3.select('#question-dropdown');
@@ -355,15 +368,18 @@ Promise.all([
     });
 
     questionDropdown.on('change', function () {
-        plotData(this.value, emailDropdown.property('value'), plotTypeDropdown.property('value'));
+        const selectedQuestionId = this.value;
+        plotData(selectedQuestionId, emailDropdown.property('value'), plotTypeDropdown.property('value'));
+        updateStandingsTable(events, responses, scores, selectedQuestionId); // Call updateStandingsTable
     });
 
     emailDropdown.on('change', function () {
         plotData(questionDropdown.property('value'), this.value, plotTypeDropdown.property('value'));
     });
 
-    // Initial plot
+    // Initial plot and standings table update
     plotData(questionDropdown.property('value'), emailDropdown.property('value'), plotTypeDropdown.property('value'));
+    updateStandingsTable(events, responses, scores, questionDropdown.property('value')); // Initial call for standings
 });
 </script>
 
@@ -374,10 +390,10 @@ Promise.all([
 <script>
   // Define standings outside to be accessible for sorting
   let standings = [];
-  let sortColumn = 'meanScore'; // Default sort column
+  let sortColumn = 'meanTotalScore'; // Default sort column
   let sortDirection = 'desc'; // Default sort direction
 
-  function renderTable() {
+  function renderTable(questionId) {
     const tableContainer = document.getElementById('standings-table-container');
     tableContainer.innerHTML = ''; // Clear previous table
 
@@ -396,19 +412,35 @@ Promise.all([
     userHeader.style.cursor = 'pointer'; // Make it clickable
     userHeader.onclick = () => sortTable('user');
 
-    const scoreHeader = headerRow.insertCell();
-    scoreHeader.textContent = 'Mean Score';
-    scoreHeader.style.border = '1px solid #ddd';
-    scoreHeader.style.padding = '8px';
-    scoreHeader.style.textAlign = 'left';
-    scoreHeader.style.cursor = 'pointer'; // Make it clickable
-    scoreHeader.onclick = () => sortTable('meanScore');
+    const meanScoreHeader = headerRow.insertCell();
+    meanScoreHeader.textContent = 'Mean Total Score';
+    meanScoreHeader.style.border = '1px solid #ddd';
+    meanScoreHeader.style.padding = '8px';
+    meanScoreHeader.style.textAlign = 'left';
+    meanScoreHeader.style.cursor = 'pointer'; // Make it clickable
+    meanScoreHeader.onclick = () => sortTable('meanTotalScore');
 
-    // Add sort indicator
+    // Add sort indicator for meanScore
     if (sortColumn === 'user') {
       userHeader.textContent += (sortDirection === 'asc' ? ' ▲' : ' ▼');
-    } else if (sortColumn === 'meanScore') {
-      scoreHeader.textContent += (sortDirection === 'asc' ? ' ▲' : ' ▼');
+    } else if (sortColumn === 'meanTotalScore') {
+      meanScoreHeader.textContent += (sortDirection === 'asc' ? ' ▲' : ' ▼');
+    }
+
+    // Conditionally add specific question score column
+    if (questionId !== 'all') {
+      const questionScoreHeader = headerRow.insertCell();
+      questionScoreHeader.textContent = 'Question Score';
+      questionScoreHeader.style.border = '1px solid #ddd';
+      questionScoreHeader.style.padding = '8px';
+      questionScoreHeader.style.textAlign = 'left';
+      questionScoreHeader.style.cursor = 'pointer'; // Make it clickable
+      questionScoreHeader.onclick = () => sortTable('questionScore');
+
+      // Add sort indicator for questionScore
+      if (sortColumn === 'questionScore') {
+        questionScoreHeader.textContent += (sortDirection === 'asc' ? ' ▲' : ' ▼');
+      }
     }
 
     const tbody = table.createTBody();
@@ -418,10 +450,18 @@ Promise.all([
       userCell.textContent = item.user;
       userCell.style.border = '1px solid #ddd';
       userCell.style.padding = '8px';
-      const scoreCell = row.insertCell();
-      scoreCell.textContent = isNaN(item.meanScore) ? 'NaN' : item.meanScore.toFixed(3);
-      scoreCell.style.border = '1px solid #ddd';
-      scoreCell.style.padding = '8px';
+
+      const meanScoreCell = row.insertCell();
+      meanScoreCell.textContent = isNaN(item.meanTotalScore) ? 'NaN' : item.meanTotalScore.toFixed(3);
+      meanScoreCell.style.border = '1px solid #ddd';
+      meanScoreCell.style.padding = '8px';
+
+      if (questionId !== 'all') {
+        const questionScoreCell = row.insertCell();
+        questionScoreCell.textContent = isNaN(item.questionScore) ? 'NaN' : item.questionScore.toFixed(3);
+        questionScoreCell.style.border = '1px solid #ddd';
+        questionScoreCell.style.padding = '8px';
+      }
     });
 
     tableContainer.appendChild(table);
@@ -432,15 +472,15 @@ Promise.all([
       sortDirection = (sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
       sortColumn = column;
-      sortDirection = 'asc'; // Default to ascending for new column
+      sortDirection = 'desc'; // Default to descending for new column, as scores are better when higher
     }
 
     standings.sort((a, b) => {
       let valA = a[column];
       let valB = b[column];
 
-      // Handle NaN for sorting meanScore
-      if (column === 'meanScore') {
+      // Handle NaN for sorting scores
+      if (column === 'meanTotalScore' || column === 'questionScore') {
         if (isNaN(valA) && isNaN(valB)) return 0;
         if (isNaN(valA)) return sortDirection === 'asc' ? 1 : -1; // NaN to the end
         if (isNaN(valB)) return sortDirection === 'asc' ? -1 : 1; // NaN to the end
@@ -455,37 +495,40 @@ Promise.all([
       return 0;
     });
 
-    renderTable(); // Re-render the table with sorted data
+    renderTable(d3.select('#question-dropdown').property('value')); // Re-render the table with sorted data
   }
 
-  fetch('scores.json')
-    .then(response => response.text())
-    .then(text => {
-      const scores = JSON.parse(text.replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"').replace(/Infinity/g, '"__INFINITY__"').replace(/NaN/g, '"__NAN__"'), function(key, value) {
-        if (typeof value === 'string') {
-          if (value === '__INFINITY__') return Infinity;
-          if (value === '__NEGATIVE_INFINITY__') return -Infinity;
-          if (value === '__NAN__') return NaN;
+  // This function will be called from the first script block
+  function updateStandingsTable(events, responses, scores, questionId) {
+    standings = []; // Clear previous standings
+
+    for (const userResponse of responses) {
+      const user = userResponse['Email Address'];
+      let totalSumOfValidScores = 0;
+      let countOfValidScores = 0;
+      let questionScoreValue = NaN;
+
+      // Always calculate mean score
+      events.forEach(event => {
+        const eventId = event.id;
+        const score = scores[user] ? scores[user][eventId] : NaN;
+        if (!isNaN(score)) {
+          totalSumOfValidScores += score;
+          countOfValidScores++;
         }
-        return value;
       });
-      for (const user in scores) {
-        let totalSumOfValidScores = 0;
-        let countOfValidScores = 0;
-        for (const eventId in scores[user]) {
-          const score = scores[user][eventId];
-          if (!isNaN(score)) {
-            totalSumOfValidScores += score;
-            countOfValidScores++;
-          }
-        }
-        const meanScore = countOfValidScores > 0 ? totalSumOfValidScores / countOfValidScores : NaN; // Use NaN for 0 events
-        standings.push({ user: user, meanScore: meanScore });
+      const meanScoreValue = countOfValidScores > 0 ? totalSumOfValidScores / countOfValidScores : NaN;
+
+      // Calculate specific question score if applicable
+      if (questionId !== 'all') {
+        questionScoreValue = scores[user] ? scores[user][questionId] : NaN;
       }
 
-      // Initial sort (highest mean score first)
-      standings.sort((a, b) => b.meanScore - a.meanScore);
-      renderTable(); // Initial render
-    })
-    .catch(error => console.error('Error fetching scores:', error));
+      standings.push({ user: user, meanTotalScore: meanScoreValue, questionScore: questionScoreValue });
+    }
+
+    // Initial sort (highest mean score first)
+    standings.sort((a, b) => b.meanTotalScore - a.meanTotalScore);
+    renderTable(questionId); // Initial render
+  }
 </script>
