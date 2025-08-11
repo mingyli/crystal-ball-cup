@@ -82,7 +82,8 @@ Promise.all([
                     fillcolor: FILL_COLOR,
                     line: {
                         color: LINE_COLOR
-                    }
+                    },
+                    points: false // Add this line to hide default outlier dots
                 };
 
                 const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
