@@ -6,7 +6,7 @@ type t =
   ; precise : string
   ; outcome : Outcome.t
   }
-[@@deriving fields, sexp, yojson]
+[@@deriving fields, sexp, yojson_of]
 
 let score t ~probability = Outcome.score t.outcome ~probability
 

@@ -25,7 +25,7 @@ let json_command =
   @@
   let%map_open.Command () = return () in
   fun () ->
-    let yojson = `List (List.map Event.all ~f:Event.to_yojson) in
+    let yojson = `List (List.map Event.all ~f:[%yojson_of: Event.t]) in
     print_endline (Yojson.Safe.pretty_to_string yojson)
 ;;
 
@@ -49,15 +49,12 @@ let scores_command =
           | Some scores_map -> Map.add_exn scores_map ~key:event_id ~data:score
           | None -> Int.Map.singleton event_id score)));
     let user_event_scores = String.Map.of_hashtbl_exn user_event_scores in
+    let all_user_scores = Scores.of_user_event_scores user_event_scores in
     let json_output =
       `Assoc
-        (Map.to_alist user_event_scores
-         |> List.map ~f:(fun (user, scores_map) ->
-           ( user
-           , `Assoc
-               (Map.to_alist scores_map ~key_order:`Increasing
-                |> List.map ~f:(fun (event_id, score) ->
-                  Int.to_string event_id, `Float score)) )))
+        (Map.to_alist all_user_scores
+         |> List.map ~f:(fun (user, scores_data) ->
+           user, [%yojson_of: Scores.t] scores_data))
     in
     print_endline (Yojson.Safe.pretty_to_string json_output)
 ;;

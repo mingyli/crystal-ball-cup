@@ -1,6 +1,6 @@
 open! Core
 
-type t [@@deriving sexp, yojson]
+type t [@@deriving sexp, yojson_of]
 
 val all : t list
 val id : t -> int

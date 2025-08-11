@@ -162,15 +162,17 @@ select {
 Promise.all([
     d3.json('events.json'),
     d3.csv('responses.csv'),
-    d3.text('scores.json') // Fetch scores.json here
-]).then(([events, responses, scoresText]) => { // Add scoresText to the destructuring
+    d3.text('scores.json') // Fetch scores.json as text
+]).then(([events, responses, scoresText]) => { // scoresText is raw text
     const FILL_COLOR = 'rgba(0, 128, 0, 0.1)';
     const LINE_COLOR = 'green';
     const HIGHLIGHT_COLOR = 'rgba(255, 0, 0, 0.85)';
     const UNHIGHLIGHT_COLOR = 'rgba(0, 0, 255, 0.1)';
     const allEvents = [{ id: 'all', short: 'All' }, ...events];
 
-    // Parse scores.json once
+    
+
+    // Parse scores.json with custom reviver
     const scores = JSON.parse(scoresText.replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"').replace(/Infinity/g, '"__INFINITY__"').replace(/NaN/g, '"__NAN__"'), function(key, value) {
         if (typeof value === 'string') {
             if (value === '__INFINITY__') return Infinity;
@@ -502,29 +504,17 @@ Promise.all([
   function updateStandingsTable(events, responses, scores, questionId) {
     standings = []; // Clear previous standings
 
-    for (const userResponse of responses) {
-      const user = userResponse['Email Address'];
-      let totalSumOfValidScores = 0;
-      let countOfValidScores = 0;
+    for (const user in scores) { // Iterate through the new scores object
+      const userData = scores[user];
+      const meanTotalScore = userData.mean_score;
+      const questionScores = userData.question_scores;
+
       let questionScoreValue = NaN;
-
-      // Always calculate mean score
-      events.forEach(event => {
-        const eventId = event.id;
-        const score = scores[user] ? scores[user][eventId] : NaN;
-        if (!isNaN(score)) {
-          totalSumOfValidScores += score;
-          countOfValidScores++;
-        }
-      });
-      const meanScoreValue = countOfValidScores > 0 ? totalSumOfValidScores / countOfValidScores : NaN;
-
-      // Calculate specific question score if applicable
       if (questionId !== 'all') {
-        questionScoreValue = scores[user] ? scores[user][questionId] : NaN;
+        questionScoreValue = questionScores[questionId];
       }
 
-      standings.push({ user: user, meanTotalScore: meanScoreValue, questionScore: questionScoreValue });
+      standings.push({ user: user, meanTotalScore: meanTotalScore, questionScore: questionScoreValue });
     }
 
     // Initial sort (highest mean score first)

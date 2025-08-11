@@ -4,7 +4,7 @@ type t =
   | Pending
   | Yes
   | No
-[@@deriving sexp, yojson]
+[@@deriving sexp, yojson_of]
 
 let to_string = function
   | Pending -> "Pending"
