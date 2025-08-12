@@ -107,6 +107,8 @@ Promise.all([
 
                 if (questionId !== 'all') {
                             layout.title = event.short;
+                            layout.margin = { l: 20, r: 20, b: 20, t: 40 };
+                            layout.height = 150;
                             d3.select('#question-description').text(event.precise);
                             d3.select('#question-description').append('div').html(`<span class="outcome-chip">${outcomeText}</span>`).attr('class', outcomeClass).style('font-weight', 'bold');
                         } else {
@@ -179,6 +181,8 @@ Promise.all([
 
                 if (questionId !== 'all') {
                     layout.title = event.short;
+                    layout.margin = { l: 20, r: 20, b: 20, t: 40 };
+                    layout.height = 150;
                     d3.select('#question-description').text(event.precise);
                     d3.select('#question-description').append('div').html(`<span class="outcome-chip">${outcomeText}</span>`).attr('class', outcomeClass).style('font-weight', 'bold');
                 } else {
