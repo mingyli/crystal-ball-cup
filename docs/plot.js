@@ -66,10 +66,9 @@ Promise.all([
         const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
         const customdata = allUsernames.map(u => {
             const scoreData = scores[u];
-            if (!scoreData) return { prediction: 'N/A', totalScore: 'N/A' };
+            if (!scoreData) return { prediction: 'N/A' };
             const prediction = (x[allUsernames.indexOf(u)] * 100).toFixed(1) + '%';
-            const totalScore = scoreData.mean_score.toFixed(2);
-            return { prediction, totalScore };
+            return { prediction };
         });
 
         return {
@@ -79,7 +78,7 @@ Promise.all([
             mode: 'markers',
             text: allUsernames,
             customdata: customdata,
-            hovertemplate: '<b>%{text}</b><br>Prediction: %{customdata.prediction}<br>Total Score: %{customdata.totalScore}<extra></extra>',
+            hovertemplate: '<b>%{text}</b><br>Prediction: %{customdata.prediction}<extra></extra>',
             marker: {
                 size: 10,
                 color: colors
