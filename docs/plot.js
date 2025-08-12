@@ -9,8 +9,6 @@ Promise.all([
     const UNHIGHLIGHT_COLOR = 'rgba(0, 0, 255, 0.1)';
     const allEvents = [{ id: 'all', short: 'All' }, ...events];
 
-    
-
     // Parse scores.json with custom reviver
     const scores = JSON.parse(scoresText.replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"').replace(/Infinity/g, '"__INFINITY__"').replace(/NaN/g, '"__NAN__"'), function(key, value) {
         if (typeof value === 'string') {
