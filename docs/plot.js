@@ -1,8 +1,8 @@
 Promise.all([
     d3.json('events.json'),
     d3.csv('responses.csv'),
-    d3.text('scores.json') // Fetch scores.json as text
-]).then(([events, responses, scoresText]) => { // scoresText is raw text
+    d3.text('scores.json') 
+]).then(([events, responses, scoresText]) => { 
     const HIGHLIGHT_COLOR = 'blue';
     const UNHIGHLIGHT_COLOR = 'rgba(128, 128, 128, 0.2)';
     const allEvents = [{ id: 'all', short: 'All' }, ...events];
