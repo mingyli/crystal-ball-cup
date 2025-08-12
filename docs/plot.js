@@ -3,10 +3,8 @@ Promise.all([
     d3.csv('responses.csv'),
     d3.text('scores.json') // Fetch scores.json as text
 ]).then(([events, responses, scoresText]) => { // scoresText is raw text
-    const FILL_COLOR = 'rgba(0, 128, 0, 0.1)';
-    const LINE_COLOR = 'green';
-    const HIGHLIGHT_COLOR = 'rgba(255, 0, 0, 0.85)';
-    const UNHIGHLIGHT_COLOR = 'rgba(0, 0, 255, 0.1)';
+    const HIGHLIGHT_COLOR = 'blue';
+    const UNHIGHLIGHT_COLOR = 'rgba(128, 128, 128, 0.2)';
     const allEvents = [{ id: 'all', short: 'All' }, ...events];
 
     // Parse scores.json with custom reviver
@@ -106,6 +104,18 @@ Promise.all([
             const outcomeText = event.outcome[0];
             const outcomeClass = `outcome-${outcomeText.toLowerCase()}`;
 
+            let fillColor, lineColor;
+            if (outcomeText === 'Yes') {
+                fillColor = 'rgba(0, 128, 0, 0.1)';
+                lineColor = 'green';
+            } else if (outcomeText === 'No') {
+                fillColor = 'rgba(255, 0, 0, 0.1)';
+                lineColor = 'red';
+            } else { // Pending
+                fillColor = 'rgba(128, 128, 128, 0.1)';
+                lineColor = 'gray';
+            }
+
             let plotContainer;
             if (questionId === 'all') {
                 const row = plotDiv.append('div').attr('class', 'plot-row');
@@ -130,9 +140,9 @@ Promise.all([
                     box: { visible: false },
                     meanline: { visible: true },
                     side: 'positive',
-                    fillcolor: FILL_COLOR,
+                    fillcolor: fillColor,
                     line: {
-                        color: LINE_COLOR
+                        color: lineColor
                     },
                     points: false
                 };
@@ -152,9 +162,9 @@ Promise.all([
                     type: 'scatter',
                     name: 'CDF',
                     hoverinfo: 'none',
-                    line: { color: LINE_COLOR },
+                    line: { color: lineColor },
                     fill: 'tozeroy',
-                    fillcolor: FILL_COLOR
+                    fillcolor: fillColor
                 };
 
                 const freqMap = d3.rollup(questionData, v => v.length, d => d);
