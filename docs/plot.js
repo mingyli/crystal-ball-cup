@@ -62,15 +62,24 @@ Promise.all([
         return layout;
     };
 
-    const createScatterTrace = (x, y, allUsernames, highlightedUsername) => {
+    const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores, eventId) => {
         const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
+        const customdata = allUsernames.map(u => {
+            const scoreData = scores[u];
+            if (!scoreData) return { prediction: 'N/A', totalScore: 'N/A' };
+            const prediction = (x[allUsernames.indexOf(u)] * 100).toFixed(1) + '%';
+            const totalScore = scoreData.mean_score.toFixed(2);
+            return { prediction, totalScore };
+        });
+
         return {
             x: x,
             y: y,
             type: 'scatter',
             mode: 'markers',
             text: allUsernames,
-            hovertemplate: '%{text}<extra></extra>',
+            customdata: customdata,
+            hovertemplate: '<b>%{text}</b><br>Prediction: %{customdata.prediction}<br>Total Score: %{customdata.totalScore}<extra></extra>',
             marker: {
                 size: 10,
                 color: colors
@@ -146,7 +155,7 @@ Promise.all([
                     },
                     points: false
                 };
-                const trace2 = createScatterTrace(questionData, Array(questionData.length).fill(' '), allUsernames, highlightedUsername);
+                const trace2 = createScatterTrace(questionData, Array(questionData.length).fill(' '), allUsernames, highlightedUsername, scores, event.id);
                 traces = [trace1, trace2];
             } else { // CDF
                 const n = questionData.length;
@@ -176,7 +185,7 @@ Promise.all([
                     cdfMap.set(val, cumulative / n);
                 }
                 const userPointsY = questionData.map(p => cdfMap.get(p));
-                const scatterTrace = createScatterTrace(questionData, userPointsY, allUsernames, highlightedUsername);
+                const scatterTrace = createScatterTrace(questionData, userPointsY, allUsernames, highlightedUsername, scores, event.id);
                 traces = [cdfTrace, scatterTrace];
                 layout.yaxis.range = [0, 1.1];
             }
