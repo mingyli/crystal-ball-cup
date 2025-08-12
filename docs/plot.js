@@ -44,7 +44,12 @@ Promise.all([
     const createLayout = (event, questionId, outcomeText, outcomeClass) => {
         const layout = {
             showlegend: false,
-            xaxis: { range: [0, 1], fixedrange: true },
+            xaxis: { 
+                range: [0, 1], 
+                fixedrange: true,
+                tickvals: [0, 0.25, 0.5, 0.75, 1],
+                ticktext: ['0.0', '0.25', '0.5', '0.75', '1.0']
+            },
             yaxis: { fixedrange: true },
         };
 
