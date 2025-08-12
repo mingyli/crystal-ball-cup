@@ -43,6 +43,56 @@ Promise.all([
     questionDropdown.property('value', 'all');
     emailDropdown.property('value', 'No user selected');
 
+    const createLayout = (event, questionId, outcomeText, outcomeClass) => {
+        const layout = {
+            showlegend: false,
+            xaxis: { range: [0, 1], fixedrange: true },
+            yaxis: { fixedrange: true },
+        };
+
+        if (questionId !== 'all') {
+            layout.title = event.short;
+            layout.margin = { l: 20, r: 20, b: 20, t: 40 };
+            layout.height = 150;
+            d3.select('#question-description').text(event.precise);
+            d3.select('#question-description').append('div').html(`<span class="outcome-chip">${outcomeText}</span>`).attr('class', outcomeClass).style('font-weight', 'bold');
+        } else {
+            layout.margin = { l: 20, r: 20, b: 20, t: 20 };
+            layout.height = 100;
+            d3.select('#question-description').text('');
+        }
+        return layout;
+    };
+
+    const createScatterTrace = (x, y, allUsernames, highlightedUsername) => {
+        const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
+        return {
+            x: x,
+            y: y,
+            type: 'scatter',
+            mode: 'markers',
+            text: allUsernames,
+            hovertemplate: '%{text}<extra></extra>',
+            marker: {
+                size: 10,
+                color: colors
+            }
+        };
+    };
+
+    const attachClickHandler = (plotContainerId) => {
+        document.getElementById(plotContainerId).on('plotly_click', function (data) {
+            if (data.points.length > 0) {
+                const point = data.points[0];
+                if (point.curveNumber === 1) { // scatter plot trace
+                    const username = point.text;
+                    emailDropdown.property('value', username);
+                    plotData(questionDropdown.property('value'), username, plotTypeDropdown.property('value'));
+                }
+            }
+        });
+    };
+
     const plotData = (questionId, highlightedUsername, plotType) => {
         const plotDiv = d3.select('#plot');
         plotDiv.html(''); // Clear previous plot(s)
@@ -67,6 +117,9 @@ Promise.all([
                 plotContainer = plotDiv.append('div').attr('id', 'plot-single');
             }
 
+            const layout = createLayout(event, questionId, outcomeText, outcomeClass);
+            let traces;
+
             if (plotType === 'violin') {
                 const trace1 = {
                     x: questionData,
@@ -81,54 +134,10 @@ Promise.all([
                     line: {
                         color: LINE_COLOR
                     },
-                    points: false // Add this line to hide default outlier dots
+                    points: false
                 };
-
-                const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
-
-                const trace2 = {
-                    x: questionData,
-                    y: Array(questionData.length).fill(' '),
-                    type: 'scatter',
-                    mode: 'markers',
-                    text: allUsernames,
-                    hovertemplate: '%{text}<extra></extra>',
-                    marker: {
-                        size: 10,
-                        color: colors
-                    }
-                };
-
-                const layout = {
-                    showlegend: false,
-                    xaxis: { range: [0, 1], fixedrange: true },
-                    yaxis: { fixedrange: true },
-                };
-
-                if (questionId !== 'all') {
-                            layout.title = event.short;
-                            layout.margin = { l: 20, r: 20, b: 20, t: 40 };
-                            layout.height = 150;
-                            d3.select('#question-description').text(event.precise);
-                            d3.select('#question-description').append('div').html(`<span class="outcome-chip">${outcomeText}</span>`).attr('class', outcomeClass).style('font-weight', 'bold');
-                        } else {
-                    layout.margin = { l: 20, r: 20, b: 20, t: 20 };
-                    layout.height = 100;
-                    d3.select('#question-description').text('');
-                }
-
-                Plotly.newPlot(plotContainer.attr('id'), [trace1, trace2], layout, {displayModeBar: false});
-
-                document.getElementById(plotContainer.attr('id')).on('plotly_click', function (data) {
-                    if (data.points.length > 0) {
-                        const point = data.points[0];
-                        if (point.curveNumber === 1) { // scatter plot trace
-                            const username = point.text;
-                            emailDropdown.property('value', username);
-                            plotData(questionDropdown.property('value'), username, plotTypeDropdown.property('value'));
-                        }
-                    }
-                });
+                const trace2 = createScatterTrace(questionData, Array(questionData.length).fill(' '), allUsernames, highlightedUsername);
+                traces = [trace1, trace2];
             } else { // CDF
                 const n = questionData.length;
                 const sortedData = [...questionData].sort(d3.ascending);
@@ -157,53 +166,13 @@ Promise.all([
                     cdfMap.set(val, cumulative / n);
                 }
                 const userPointsY = questionData.map(p => cdfMap.get(p));
-
-                const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
-
-                const scatterTrace = {
-                    x: questionData,
-                    y: userPointsY,
-                    mode: 'markers',
-                    type: 'scatter',
-                    text: allUsernames,
-                    hovertemplate: '%{text}<extra></extra>',
-                    marker: {
-                        size: 10,
-                        color: colors
-                    }
-                };
-
-                const layout = {
-                    showlegend: false,
-                    xaxis: { range: [0, 1], fixedrange: true },
-                    yaxis: { range: [0, 1.1], fixedrange: true },
-                };
-
-                if (questionId !== 'all') {
-                    layout.title = event.short;
-                    layout.margin = { l: 20, r: 20, b: 20, t: 40 };
-                    layout.height = 150;
-                    d3.select('#question-description').text(event.precise);
-                    d3.select('#question-description').append('div').html(`<span class="outcome-chip">${outcomeText}</span>`).attr('class', outcomeClass).style('font-weight', 'bold');
-                } else {
-                    layout.margin = { l: 20, r: 20, b: 20, t: 20 };
-                    layout.height = 100;
-                    d3.select('#question-description').text('');
-                }
-
-                Plotly.newPlot(plotContainer.attr('id'), [cdfTrace, scatterTrace], layout, {displayModeBar: false});
-
-                document.getElementById(plotContainer.attr('id')).on('plotly_click', function (data) {
-                    if (data.points.length > 0) {
-                        const point = data.points[0];
-                        if (point.curveNumber === 1) { // scatter plot trace
-                            const username = point.text;
-                            emailDropdown.property('value', username);
-                            plotData(questionDropdown.property('value'), username, plotTypeDropdown.property('value'));
-                        }
-                    }
-                });
+                const scatterTrace = createScatterTrace(questionData, userPointsY, allUsernames, highlightedUsername);
+                traces = [cdfTrace, scatterTrace];
+                layout.yaxis.range = [0, 1.1];
             }
+
+            Plotly.newPlot(plotContainer.attr('id'), traces, layout, {displayModeBar: false});
+            attachClickHandler(plotContainer.attr('id'));
         });
     };
 
