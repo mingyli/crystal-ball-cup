@@ -72,7 +72,7 @@ const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores) => 
         const customdata = allUsernames.map(u => {
             const scoreData = scores[u];
             if (!scoreData) return { prediction: 'N/A' };
-            const prediction = (x[allUsernames.indexOf(u)] * 100).toFixed(1) + '%';
+            const prediction = x[allUsernames.indexOf(u)].toFixed(2);
             return { prediction };
         });
 
