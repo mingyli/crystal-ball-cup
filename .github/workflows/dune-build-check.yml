@@ -1,0 +1,37 @@
+name: Dune Build Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up OCaml
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: '4.10.2'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-xetex wget
+          wget https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-1-amd64.deb
+          sudo dpkg -i pandoc-3.7.0.2-1-amd64.deb
+          sudo apt-get -f install -y
+
+      - name: Install dependencies and build
+        run: |
+          opam install . --deps-only --with-test
+          eval $(opam env)
+          dune build
+
+      - name: Check for unclean workspace
+        run: git diff --exit-code -- . ':!*.pdf'
