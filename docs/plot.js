@@ -1,14 +1,14 @@
 Promise.all([
     d3.json('events.json'),
     d3.csv('responses.csv'),
-    d3.text('scores.json') 
-]).then(([events, responses, scoresText]) => { 
+    d3.text('scores.json')
+]).then(([events, responses, scoresText]) => {
     const HIGHLIGHT_COLOR = 'blue';
     const UNHIGHLIGHT_COLOR = 'rgba(128, 128, 128, 0.2)';
     const allEvents = [{ id: 'all', short: 'All' }, ...events];
 
     // Parse scores.json with custom reviver
-    const scores = JSON.parse(scoresText.replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"').replace(/Infinity/g, '"__INFINITY__"').replace(/NaN/g, '"__NAN__"'), function(key, value) {
+    const scores = JSON.parse(scoresText.replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"').replace(/Infinity/g, '"__INFINITY__"').replace(/NaN/g, '"__NAN__"'), function (key, value) {
         if (typeof value === 'string') {
             if (value === '__INFINITY__') return Infinity;
             if (value === '__NEGATIVE_INFINITY__') return -Infinity;
@@ -44,8 +44,8 @@ Promise.all([
     const createLayout = (event, questionId, outcomeText, outcomeClass) => {
         const layout = {
             showlegend: false,
-            xaxis: { 
-                range: [0, 1], 
+            xaxis: {
+                range: [0, 1],
                 fixedrange: true,
                 tickvals: [0, 0.25, 0.5, 0.75, 1],
                 ticktext: ['0.0', '0.25', '0.5', '0.75', '1.0']
@@ -67,15 +67,23 @@ Promise.all([
         return layout;
     };
 
-    const createScatterTrace = (x, y, allUsernames, highlightedUsername) => {
+    const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores) => {
         const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
+        const customdata = allUsernames.map(u => {
+            const scoreData = scores[u];
+            if (!scoreData) return { prediction: 'N/A' };
+            const prediction = x[allUsernames.indexOf(u)].toFixed(2);
+            return { prediction };
+        });
+
         return {
             x: x,
             y: y,
             type: 'scatter',
             mode: 'markers',
             text: allUsernames,
-            hovertemplate: '%{text}<extra></extra>',
+            customdata: customdata,
+            hovertemplate: '<b>%{customdata.prediction}</b> %{text}<extra></extra>',
             marker: {
                 size: 10,
                 color: colors
@@ -151,7 +159,7 @@ Promise.all([
                     },
                     points: false
                 };
-                const trace2 = createScatterTrace(questionData, Array(questionData.length).fill(' '), allUsernames, highlightedUsername);
+                const trace2 = createScatterTrace(questionData, Array(questionData.length).fill(' '), allUsernames, highlightedUsername, scores, event.id);
                 traces = [trace1, trace2];
             } else { // CDF
                 const n = questionData.length;
@@ -181,12 +189,12 @@ Promise.all([
                     cdfMap.set(val, cumulative / n);
                 }
                 const userPointsY = questionData.map(p => cdfMap.get(p));
-                const scatterTrace = createScatterTrace(questionData, userPointsY, allUsernames, highlightedUsername);
+                const scatterTrace = createScatterTrace(questionData, userPointsY, allUsernames, highlightedUsername, scores, event.id);
                 traces = [cdfTrace, scatterTrace];
                 layout.yaxis.range = [0, 1.1];
             }
 
-            Plotly.newPlot(plotContainer.attr('id'), traces, layout, {displayModeBar: false});
+            Plotly.newPlot(plotContainer.attr('id'), traces, layout, { displayModeBar: false });
             attachClickHandler(plotContainer.attr('id'));
         });
     };
