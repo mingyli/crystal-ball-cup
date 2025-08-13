@@ -161,5 +161,4 @@ select {
 ## Standings
 
 <div id="standings-table-container"></div>
-<script src="plot.js"></script>
-<script src="standings.js"></script>
+<script src="main.js"></script>
