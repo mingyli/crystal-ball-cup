@@ -1,14 +1,14 @@
 Promise.all([
     d3.json('events.json'),
     d3.csv('responses.csv'),
-    d3.text('scores.json') 
-]).then(([events, responses, scoresText]) => { 
+    d3.text('scores.json')
+]).then(([events, responses, scoresText]) => {
     const HIGHLIGHT_COLOR = 'blue';
     const UNHIGHLIGHT_COLOR = 'rgba(128, 128, 128, 0.2)';
     const allEvents = [{ id: 'all', short: 'All' }, ...events];
 
     // Parse scores.json with custom reviver
-    const scores = JSON.parse(scoresText.replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"').replace(/Infinity/g, '"__INFINITY__"').replace(/NaN/g, '"__NAN__"'), function(key, value) {
+    const scores = JSON.parse(scoresText.replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"').replace(/Infinity/g, '"__INFINITY__"').replace(/NaN/g, '"__NAN__"'), function (key, value) {
         if (typeof value === 'string') {
             if (value === '__INFINITY__') return Infinity;
             if (value === '__NEGATIVE_INFINITY__') return -Infinity;
@@ -44,8 +44,8 @@ Promise.all([
     const createLayout = (event, questionId, outcomeText, outcomeClass) => {
         const layout = {
             showlegend: false,
-            xaxis: { 
-                range: [0, 1], 
+            xaxis: {
+                range: [0, 1],
                 fixedrange: true,
                 tickvals: [0, 0.25, 0.5, 0.75, 1],
                 ticktext: ['0.0', '0.25', '0.5', '0.75', '1.0']
@@ -67,7 +67,7 @@ Promise.all([
         return layout;
     };
 
-const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores) => {
+    const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores) => {
         const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
         const customdata = allUsernames.map(u => {
             const scoreData = scores[u];
@@ -83,7 +83,7 @@ const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores) => 
             mode: 'markers',
             text: allUsernames,
             customdata: customdata,
-            hovertemplate: '<b>%{text}</b><br>Prediction: %{customdata.prediction}<extra></extra>',
+            hovertemplate: '<b>%{customdata.prediction}</b> %{text}<extra></extra>',
             marker: {
                 size: 10,
                 color: colors
@@ -194,7 +194,7 @@ const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores) => 
                 layout.yaxis.range = [0, 1.1];
             }
 
-            Plotly.newPlot(plotContainer.attr('id'), traces, layout, {displayModeBar: false});
+            Plotly.newPlot(plotContainer.attr('id'), traces, layout, { displayModeBar: false });
             attachClickHandler(plotContainer.attr('id'));
         });
     };
