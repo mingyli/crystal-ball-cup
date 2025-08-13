@@ -67,7 +67,7 @@ Promise.all([
         return layout;
     };
 
-    const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores, eventId) => {
+const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores) => {
         const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
         const customdata = allUsernames.map(u => {
             const scoreData = scores[u];
