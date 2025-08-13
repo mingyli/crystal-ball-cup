@@ -17,7 +17,7 @@ depends: [
   "ppx_inline_test"
   "ppx_expect"
   "csv"
-  "textutils-ascii-table"
+  "textutils"
 ]
 build: [
   ["dune" "build" "-p" name "-j" jobs]
