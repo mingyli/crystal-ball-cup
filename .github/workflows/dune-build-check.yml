@@ -19,14 +19,12 @@ jobs:
         with:
           ocaml-compiler: '5.1.1'
 
-      - name: Install Dune
-        run: opam install dune
-
-      - name: Install dependencies
-        run: opam install . --deps-only --with-test
-
-      - name: Build project
-        run: dune build
+      - name: Install dependencies and build
+        run: |
+          opam install dune
+          opam install . --deps-only --with-test
+          eval $(opam env)
+          dune build
 
       - name: Check for unclean workspace
         run: git diff --exit-code
