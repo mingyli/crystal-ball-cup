@@ -34,4 +34,17 @@ jobs:
           dune build
 
       - name: Check for unclean workspace
+        id: diff
         run: git diff --exit-code
+        continue-on-error: true
+
+      - name: Upload generated PDF if diff fails
+        if: steps.diff.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: slides-pdf-from-ci
+          path: etc/slides.pdf
+
+      - name: Fail if diff is not clean
+        if: steps.diff.outcome == 'failure'
+        run: exit 1

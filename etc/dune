@@ -1,3 +1,8 @@
+(env
+ (_ 
+  (env-vars
+   (SOURCE_DATE_EPOCH 0))))
+
 (rule
  (target events.md)
  (deps ../bin/main.exe)
