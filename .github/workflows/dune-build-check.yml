@@ -1,0 +1,32 @@
+name: Dune Build Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up OCaml
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: '5.1.1'
+
+      - name: Install Dune
+        run: opam install dune
+
+      - name: Install dependencies
+        run: opam install . --deps-only --with-test
+
+      - name: Build project
+        run: dune build
+
+      - name: Check for unclean workspace
+        run: git diff --exit-code
