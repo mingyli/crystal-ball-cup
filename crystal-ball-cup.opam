@@ -8,16 +8,16 @@ license: "MIT"
 homepage: "https://github.com/ming-li/crystal-ball-cup"
 bug-reports: "https://github.com/ming-li/crystal-ball-cup/issues"
 depends: [
-  "ocaml" {>= "5.1.1"}
-  "dune" {>= "3.12"}
-  "core"
-  "yojson"
-  "ppx_jane"
-  "ppx_yojson_conv"
-  "ppx_inline_test"
-  "ppx_expect"
-  "csv"
-  "textutils"
+  "ocaml" {= "4.10.2"}
+  "dune" {= "3.19.1"}
+  "core" {= "v0.14.1"}
+  "yojson" {= "3.0.0"}
+  "ppx_jane" {= "v0.14.0"}
+  "ppx_yojson_conv" {= "v0.14.0"}
+  "ppx_inline_test" {= "v0.14.1"}
+  "ppx_expect" {= "v0.14.2"}
+  "csv" {= "2.4"}
+  "textutils" {= "v0.14.0"}
 ]
 build: [
   ["dune" "build" "-p" name "-j" jobs]
