@@ -4,9 +4,8 @@ version: "1.0.0"
 synopsis: "Crystal Ball Cup"
 maintainer: "Ming Li <mingyli34@gmail.com>"
 authors: "Ming Li <mingyli34@gmail.com>"
-license: "MIT"
-homepage: "https://github.com/ming-li/crystal-ball-cup"
-bug-reports: "https://github.com/ming-li/crystal-ball-cup/issues"
+homepage: "https://github.com/mingyli/crystal-ball-cup"
+bug-reports: "https://github.com/mingyli/crystal-ball-cup/issues"
 depends: [
   "ocaml" {= "4.10.2"}
   "dune" {= "3.19.1"}
