@@ -74,7 +74,7 @@ end
 
 let command =
   let collections : (string * (module Event.Collection)) list =
-    [ "2025", (module M2025.Events) ]
+    [ "2025", (module Collections.M2025) ]
   in
   Command.group ~summary:"Crystal Ball Cup"
   @@ List.map collections ~f:(fun (name, (module Collection)) ->
