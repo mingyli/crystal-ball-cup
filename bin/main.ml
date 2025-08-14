@@ -72,16 +72,14 @@ module Make (Collection : Event.Collection) = struct
   ;;
 end
 
-module type Commands = sig
-  val command : Command.t
-end
-
 let command =
-  let collections : (string * (module Event.Collection)) list = [ "2025", (module M2025.Events) ] in
+  let collections : (string * (module Event.Collection)) list =
+    [ "2025", (module M2025.Events) ]
+  in
   Command.group ~summary:"Crystal Ball Cup"
-  @@ List.map collections ~f:(fun (name, (module M)) ->
-    let (module M) : (module Commands) = (module Make(M)) in
-    name, M.command)
+  @@ List.map collections ~f:(fun (name, (module Collection)) ->
+    let module Commands = Make (Collection) in
+    name, Commands.command)
 ;;
 
 let () = Command.run command
