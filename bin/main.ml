@@ -7,7 +7,7 @@ let markdown_command =
   let%map_open.Command () = return () in
   fun () ->
     print_endline "# Events\n";
-    List.iteri Event.all ~f:(fun i event ->
+    List.iteri M2025.Events.all ~f:(fun i event ->
       print_endline [%string "## %{i+1#Int}. %{Event.short event}"];
       print_endline [%string "%{Event.precise event}\n"])
 ;;
@@ -17,7 +17,8 @@ let sexp_command =
   @@
   let%map_open.Command () = return () in
   fun () ->
-    List.iter Event.all ~f:(fun event -> print_s ~mach:() [%sexp (event : Event.t)])
+    List.iter M2025.Events.all ~f:(fun event ->
+      print_s ~mach:() [%sexp (event : Event.t)])
 ;;
 
 let json_command =
@@ -25,7 +26,7 @@ let json_command =
   @@
   let%map_open.Command () = return () in
   fun () ->
-    let yojson = `List (List.map Event.all ~f:[%yojson_of: Event.t]) in
+    let yojson = `List (List.map M2025.Events.all ~f:[%yojson_of: Event.t]) in
     print_endline (Yojson.Safe.pretty_to_string yojson)
 ;;
 
@@ -41,7 +42,7 @@ let scores_command =
     let user_event_scores = String.Table.create () in
     List.iter responses ~f:(fun (response : Response.t) ->
       let user = Response.user response in
-      List.iter Event.all ~f:(fun (event : Event.t) ->
+      List.iter M2025.Events.all ~f:(fun (event : Event.t) ->
         let event_id = Event.id event in
         let probability = Response.probability response ~event_id in
         let score = Event.score event ~probability in

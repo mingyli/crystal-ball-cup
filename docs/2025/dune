@@ -1,11 +1,11 @@
 (rule
  (target events.json)
- (deps ../bin/main.exe)
+ (deps %{project_root}/bin/main.exe)
  (mode promote)
  (action
   (with-stdout-to
    events.json
-   (run ../bin/main.exe json))))
+   (run %{project_root}/bin/main.exe json))))
 
 (rule
  (target index.html)
@@ -16,9 +16,9 @@
 
 (rule
  (target scores.json)
- (deps ../bin/main.exe responses.csv)
+ (deps %{project_root}/bin/main.exe responses.csv)
  (mode promote)
  (action
   (with-stdout-to
    scores.json
-   (run ../bin/main.exe scores -responses responses.csv))))
+   (run %{project_root}/bin/main.exe scores -responses responses.csv))))
