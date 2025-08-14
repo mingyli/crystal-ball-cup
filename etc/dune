@@ -4,7 +4,7 @@
  (action
   (with-stdout-to
    events.md
-   (run ../bin/main.exe markdown))))
+   (run ../bin/main.exe 2025 markdown))))
 
 (rule
  (targets slides.md)

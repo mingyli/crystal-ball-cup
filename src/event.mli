@@ -8,3 +8,7 @@ val short : t -> string
 val precise : t -> string
 val outcome : t -> Outcome.t
 val score : t -> probability:float -> float
+
+module type Collection = sig
+  val all : t list
+end

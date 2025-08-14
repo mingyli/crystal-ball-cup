@@ -5,7 +5,7 @@
  (action
   (with-stdout-to
    events.json
-   (run %{project_root}/bin/main.exe json))))
+   (run %{project_root}/bin/main.exe 2025 json))))
 
 (rule
  (target index.html)
@@ -21,4 +21,4 @@
  (action
   (with-stdout-to
    scores.json
-   (run %{project_root}/bin/main.exe scores -responses responses.csv))))
+   (run %{project_root}/bin/main.exe 2025 scores -responses responses.csv))))
