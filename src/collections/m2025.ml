@@ -174,8 +174,8 @@ let%expect_test _ =
     │    │ f Q4 2025 is based on an origina │  2025 (October through December), ac │         │
     │    │ l screenplay                     │ cording to Box Office Mojo, is based │         │
     │    │                                  │  on an original screenplay—meaning │         │
-    │    │                                  │  not adapted from existing material� │         │
-    │    │                                  │ ��as determined by Oscar eligibility │         │
+    │    │                                  │  not adapted from existing material� │         │
+    │    │                                  │ ��as determined by Oscar eligibility │         │
     │    │                                  │  or expert consensus (e.g., Writer's │         │
     │    │                                  │  Branch of the Academy of Motion Pic │         │
     │    │                                  │ ture Arts and Sciences).             │         │
@@ -194,7 +194,9 @@ let%expect_test _ =
     │    │  chess on a random November date │ ber 2025, more than five participant │         │
     │    │                                  │ s confirm via group poll that they p │         │
     │    │                                  │ layed at least one complete game of  │         │
-    │    │                                  │ chess on that date.                  │         │
+    │    │                                  │ chess on that date. Participants are │         │
+    │    │                                  │  those who attended the live event o │         │
+    │    │                                  │ n 2025-08-09.                        │         │
     ├────┼──────────────────────────────────┼──────────────────────────────────────┼─────────┤
     │ 7  │ There is an unplanned market clo │ A National Market System stock excha │ Pending │
     │    │ sure                             │ nge (e.g., NYSE or Nasdaq) is closed │         │
@@ -243,7 +245,9 @@ let%expect_test _ =
     │ 14 │ Our most listened-to artist is a │ The artist with the most appearances │ Pending │
     │    │  solo female artist              │  across all participants' 2025 Spoti │         │
     │    │                                  │ fy Wrapped Top Artists lists is a so │         │
-    │    │                                  │ lo female artist.                    │         │
+    │    │                                  │ lo female artist. Participants are t │         │
+    │    │                                  │ hose who attended the live event on  │         │
+    │    │                                  │ 2025-08-09.                          │         │
     ├────┼──────────────────────────────────┼──────────────────────────────────────┼─────────┤
     │ 15 │ Jerome Powell remains Chair of t │ Jerome Powell is Chair of the Board  │ Pending │
     │    │ he Federal Reserve               │ of Governors of the Federal Reserve  │         │
@@ -263,7 +267,9 @@ let%expect_test _ =
     │    │                                  │ mber 1 compared to December 31. A ch │         │
     │    │                                  │ ange in employment status includes s │         │
     │    │                                  │ witching employers, becoming unemplo │         │
-    │    │                                  │ yed, or gaining employment.          │         │
+    │    │                                  │ yed, or gaining employment. Particip │         │
+    │    │                                  │ ants are those who attended the live │         │
+    │    │                                  │  event on 2025-08-09.                │         │
     ├────┼──────────────────────────────────┼──────────────────────────────────────┼─────────┤
     │ 19 │ The winner of the 2025 Breeders' │ The winner of the 2025 Breeders' Cup │ Pending │
     │    │  Cup Classic has previously won  │  Classic is a horse that has previou │         │
