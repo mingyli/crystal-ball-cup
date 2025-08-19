@@ -12,5 +12,6 @@ let create = Fields.create
 let score t ~probability = Outcome.score t.outcome ~probability
 
 module type Collection = sig
+  val name : string
   val all : t list
 end

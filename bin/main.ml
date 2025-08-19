@@ -63,7 +63,7 @@ module Make (Collection : Event.Collection) = struct
 
   let command =
     Command.group
-      ~summary:"Crystal Ball Cup"
+      ~summary:[%string "Crystal Ball Cup %{Collection.name}"]
       [ "markdown", markdown_command
       ; "sexp", sexp_command
       ; "json", json_command
@@ -73,13 +73,11 @@ module Make (Collection : Event.Collection) = struct
 end
 
 let command =
-  let collections : (string * (module Event.Collection)) list =
-    [ "2025", (module Collections.M2025) ]
-  in
+  let collections : (module Event.Collection) list = [ (module Collections.M2025) ] in
   Command.group ~summary:"Crystal Ball Cup"
-  @@ List.map collections ~f:(fun (name, (module Collection)) ->
+  @@ List.map collections ~f:(fun (module Collection) ->
     let module Commands = Make (Collection) in
-    name, Commands.command)
+    Collection.name, Commands.command)
 ;;
 
 let () = Command.run command

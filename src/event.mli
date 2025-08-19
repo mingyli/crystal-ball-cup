@@ -10,5 +10,6 @@ val outcome : t -> Outcome.t
 val score : t -> probability:float -> float
 
 module type Collection = sig
+  val name : string
   val all : t list
 end
