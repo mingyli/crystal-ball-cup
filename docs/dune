@@ -1,6 +1,6 @@
 (rule
  (target index.html)
- (deps index.md)
+ (deps index.md style.css)
  (mode promote)
  (action
-  (run pandoc -s -t html5 index.md -o index.html)))
+  (run pandoc -s -t html5 --css style.css index.md -o index.html)))

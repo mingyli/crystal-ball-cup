@@ -11,39 +11,6 @@ title: 2025 Crystal Ball Cup
 <script src="https://cdn.plot.ly/plotly-3.0.3.min.js"></script>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <style>
-html {
-    background-color: #f8f9fa;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-    font-variation-settings: 'wdth' 55;
-    background-color: #f8f9fa;
-    color: #212529;
-    max-width: 50em;
-}
-
-main {
-    max-width: 80rem;
-    padding: 1rem;
-    margin: auto;
-}
-
-h1 {
-    text-align: center;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-}
-
-header {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-p {
-    margin-block-start: 0.5em;
-    margin-block-end: 0.5em;
-}
 
 .dropdowns-container {
     display: flex;
@@ -162,3 +129,5 @@ select {
 
 <div id="standings-table-container"></div>
 <script src="main.js"></script>
+
+[Back to home](../) | [Back to top](#title-block-header)

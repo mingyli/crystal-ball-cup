@@ -1,0 +1,38 @@
+html {
+    background-color: #f8f9fa;
+}
+
+body {
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+    font-variation-settings: 'wdth' 55;
+    background-color: #f8f9fa;
+    color: #212529;
+    max-width: 50em;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+main {
+    max-width: 80rem;
+    padding: 1rem;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+header {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+p {
+    margin-block-start: 0.5em;
+    margin-block-end: 0.5em;
+}
