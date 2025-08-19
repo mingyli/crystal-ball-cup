@@ -1,10 +1,10 @@
 (rule
  (target events.md)
- (deps ../bin/main.exe)
+ (deps %{project_root}/bin/main.exe)
  (action
   (with-stdout-to
    events.md
-   (run ../bin/main.exe 2025 markdown))))
+   (run %{project_root}/bin/main.exe 2025 markdown))))
 
 (rule
  (targets slides.md)
