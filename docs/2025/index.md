@@ -1,5 +1,5 @@
 ---
-title: 2025 Crystal Ball Cup
+title: Crystal Ball Cup 2025
 ---
 
 <center>[Jump to Standings](#standings)</center>
