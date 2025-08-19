@@ -1,7 +1,7 @@
 open! Core
 open Crystal
 
-module Make (Collection : Event.Collection) = struct
+module Make (Collection : Collection.S) = struct
   let markdown_command =
     Command.basic ~summary:"Print events in markdown format"
     @@
@@ -73,7 +73,7 @@ module Make (Collection : Event.Collection) = struct
 end
 
 let command =
-  let collections : (module Event.Collection) list = [ (module Collections.M2025) ] in
+  let collections : (module Collection.S) list = [ (module Collections.M2025) ] in
   Command.group ~summary:"Crystal Ball Cup"
   @@ List.map collections ~f:(fun (module Collection) ->
     let module Commands = Make (Collection) in

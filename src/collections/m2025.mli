@@ -1,3 +1,3 @@
 open! Core
 open Crystal
-include Event.Collection
+include Collection.S
