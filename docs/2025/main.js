@@ -170,7 +170,7 @@ Promise.all([
     .text(d => d);
 
   // Set initial dropdown values
-  plotTypeDropdown.property('value', 'violin');
+  plotTypeDropdown.property('value', 'density');
   questionDropdown.property('value', 'all');
   emailDropdown.property('value', 'No user selected');
 
@@ -276,7 +276,7 @@ Promise.all([
       const layout = createLayout(event, questionId, outcomeText, outcomeClass);
       let traces;
 
-      if (plotType === 'violin') {
+      if (plotType === 'density') {
         const trace1 = {
           x: questionData,
           type: 'violin',
@@ -306,7 +306,7 @@ Promise.all([
           y: cdfY,
           mode: 'lines',
           type: 'scatter',
-          name: 'CDF',
+          name: 'Cumulative',
           hoverinfo: 'none',
           line: { color: lineColor },
           fill: 'tozeroy',

@@ -117,8 +117,8 @@ select {
 <div class="all-dropdowns-container">
 <select id="question-dropdown"></select>
 <select id="plot-type-dropdown">
-    <option value="violin">Violin</option>
-    <option value="cdf">CDF</option>
+    <option value="density">Density</option>
+    <option value="cumulative">Cumulative</option>
 </select>
 <select id="email-dropdown"></select>
 </div>
