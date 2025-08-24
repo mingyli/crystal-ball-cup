@@ -38,6 +38,16 @@ let of_csv csv =
 let probability t ~event_id = Map.find_exn t.probabilities event_id
 let user t = t.email
 
+let apply_confidence t ~confidence =
+  let probabilities =
+    Map.map t.probabilities ~f:(fun p ->
+      let open Float.O in
+      let odds = p / (1. - p) in
+      (odds ** confidence) / (1. + (odds ** confidence)))
+  in
+  { t with probabilities }
+;;
+
 let%expect_test "of_csv" =
   let csv =
     "Timestamp,Email Address,1,2,Feedback\n\
@@ -49,5 +59,13 @@ let%expect_test "of_csv" =
   [%expect
     {|
     (((email abc@gmail.com) (probabilities ((1 0.75) (2 0.9))))
-     ((email def@gmail.com) (probabilities ((1 0.32) (2 0.999)))))    |}]
+     ((email def@gmail.com) (probabilities ((1 0.32) (2 0.999)))))    |}];
+  let responses = List.map responses ~f:(apply_confidence ~confidence:0.01) in
+  print_s [%sexp (responses : t list)];
+  [%expect
+    {|
+       (((email abc@gmail.com)
+         (probabilities ((1 0.50274650309765034) (2 0.50549284045918252))))
+        ((email def@gmail.com)
+         (probabilities ((1 0.49811557941634127) (2 0.51726002616254929))))) |}]
 ;;
