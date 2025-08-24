@@ -1,134 +1,154 @@
-// Define standings outside to be accessible for sorting
-let standings = [];
-let sortColumn = 'meanTotalScore'; // Default sort column
-let sortDirection = 'desc'; // Default sort direction
+const GREEN = 'green';
+const RED = 'red';
+const GRAY = 'gray';
+const GREEN_FILL = 'rgba(0, 128, 0, 0.1)';
+const RED_FILL = 'rgba(255, 0, 0, 0.1)';
+const GRAY_FILL = 'rgba(128, 128, 128, 0.1)';
+const HIGHLIGHT_COLOR = 'blue';
+const UNHIGHLIGHT_COLOR = 'rgba(128, 128, 128, 0.2)';
 
-function renderTable(questionId) {
-  const tableContainer = document.getElementById('standings-table-container');
-  tableContainer.innerHTML = ''; // Clear previous table
 
-  const table = document.createElement('table');
-  table.style.width = '100%';
-  table.style.borderCollapse = 'collapse';
 
-  const thead = table.createTHead();
-  const headerRow = thead.insertRow();
+const createLayout = (event, questionId, outcomeText, outcomeClass) => {
+  const layout = {
+    showlegend: false,
+    xaxis: {
+      range: [0, 1],
+      fixedrange: true,
+      tickvals: [0, 0.25, 0.5, 0.75, 1],
+      ticktext: ['0.0', '0.25', '0.5', '0.75', '1.0']
+    },
+    yaxis: { fixedrange: true },
+  };
 
-  const userHeader = headerRow.insertCell();
-  userHeader.textContent = 'User';
-  userHeader.style.border = '1px solid #ddd';
-  userHeader.style.padding = '8px';
-  userHeader.style.textAlign = 'left';
-  userHeader.style.cursor = 'pointer'; // Make it clickable
-  userHeader.onclick = () => sortTable('user');
-
-  const meanScoreHeader = headerRow.insertCell();
-  meanScoreHeader.textContent = 'Mean Total Score';
-  meanScoreHeader.style.border = '1px solid #ddd';
-  meanScoreHeader.style.padding = '8px';
-  meanScoreHeader.style.textAlign = 'left';
-  meanScoreHeader.style.cursor = 'pointer'; // Make it clickable
-  meanScoreHeader.onclick = () => sortTable('meanTotalScore');
-
-  // Add sort indicator for meanScore
-  if (sortColumn === 'user') {
-    userHeader.textContent += (sortDirection === 'asc' ? ' ▲' : ' ▼');
-  } else if (sortColumn === 'meanTotalScore') {
-    meanScoreHeader.textContent += (sortDirection === 'asc' ? ' ▲' : ' ▼');
-  }
-
-  // Conditionally add specific question score column
   if (questionId !== 'all') {
-    const questionScoreHeader = headerRow.insertCell();
-    questionScoreHeader.textContent = 'Question Score';
-    questionScoreHeader.style.border = '1px solid #ddd';
-    questionScoreHeader.style.padding = '8px';
-    questionScoreHeader.style.textAlign = 'left';
-    questionScoreHeader.style.cursor = 'pointer'; // Make it clickable
-    questionScoreHeader.onclick = () => sortTable('questionScore');
-
-    // Add sort indicator for questionScore
-    if (sortColumn === 'questionScore') {
-      questionScoreHeader.textContent += (sortDirection === 'asc' ? ' ▲' : ' ▼');
-    }
+    layout.title = event.short;
+    layout.margin = { l: 20, r: 20, b: 20, t: 40 };
+    layout.height = 150;
+    d3.select('#question-description').text(event.precise);
+    d3.select('#question-description').append('div').html(`<span class="outcome-chip">${outcomeText}</span>`).attr('class', outcomeClass).style('font-weight', 'bold');
+  } else {
+    layout.margin = { l: 20, r: 20, b: 20, t: 20 };
+    layout.height = 100;
+    d3.select('#question-description').text('');
   }
+  return layout;
+};
 
-  const tbody = table.createTBody();
-  standings.forEach(item => {
-    const row = tbody.insertRow();
-    const userCell = row.insertCell();
-    userCell.textContent = item.user;
-    userCell.style.border = '1px solid #ddd';
-    userCell.style.padding = '8px';
-
-    const meanScoreCell = row.insertCell();
-    meanScoreCell.textContent = isNaN(item.meanTotalScore) ? 'NaN' : item.meanTotalScore.toFixed(3);
-    meanScoreCell.style.border = '1px solid #ddd';
-    meanScoreCell.style.padding = '8px';
-
-    if (questionId !== 'all') {
-      const questionScoreCell = row.insertCell();
-      questionScoreCell.textContent = isNaN(item.questionScore) ? 'NaN' : item.questionScore.toFixed(3);
-      questionScoreCell.style.border = '1px solid #ddd';
-      questionScoreCell.style.padding = '8px';
-    }
+const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores) => {
+  const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
+  const customdata = allUsernames.map((_, index) => {
+    const prediction = x[index].toFixed(2);
+    return { prediction };
   });
 
-  tableContainer.appendChild(table);
-}
+  return {
+    x: x,
+    y: y,
+    type: 'scatter',
+    mode: 'markers',
+    text: allUsernames,
+    customdata: customdata,
+    hovertemplate: '<b>%{customdata.prediction}</b> %{text}<extra></extra>',
+    marker: {
+      size: 10,
+      color: colors
+    }
+  };
+};
 
-function sortTable(column) {
-  if (sortColumn === column) {
-    sortDirection = (sortDirection === 'asc' ? 'desc' : 'asc');
-  } else {
-    sortColumn = column;
-    sortDirection = 'desc'; // Default to descending for new column, as scores are better when higher
+function renderStandings(scores) {
+  const container = document.getElementById('standings-container');
+  container.innerHTML = '';
+
+  const standings = [];
+  for (const user in scores) {
+    const userData = scores[user];
+    const meanTotalScore = userData.mean_score;
+    standings.push({ user: user, meanTotalScore: meanTotalScore });
   }
 
   standings.sort((a, b) => {
-    let valA = a[column];
-    let valB = b[column];
-
-    // Handle NaN for sorting scores
-    if (column === 'meanTotalScore' || column === 'questionScore') {
-      if (isNaN(valA) && isNaN(valB)) return 0;
-      if (isNaN(valA)) return sortDirection === 'asc' ? 1 : -1; // NaN to the end
-      if (isNaN(valB)) return sortDirection === 'asc' ? -1 : 1; // NaN to the end
-    }
-
-    if (valA < valB) {
-      return sortDirection === 'asc' ? -1 : 1;
-    }
-    if (valA > valB) {
-      return sortDirection === 'asc' ? 1 : -1;
-    }
-    return 0;
+    if (isNaN(a.meanTotalScore) && isNaN(b.meanTotalScore)) return 0;
+    if (isNaN(a.meanTotalScore)) return 1;
+    if (isNaN(b.meanTotalScore)) return -1;
+    return b.meanTotalScore - a.meanTotalScore; // Sort descending
   });
 
-  renderTable(d3.select('#question-dropdown').property('value')); // Re-render the table with sorted data
-}
+  const users = standings.map(s => s.user);
+  const displayScores = standings.map(s => s.meanTotalScore);
 
+  const finiteScores = displayScores.filter(s => isFinite(s));
+  const maxAbsScore = finiteScores.length > 0 ? Math.max(...finiteScores.map(s => Math.abs(s))) : 1;
 
-// This function will be called from the first script block
-function updateStandingsTable(events, responses, scores, questionId) {
-  standings = []; // Clear previous standings
+  const finalDisplayScores = displayScores.map(s => {
+    if (s === Infinity) return maxAbsScore * 1.1;
+    if (s === -Infinity) return -maxAbsScore * 1.1;
+    return s;
+  });
 
-  for (const user in scores) { // Iterate through the new scores object
-    const userData = scores[user];
-    const meanTotalScore = userData.mean_score;
-    const questionScores = userData.question_scores;
-
-    let questionScoreValue = NaN;
-    if (questionId !== 'all') {
-      questionScoreValue = questionScores[questionId];
+  const data = [{
+    y: users,
+    x: finalDisplayScores,
+    type: 'bar',
+    orientation: 'h',
+    text: displayScores.map(s => {
+      if (s === Infinity) return '∞';
+      if (s === -Infinity) return '-∞';
+      if (isNaN(s)) return 'NaN';
+      return s.toFixed(3);
+    }),
+    textposition: 'auto',
+    hoverinfo: 'none',
+    textfont: {
+      size: 10
+    },
+    marker: {
+      color: displayScores.map(score => score >= 0 ? GREEN_FILL : RED_FILL),
+      line: {
+        color: displayScores.map(score => score >= 0 ? GREEN : RED),
+        width: 1
+      }
     }
+  }];
 
-    standings.push({ user: user, meanTotalScore: meanTotalScore, questionScore: questionScoreValue });
-  }
+  const layout = {
+    title: 'Standings',
+    yaxis: {
+      autorange: 'reversed',
+      automargin: true,
+      tickfont: {
+        size: 10
+      },
+      fixedrange: true
+    },
+    xaxis: {
+      title: '',
+      showticklabels: false,
+      zeroline: false,
+      fixedrange: true
+    },
+    shapes: [{
+      type: 'line',
+      x0: 0,
+      y0: -0.5,
+      x1: 0,
+      y1: users.length - 0.5,
+      line: {
+        color: 'black',
+        width: 1,
+      }
+    }],
+    margin: {
+      l: 200,
+      r: 20,
+      t: 40,
+      b: 40
+    },
+    height: 20 * users.length + 80,
+  };
 
-  // Initial sort (highest mean score first)
-  standings.sort((a, b) => b.meanTotalScore - a.meanTotalScore);
-  renderTable(questionId); // Initial render
+  Plotly.newPlot(container, data, layout, { displayModeBar: false });
 }
 
 Promise.all([
@@ -136,19 +156,20 @@ Promise.all([
   d3.csv('responses.csv'),
   d3.text('scores.json')
 ]).then(([events, responses, scoresText]) => {
-  const HIGHLIGHT_COLOR = 'blue';
-  const UNHIGHLIGHT_COLOR = 'rgba(128, 128, 128, 0.2)';
   const allEvents = [{ id: 'all', short: 'All' }, ...events];
 
   // Parse scores.json with custom reviver
-  const scores = JSON.parse(scoresText.replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"').replace(/Infinity/g, '"__INFINITY__"').replace(/NaN/g, '"__NAN__"'), function (key, value) {
-    if (typeof value === 'string') {
-      if (value === '__INFINITY__') return Infinity;
-      if (value === '__NEGATIVE_INFINITY__') return -Infinity;
-      if (value === '__NAN__') return NaN;
-    }
-    return value;
-  });
+  const scores = JSON.parse(scoresText
+    .replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"')
+    .replace(/Infinity/g, '"__INFINITY__"')
+    .replace(/NaN/g, '"__NAN__"'), function (key, value) {
+      if (typeof value === 'string') {
+        if (value === '__INFINITY__') return Infinity;
+        if (value === '__NEGATIVE_INFINITY__') return -Infinity;
+        if (value === '__NAN__') return NaN;
+      }
+      return value;
+    });
 
   const plotTypeDropdown = d3.select('#plot-type-dropdown');
   const questionDropdown = d3.select('#question-dropdown');
@@ -174,56 +195,6 @@ Promise.all([
   questionDropdown.property('value', 'all');
   emailDropdown.property('value', 'No user selected');
 
-  const createLayout = (event, questionId, outcomeText, outcomeClass) => {
-    const layout = {
-      showlegend: false,
-      xaxis: {
-        range: [0, 1],
-        fixedrange: true,
-        tickvals: [0, 0.25, 0.5, 0.75, 1],
-        ticktext: ['0.0', '0.25', '0.5', '0.75', '1.0']
-      },
-      yaxis: { fixedrange: true },
-    };
-
-    if (questionId !== 'all') {
-      layout.title = event.short;
-      layout.margin = { l: 20, r: 20, b: 20, t: 40 };
-      layout.height = 150;
-      d3.select('#question-description').text(event.precise);
-      d3.select('#question-description').append('div').html(`<span class="outcome-chip">${outcomeText}</span>`).attr('class', outcomeClass).style('font-weight', 'bold');
-    } else {
-      layout.margin = { l: 20, r: 20, b: 20, t: 20 };
-      layout.height = 100;
-      d3.select('#question-description').text('');
-    }
-    return layout;
-  };
-
-  const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores) => {
-    const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
-    const customdata = allUsernames.map(u => {
-      const scoreData = scores[u];
-      if (!scoreData) return { prediction: 'N/A' };
-      const prediction = x[allUsernames.indexOf(u)].toFixed(2);
-      return { prediction };
-    });
-
-    return {
-      x: x,
-      y: y,
-      type: 'scatter',
-      mode: 'markers',
-      text: allUsernames,
-      customdata: customdata,
-      hovertemplate: '<b>%{customdata.prediction}</b> %{text}<extra></extra>',
-      marker: {
-        size: 10,
-        color: colors
-      }
-    };
-  };
-
   const attachClickHandler = (plotContainerId) => {
     document.getElementById(plotContainerId).on('plotly_click', function (data) {
       if (data.points.length > 0) {
@@ -236,6 +207,67 @@ Promise.all([
       }
     });
   };
+
+  const renderPlot = (plotContainer, event, questionData, allUsernames,
+    highlightedUsername, scores, plotType, fillColor, lineColor, outcomeText,
+    outcomeClass, questionId) => {
+    const layout = createLayout(event, questionId, outcomeText, outcomeClass);
+    let traces;
+
+    if (plotType === 'density') {
+      const trace1 = {
+        x: questionData,
+        type: 'violin',
+        name: ' ',
+        orientation: 'h',
+        hoverinfo: 'none',
+        box: { visible: false },
+        meanline: { visible: true },
+        side: 'positive',
+        fillcolor: fillColor,
+        line: {
+          color: lineColor
+        },
+        points: false
+      };
+      const trace2 = createScatterTrace(questionData, Array(questionData.length).fill(' '), allUsernames, highlightedUsername, scores, event.id);
+      traces = [trace1, trace2];
+    } else { // CDF
+      const n = questionData.length;
+      const sortedData = [...questionData].sort(d3.ascending);
+
+      const cdfX = [0, ...sortedData, 1];
+      const cdfY = [0, ...sortedData.map((d, i) => (i + 1) / n), 1];
+
+      const cdfTrace = {
+        x: cdfX,
+        y: cdfY,
+        mode: 'lines',
+        type: 'scatter',
+        name: 'Cumulative',
+        hoverinfo: 'none',
+        line: { color: lineColor },
+        fill: 'tozeroy',
+        fillcolor: fillColor
+      };
+
+      const freqMap = d3.rollup(questionData, v => v.length, d => d);
+      const uniqueSorted = Array.from(freqMap.keys()).sort(d3.ascending);
+      const cdfMap = new Map();
+      let cumulative = 0;
+      for (const val of uniqueSorted) {
+        cumulative += freqMap.get(val);
+        cdfMap.set(val, cumulative / n);
+      }
+      const userPointsY = questionData.map(p => cdfMap.get(p));
+      const scatterTrace = createScatterTrace(questionData, userPointsY, allUsernames, highlightedUsername, scores, event.id);
+      traces = [cdfTrace, scatterTrace];
+      layout.yaxis.range = [0, 1.1];
+    }
+
+    Plotly.newPlot(plotContainer.attr('id'), traces, layout, { displayModeBar: false });
+    attachClickHandler(plotContainer.attr('id'));
+  }
 
   const plotData = (questionId, highlightedUsername, plotType) => {
     const plotDiv = d3.select('#plot');
@@ -252,20 +284,21 @@ Promise.all([
 
       let fillColor, lineColor;
       if (outcomeText === 'Yes') {
-        fillColor = 'rgba(0, 128, 0, 0.1)';
-        lineColor = 'green';
+        fillColor = GREEN_FILL;
+        lineColor = GREEN;
       } else if (outcomeText === 'No') {
-        fillColor = 'rgba(255, 0, 0, 0.1)';
-        lineColor = 'red';
+        fillColor = RED_FILL;
+        lineColor = RED;
       } else { // Pending
-        fillColor = 'rgba(128, 128, 128, 0.1)';
-        lineColor = 'gray';
+        fillColor = GRAY_FILL;
+        lineColor = GRAY;
       }
 
       let plotContainer;
       if (questionId === 'all') {
         const row = plotDiv.append('div').attr('class', 'plot-row');
-        row.append('div').attr('class', `plot-outcome ${outcomeClass}`).html(`<span class="outcome-chip">${outcomeText}</span>`);
+        row.append('div').attr('class', `plot-outcome ${outcomeClass}`)
+          .html(`<span class="outcome-chip">${outcomeText}</span>`);
         row.append('div').attr('class', 'plot-label').text(event.short);
         plotContainer = row.append('div').attr('id', 'plot-' + event.id).attr('class', 'plot-container');
       } else {
@@ -273,62 +306,7 @@ Promise.all([
         plotContainer = plotDiv.append('div').attr('id', 'plot-single');
       }
 
-      const layout = createLayout(event, questionId, outcomeText, outcomeClass);
-      let traces;
-
-      if (plotType === 'density') {
-        const trace1 = {
-          x: questionData,
-          type: 'violin',
-          name: ' ',
-          orientation: 'h',
-          hoverinfo: 'none',
-          box: { visible: false },
-          meanline: { visible: true },
-          side: 'positive',
-          fillcolor: fillColor,
-          line: {
-            color: lineColor
-          },
-          points: false
-        };
-        const trace2 = createScatterTrace(questionData, Array(questionData.length).fill(' '), allUsernames, highlightedUsername, scores, event.id);
-        traces = [trace1, trace2];
-      } else { // CDF
-        const n = questionData.length;
-        const sortedData = [...questionData].sort(d3.ascending);
-
-        const cdfX = [0, ...sortedData, 1];
-        const cdfY = [0, ...sortedData.map((d, i) => (i + 1) / n), 1];
-
-        const cdfTrace = {
-          x: cdfX,
-          y: cdfY,
-          mode: 'lines',
-          type: 'scatter',
-          name: 'Cumulative',
-          hoverinfo: 'none',
-          line: { color: lineColor },
-          fill: 'tozeroy',
-          fillcolor: fillColor
-        };
-
-        const freqMap = d3.rollup(questionData, v => v.length, d => d);
-        const uniqueSorted = Array.from(freqMap.keys()).sort(d3.ascending);
-        const cdfMap = new Map();
-        let cumulative = 0;
-        for (const val of uniqueSorted) {
-          cumulative += freqMap.get(val);
-          cdfMap.set(val, cumulative / n);
-        }
-        const userPointsY = questionData.map(p => cdfMap.get(p));
-        const scatterTrace = createScatterTrace(questionData, userPointsY, allUsernames, highlightedUsername, scores, event.id);
-        traces = [cdfTrace, scatterTrace];
-        layout.yaxis.range = [0, 1.1];
-      }
-
-      Plotly.newPlot(plotContainer.attr('id'), traces, layout, { displayModeBar: false });
-      attachClickHandler(plotContainer.attr('id'));
+      renderPlot(plotContainer, event, questionData, allUsernames, highlightedUsername, scores, plotType, fillColor, lineColor, outcomeText, outcomeClass, questionId);
     });
   };
 
@@ -339,14 +317,12 @@ Promise.all([
   questionDropdown.on('change', function () {
     const selectedQuestionId = this.value;
     plotData(selectedQuestionId, emailDropdown.property('value'), plotTypeDropdown.property('value'));
-    updateStandingsTable(events, responses, scores, selectedQuestionId); // Call updateStandingsTable
   });
 
   emailDropdown.on('change', function () {
     plotData(questionDropdown.property('value'), this.value, plotTypeDropdown.property('value'));
   });
 
-  // Initial plot and standings table update
   plotData(questionDropdown.property('value'), emailDropdown.property('value'), plotTypeDropdown.property('value'));
-  updateStandingsTable(events, responses, scores, questionDropdown.property('value')); // Initial call for standings
+  renderStandings(scores);
 });
