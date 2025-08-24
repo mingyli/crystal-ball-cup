@@ -35,4 +35,4 @@ jobs:
           dune runtest
 
       - name: Check for unclean workspace
-        run: git diff --exit-code -- . ':!*.pdf'
+        run: git diff --exit-code 
