@@ -17,6 +17,7 @@ depends: [
   "ppx_expect" {= "v0.14.2"}
   "csv" {= "2.4"}
   "textutils" {= "v0.14.0"}
+  "ocamlformat"
 ]
 build: [
   ["dune" "build" "-p" name "-j" jobs]

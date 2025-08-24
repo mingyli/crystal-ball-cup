@@ -37,7 +37,8 @@ let%expect_test "score" =
     ]
   in
   print_endline (Ascii_table.to_string columns rows ~bars:`Unicode);
-  [%expect {|
+  [%expect
+    {|
     ┌─────────┬─────────────┬─────────────────────┐
     │ Outcome │ Probability │ Score               │
     ├─────────┼─────────────┼─────────────────────┤
