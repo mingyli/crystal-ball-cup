@@ -7,6 +7,8 @@ const GRAY_FILL = 'rgba(128, 128, 128, 0.1)';
 const HIGHLIGHT_COLOR = 'blue';
 const UNHIGHLIGHT_COLOR = 'rgba(128, 128, 128, 0.2)';
 
+
+
 const createLayout = (event, questionId, outcomeText, outcomeClass) => {
   const layout = {
     showlegend: false,
@@ -35,10 +37,8 @@ const createLayout = (event, questionId, outcomeText, outcomeClass) => {
 
 const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores) => {
   const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
-  const customdata = allUsernames.map(u => {
-    const scoreData = scores[u];
-    if (!scoreData) return { prediction: 'N/A' };
-    const prediction = x[allUsernames.indexOf(u)].toFixed(2);
+  const customdata = allUsernames.map((_, index) => {
+    const prediction = x[index].toFixed(2);
     return { prediction };
   });
 
@@ -58,7 +58,7 @@ const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores) => 
 };
 
 function renderStandings(scores) {
-  const container = document.getElementById('standings-table-container');
+  const container = document.getElementById('standings-container');
   container.innerHTML = '';
 
   const standings = [];
@@ -69,12 +69,10 @@ function renderStandings(scores) {
   }
 
   standings.sort((a, b) => {
-    let valA = a.meanTotalScore;
-    let valB = b.meanTotalScore;
-    if (isNaN(valA) && isNaN(valB)) return 0;
-    if (isNaN(valA)) return 1;
-    if (isNaN(valB)) return -1;
-    return valB - valA; // Sort descending
+    if (isNaN(a.meanTotalScore) && isNaN(b.meanTotalScore)) return 0;
+    if (isNaN(a.meanTotalScore)) return 1;
+    if (isNaN(b.meanTotalScore)) return -1;
+    return b.meanTotalScore - a.meanTotalScore; // Sort descending
   });
 
   const users = standings.map(s => s.user);
@@ -161,14 +159,17 @@ Promise.all([
   const allEvents = [{ id: 'all', short: 'All' }, ...events];
 
   // Parse scores.json with custom reviver
-  const scores = JSON.parse(scoresText.replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"').replace(/Infinity/g, '"__INFINITY__"').replace(/NaN/g, '"__NAN__"'), function (key, value) {
-    if (typeof value === 'string') {
-      if (value === '__INFINITY__') return Infinity;
-      if (value === '__NEGATIVE_INFINITY__') return -Infinity;
-      if (value === '__NAN__') return NaN;
-    }
-    return value;
-  });
+  const scores = JSON.parse(scoresText
+    .replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"')
+    .replace(/Infinity/g, '"__INFINITY__"')
+    .replace(/NaN/g, '"__NAN__"'), function (key, value) {
+      if (typeof value === 'string') {
+        if (value === '__INFINITY__') return Infinity;
+        if (value === '__NEGATIVE_INFINITY__') return -Infinity;
+        if (value === '__NAN__') return NaN;
+      }
+      return value;
+    });
 
   const plotTypeDropdown = d3.select('#plot-type-dropdown');
   const questionDropdown = d3.select('#question-dropdown');
@@ -207,7 +208,9 @@ Promise.all([
     });
   };
 
-  const renderPlot = (plotContainer, event, questionData, allUsernames, highlightedUsername, scores, plotType, fillColor, lineColor, outcomeText, outcomeClass, questionId) => {
+  const renderPlot = (plotContainer, event, questionData, allUsernames,
+    highlightedUsername, scores, plotType, fillColor, lineColor, outcomeText,
+    outcomeClass, questionId) => {
     const layout = createLayout(event, questionId, outcomeText, outcomeClass);
     let traces;
 
