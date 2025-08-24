@@ -34,5 +34,10 @@ jobs:
           dune build
           dune runtest
 
+      - name: Run ocamlformat
+        run: |
+          eval $(opam env)
+          dune fmt
+
       - name: Check for unclean workspace
         run: git diff --exit-code 
