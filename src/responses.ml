@@ -34,3 +34,13 @@ let of_csv csv =
       respondent, { probabilities })
     |> String.Map.of_alist_exn
 ;;
+
+let apply_confidence t ~confidence =
+  let probabilities =
+    Map.map t.probabilities ~f:(fun p ->
+      let open Float.O in
+      let odds = p / (1. - p) in
+      (odds ** confidence) / (1. + (odds ** confidence)))
+  in
+  { probabilities }
+;;
