@@ -2,9 +2,9 @@ open! Core
 
 type t =
   { email : string
-  ; probabilities : float Int.Map.t
+  ; probabilities : Question_map.t
   }
-[@@deriving sexp_of, fields]
+[@@deriving sexp_of, fields, yojson_of]
 
 let of_csv csv =
   let channel = Csv.of_string csv in
@@ -31,11 +31,12 @@ let of_csv csv =
           let p = Float.of_string (List.nth_exn row i) in
           q, p)
         |> Int.Map.of_alist_exn
+        |> Question_map.of_map
       in
       { email; probabilities })
 ;;
 
-let probability t ~event_id = Map.find_exn t.probabilities event_id
+let probability t ~event_id = Question_map.find t.probabilities event_id
 let user t = t.email
 
 let%expect_test "of_csv" =

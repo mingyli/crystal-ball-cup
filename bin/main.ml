@@ -31,8 +31,8 @@ module Make (Collection : Collection.S) = struct
       print_endline (Yojson.Safe.pretty_to_string yojson)
   ;;
 
-  let scores_command =
-    Command.basic ~summary:"Print scores"
+  let results_command =
+    Command.basic ~summary:"Print unified results in json format"
     @@
     let%map_open.Command () = return ()
     and responses_file =
@@ -40,25 +40,31 @@ module Make (Collection : Collection.S) = struct
     in
     fun () ->
       let responses = Response.of_csv (In_channel.read_all responses_file) in
-      let user_event_scores = String.Table.create () in
-      List.iter responses ~f:(fun (response : Response.t) ->
-        let user = Response.user response in
-        List.iter Collection.all ~f:(fun (event : Event.t) ->
-          let event_id = Event.id event in
-          let probability = Response.probability response ~event_id in
-          let score = Event.score event ~probability in
-          Hashtbl.update user_event_scores user ~f:(function
-            | Some scores_map -> Map.add_exn scores_map ~key:event_id ~data:score
-            | None -> Int.Map.singleton event_id score)));
-      let user_event_scores = String.Map.of_hashtbl_exn user_event_scores in
-      let all_user_scores = Scores.of_user_event_scores user_event_scores in
-      let json_output =
-        `Assoc
-          (Map.to_alist all_user_scores
-           |> List.map ~f:(fun (user, scores_data) ->
-             user, [%yojson_of: Scores.t] scores_data))
+      let user_event_scores =
+        let user_event_scores = String.Table.create () in
+        List.iter responses ~f:(fun (response : Response.t) ->
+          let user = Response.user response in
+          List.iter Collection.all ~f:(fun (event : Event.t) ->
+            let event_id = Event.id event in
+            let probability = Response.probability response ~event_id in
+            let score = Event.score event ~probability in
+            Hashtbl.update user_event_scores user ~f:(function
+              | Some scores_map -> Map.add_exn scores_map ~key:event_id ~data:score
+              | None -> Int.Map.singleton event_id score)));
+        let user_event_scores = String.Map.of_hashtbl_exn user_event_scores in
+        let user_event_scores = Map.map user_event_scores ~f:Question_map.of_map in
+        user_event_scores
       in
-      print_endline (Yojson.Safe.pretty_to_string json_output)
+      let all_user_scores = Scores.of_user_event_scores user_event_scores in
+      let user_results =
+        List.map responses ~f:(fun (response : Response.t) ->
+          let user_email = Response.user response in
+          let scores_data = Map.find_exn all_user_scores user_email in
+          let scores = scores_data in
+          User_result.yojson_of_t (User_result.create ~response ~scores))
+      in
+      let yojson_output = `List user_results in
+      print_endline (Yojson.Safe.pretty_to_string yojson_output)
   ;;
 
   let command =
@@ -67,7 +73,7 @@ module Make (Collection : Collection.S) = struct
       [ "markdown", markdown_command
       ; "sexp", sexp_command
       ; "json", json_command
-      ; "scores", scores_command
+      ; "results", results_command
       ]
   ;;
 end

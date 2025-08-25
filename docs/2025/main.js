@@ -153,13 +153,11 @@ function renderStandings(scores) {
 
 Promise.all([
   d3.json('events.json'),
-  d3.csv('responses.csv'),
-  d3.text('scores.json')
-]).then(([events, responses, scoresText]) => {
+  d3.text('results.json')
+]).then(([events, resultsText]) => {
   const allEvents = [{ id: 'all', short: 'All' }, ...events];
 
-  // Parse scores.json with custom reviver
-  const scores = JSON.parse(scoresText
+  const results = JSON.parse(resultsText
     .replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"')
     .replace(/Infinity/g, '"__INFINITY__"')
     .replace(/NaN/g, '"__NAN__"'), function (key, value) {
@@ -170,6 +168,14 @@ Promise.all([
       }
       return value;
     });
+
+  const scores = {};
+  results.forEach(userResult => {
+    scores[userResult.user_email] = {
+      mean_score: userResult.mean_score,
+      question_scores: userResult.question_scores
+    };
+  });
 
   const plotTypeDropdown = d3.select('#plot-type-dropdown');
   const questionDropdown = d3.select('#question-dropdown');
@@ -182,7 +188,7 @@ Promise.all([
     .attr('value', d => d.id)
     .text(d => d.short);
 
-  const usernames = responses.map(r => r['Email Address']).sort();
+  const usernames = results.map(r => r.user_email).sort();
   emailDropdown.selectAll('option')
     .data(['No user selected', ...usernames])
     .enter()
@@ -276,8 +282,8 @@ Promise.all([
     const questionsToPlot = (questionId === 'all') ? events : events.filter(e => e.id == questionId);
 
     questionsToPlot.forEach(event => {
-      const questionData = responses.map(r => +r[event.id]);
-      const allUsernames = responses.map(r => r['Email Address']);
+      const questionData = results.map(r => r.predictions[event.id]);
+      const allUsernames = results.map(r => r.user_email);
 
       const outcomeText = event.outcome[0];
       const outcomeClass = `outcome-${outcomeText.toLowerCase()}`;

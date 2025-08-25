@@ -8,17 +8,22 @@
    (run %{project_root}/bin/main.exe 2025 json))))
 
 (rule
+ (target results.json)
+ (deps %{project_root}/bin/main.exe %{project_root}/etc/2025/responses.csv)
+ (mode promote)
+ (action
+  (with-stdout-to
+   results.json
+   (run
+    %{project_root}/bin/main.exe
+    2025
+    results
+    -responses
+    %{project_root}/etc/2025/responses.csv))))
+
+(rule
  (target index.html)
  (deps index.md ../style.css)
  (mode promote)
  (action
   (run pandoc -s -t html5 --css ../style.css index.md -o index.html)))
-
-(rule
- (target scores.json)
- (deps %{project_root}/bin/main.exe responses.csv)
- (mode promote)
- (action
-  (with-stdout-to
-   scores.json
-   (run %{project_root}/bin/main.exe 2025 scores -responses responses.csv))))
