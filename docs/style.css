@@ -36,3 +36,27 @@ p {
     margin-block-start: 0.5em;
     margin-block-end: 0.5em;
 }
+
+table.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+table.table th, table.table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+table.table th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+
+table.table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+table.table tr.highlighted {
+  background-color: #cce5ff;
+}
