@@ -58,7 +58,7 @@ let all =
         ~precise:
           "Travis Kelce and Taylor Swift are reported to be engaged on or before \
            2025-12-31, via a consensus of credible media reporting or primary sources."
-        ~outcome:Pending
+        ~outcome:Yes
     ; Event.create
         ~short:"Life is discovered beyond Earth"
         ~precise:
@@ -208,7 +208,7 @@ let%expect_test _ =
     │    │                                  │ ral disaster or death of a political │         │
     │    │                                  │  figure).                            │         │
     ├────┼──────────────────────────────────┼──────────────────────────────────────┼─────────┤
-    │ 8  │ Travis Kelce and Taylor Swift ar │ Travis Kelce and Taylor Swift are re │ Pending │
+    │ 8  │ Travis Kelce and Taylor Swift ar │ Travis Kelce and Taylor Swift are re │ Yes     │
     │    │ e engaged                        │ ported to be engaged on or before 20 │         │
     │    │                                  │ 25-12-31, via a consensus of credibl │         │
     │    │                                  │ e media reporting or primary sources │         │
