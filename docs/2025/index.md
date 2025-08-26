@@ -2,8 +2,6 @@
 title: Crystal Ball Cup 2025
 ---
 
-<center>[Jump to Standings](#standings)</center>
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -114,6 +112,12 @@ select {
 }
 </style>
 
+## Standings
+
+<div id="standings-container"></div>
+
+## Events
+
 <div class="all-dropdowns-container">
 <select id="question-dropdown"></select>
 <select id="plot-type-dropdown">
@@ -124,11 +128,5 @@ select {
 </div>
 <div id="question-description" style="margin-top: 1rem; font-style: italic;"></div>
 <div id="plot"></div>
-
-## Standings
-
-<div id="standings-container"></div>
 <script src="main.js"></script>
-
-[Back to home](../) | [Back to top](#title-block-header)
 
