@@ -151,6 +151,50 @@ function renderStandings(scores) {
   Plotly.newPlot(container, data, layout, { displayModeBar: false });
 }
 
+function renderSubmissionsTable(questionId, responses, scores, highlightedUsername) {
+  const container = document.getElementById('submissions-table-container');
+  container.innerHTML = '';
+
+  if (questionId === 'all') {
+    return;
+  }
+
+  const sortedResponses = [...responses].sort((a, b) => {
+    const userA = a['Email Address'];
+    const userB = b['Email Address'];
+    const scoreA = (scores[userA] && scores[userA].question_scores && scores[userA].question_scores[questionId]) ? scores[userA].question_scores[questionId] : -Infinity;
+    const scoreB = (scores[userB] && scores[userB].question_scores && scores[userB].question_scores[questionId]) ? scores[userB].question_scores[questionId] : -Infinity;
+    return scoreB - scoreA;
+  });
+
+  const table = d3.select(container).append('table').attr('class', 'table');
+  const thead = table.append('thead');
+  const tbody = table.append('tbody');
+
+  thead.append('tr')
+    .selectAll('th')
+    .data(['Respondent', 'Submission', 'Score'])
+    .enter()
+    .append('th')
+    .text(d => d);
+
+  const rows = tbody.selectAll('tr')
+    .data(sortedResponses)
+    .enter()
+    .append('tr')
+    .attr('class', d => d['Email Address'] === highlightedUsername ? 'highlighted' : null);
+
+  rows.append('td').text(d => d['Email Address']);
+  rows.append('td').text(d => d[questionId]);
+  rows.append('td').text(d => {
+    const user = d['Email Address'];
+    if (scores[user] && scores[user].question_scores && scores[user].question_scores[questionId]) {
+      return scores[user].question_scores[questionId].toFixed(3);
+    }
+    return 'N/A';
+  });
+}
+
 Promise.all([
   d3.json('events.json'),
   d3.csv('responses.csv'),
@@ -272,6 +316,8 @@ Promise.all([
   const plotData = (questionId, highlightedUsername, plotType) => {
     const plotDiv = d3.select('#plot');
     plotDiv.html(''); // Clear previous plot(s)
+
+    renderSubmissionsTable(questionId, responses, scores, highlightedUsername);
 
     const questionsToPlot = (questionId === 'all') ? events : events.filter(e => e.id == questionId);
 

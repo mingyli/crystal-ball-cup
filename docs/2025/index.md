@@ -128,5 +128,6 @@ select {
 </div>
 <div id="question-description" style="margin-top: 1rem; font-style: italic;"></div>
 <div id="plot"></div>
+<div id="submissions-table-container"></div>
 <script src="main.js"></script>
 
