@@ -176,8 +176,8 @@ let%expect_test _ =
     │    │ f Q4 2025 is based on an origina │  2025 (October through December), ac │         │
     │    │ l screenplay                     │ cording to Box Office Mojo, is based │         │
     │    │                                  │  on an original screenplay—meaning │         │
-    │    │                                  │  not adapted from existing material� │         │
-    │    │                                  │ ��as determined by Oscar eligibility │         │
+    │    │                                  │  not adapted from existing material� │         │
+    │    │                                  │ ��as determined by Oscar eligibility │         │
     │    │                                  │  or expert consensus (e.g., Writer's │         │
     │    │                                  │  Branch of the Academy of Motion Pic │         │
     │    │                                  │ ture Arts and Sciences).             │         │
