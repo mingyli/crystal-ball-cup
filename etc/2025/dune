@@ -20,5 +20,3 @@
  (mode promote)
  (action
   (run pandoc -t beamer slides.md -o slides.pdf --pdf-engine=xelatex)))
-
-

@@ -28,6 +28,13 @@
 <header id="title-block-header">
 <h1 class="title">Crystal Ball Cup 2025</h1>
 </header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#standings" id="toc-standings">Standings</a></li>
+<li><a href="#events" id="toc-events">Events</a></li>
+<li><a href="#explorer" id="toc-explorer">Explorer</a></li>
+</ul>
+</nav>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <p><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin></p>
@@ -159,7 +166,7 @@ style="margin-top: 1rem; font-style: italic;">
 <h2 id="explorer">Explorer</h2>
 <div id="explorer-section">
 <textarea id="query-editor">SELECT name, sql FROM sqlite_master WHERE type='table';</textarea>
-<button id="run-query-btn">Run</button>
+<button id="run-query-btn">Run (ctrl+enter)</button>
 <pre id="query-error" style="color: red;"></pre>
 <table id="query-results" class="data-table">
 </table>

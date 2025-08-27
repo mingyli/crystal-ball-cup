@@ -340,7 +340,7 @@ async function initializeDatabaseExplorer() {
     const queryResults = document.getElementById('query-results');
     const queryError = document.getElementById('query-error');
 
-    runQueryBtn.addEventListener('click', () => {
+    const executeQuery = () => {
       queryError.textContent = '';
       queryResults.innerHTML = '';
       try {
@@ -375,10 +375,18 @@ async function initializeDatabaseExplorer() {
       } catch (err) {
         queryError.textContent = err.message;
       }
+    };
+
+    runQueryBtn.addEventListener('click', executeQuery);
+
+    queryEditor.addEventListener('keydown', (event) => {
+      if (event.ctrlKey && event.key === 'Enter') {
+        event.preventDefault();
+        executeQuery();
+      }
     });
 
-    // Run initial query
-    runQueryBtn.click();
+    executeQuery();
 
   } catch (err) {
     console.error("Failed to load SQL.js or database:", err);

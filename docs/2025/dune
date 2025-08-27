@@ -12,7 +12,17 @@
  (deps index.md ../style.css)
  (mode promote)
  (action
-  (run pandoc -s -t html5 --css ../style.css index.md -o index.html)))
+  (run
+   pandoc
+   -s
+   -t
+   html5
+   --css
+   ../style.css
+   --table-of-contents=true
+   index.md
+   -o
+   index.html)))
 
 (rule
  (target responses_and_scores.json)
