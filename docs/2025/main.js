@@ -149,47 +149,7 @@ function renderStandings(responsesAndScores) {
   Plotly.newPlot(container, data, layout, { displayModeBar: false });
 }
 
-function renderSubmissionsTable(eventId, responsesAndScores, highlightedRespondent) {
-  const container = document.getElementById('submissions-table-container');
-  container.innerHTML = '';
 
-  if (eventId === 'all') {
-    return;
-  }
-
-  const sortedRespondents = Object.keys(responsesAndScores).sort((a, b) => {
-    const scoreA = (responsesAndScores[a] && responsesAndScores[a].scores.mean_score) ? responsesAndScores[a].scores.mean_score : -Infinity;
-    const scoreB = (responsesAndScores[b] && responsesAndScores[b].scores.mean_score) ? responsesAndScores[b].scores.mean_score : -Infinity;
-    return scoreB - scoreA;
-  });
-
-  const table = d3.select(container).append('table').attr('class', 'table');
-  const thead = table.append('thead');
-  const tbody = table.append('tbody');
-
-  thead.append('tr')
-    .selectAll('th')
-    .data(['Respondent', 'Submission', 'Score'])
-    .enter()
-    .append('th')
-    .text(d => d);
-
-  const rows = tbody.selectAll('tr')
-    .data(sortedRespondents)
-    .enter()
-    .append('tr')
-    .attr('class', d => d === highlightedRespondent ? 'highlighted' : null);
-
-  rows.append('td').text(d => d);
-  rows.append('td').text(d => responsesAndScores[d].responses.probabilities[eventId]);
-  rows.append('td').text(d => {
-    const respondent = d;
-    if (responsesAndScores[respondent] && responsesAndScores[respondent].scores.event_scores && responsesAndScores[respondent].scores.event_scores[eventId]) {
-      return responsesAndScores[respondent].scores.event_scores[eventId].toFixed(3);
-    }
-    return 'N/A';
-  });
-}
 
 Promise.all([
   d3.json('events.json'),
@@ -311,8 +271,6 @@ Promise.all([
     const plotDiv = d3.select('#plot');
     plotDiv.html(''); // Clear previous plot(s)
 
-    renderSubmissionsTable(eventId, responsesAndScores, highlightedRespondent);
-
     const eventsToPlot = (eventId === 'all') ? events : events.filter(e => e.id == eventId);
 
     eventsToPlot.forEach(event => {
@@ -366,3 +324,66 @@ Promise.all([
   plotData(eventDropdown.property('value'), respondentDropdown.property('value'), plotTypeDropdown.property('value'));
   renderStandings(responsesAndScores);
 });
+
+async function initializeDatabaseExplorer() {
+  try {
+    const SQL = await initSqlJs({
+      locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+    });
+
+    const response = await fetch('crystal.db');
+    const buffer = await response.arrayBuffer();
+    const db = new SQL.Database(new Uint8Array(buffer));
+
+    const queryEditor = document.getElementById('query-editor');
+    const runQueryBtn = document.getElementById('run-query-btn');
+    const queryResults = document.getElementById('query-results');
+    const queryError = document.getElementById('query-error');
+
+    runQueryBtn.addEventListener('click', () => {
+      queryError.textContent = '';
+      queryResults.innerHTML = '';
+      try {
+        const stmt = queryEditor.value;
+        const res = db.exec(stmt);
+
+        if (res.length === 0) {
+          queryResults.innerHTML = '<tr><td>No results</td></tr>';
+          return;
+        }
+
+        res.forEach(table => {
+          const headerRow = document.createElement('tr');
+          table.columns.forEach(col => {
+            const th = document.createElement('th');
+            th.textContent = col;
+            headerRow.appendChild(th);
+          });
+          queryResults.appendChild(headerRow);
+
+          table.values.forEach(row => {
+            const dataRow = document.createElement('tr');
+            row.forEach(val => {
+              const td = document.createElement('td');
+              td.textContent = val;
+              dataRow.appendChild(td);
+            });
+            queryResults.appendChild(dataRow);
+          });
+        });
+
+      } catch (err) {
+        queryError.textContent = err.message;
+      }
+    });
+
+    // Run initial query
+    runQueryBtn.click();
+
+  } catch (err) {
+    console.error("Failed to load SQL.js or database:", err);
+    document.getElementById('explorer-section').innerHTML = `<p style="color: red;">Failed to load database explorer: ${err.message}</p>`;
+  }
+}
+
+initializeDatabaseExplorer();
