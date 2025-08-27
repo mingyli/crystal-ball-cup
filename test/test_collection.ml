@@ -14,6 +14,11 @@ let all =
       ~short:"Event 2"
       ~precise:"Precise description for event 2"
       ~outcome:Yes
+  ; Event.create
+      ~id:(Event_id.of_int 3)
+      ~short:"Event 3"
+      ~precise:"Precise description for event 3"
+      ~outcome:No
   ]
 ;;
 

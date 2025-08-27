@@ -20,21 +20,3 @@ running `dune build`.
     directory. You can serve it locally by running `python3 -m http.server`
     from this directory.
 *   **`etc/`**: Stores miscellaneous assets for this project.
-
-## sqlite plan
-
-Let's plan a large change to serve a sqlite database in the web page. The 
-database will have the following tables in order to replace the data currently
-served by the json files:
-
-- events
-  - schema: event_id, short, precise, outcome
-- responses
-  - schema: respondent, event_id, probability 
-- scores
-  - schema: respondent, event_id, score
-
-The steps involved in this change are
-
-1. Implement subcommand to create and populate the sqlite database 
-2. Update the web page to support interacting with the database

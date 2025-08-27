@@ -2,13 +2,11 @@ open! Core
 open Crystal
 
 let dummy_responses =
+  let event = Event_id.of_int in
+  let responses l = Responses.create @@ Event_id.Map.of_alist_exn l in
   String.Map.of_alist_exn
-    [ ( "respondent1"
-      , Responses.create
-        @@ Event_id.Map.of_alist_exn [ Event_id.of_int 1, 0.5; Event_id.of_int 2, 0.8 ] )
-    ; ( "respondent2"
-      , Responses.create
-        @@ Event_id.Map.of_alist_exn [ Event_id.of_int 1, 0.2; Event_id.of_int 2, 0.9 ] )
+    [ "respondent1", responses [ event 1, 0.5; event 2, 0.5; event 3, 0.8 ]
+    ; "respondent2", responses [ event 1, 0.2; event 2, 0.9; event 3, 0.5 ]
     ]
 ;;
 
@@ -32,15 +30,15 @@ let max_score_per_respondent_query =
 let%expect_test _ =
   let open Result.Let_syntax in
   let output_file = Filename.temp_file "test_db" ".sqlite" in
+  let db = Db.create ~output_file in
   let () =
-    Db.create_and_populate
-      (module Test_collection)
-      ~output_file
-      ~responses:dummy_responses
-      ~scores:dummy_scores
+    Db.with_connection db ~f:(fun conn ->
+      let%bind.Or_error () = Db.Connection.make_events conn (module Test_collection) in
+      let%bind.Or_error () = Db.Connection.make_responses conn dummy_responses in
+      let%bind.Or_error () = Db.Connection.make_scores conn dummy_scores in
+      Ok ())
     |> Or_error.ok_exn
   in
-  print_endline "Database created successfully.";
   let result =
     let uri = Uri.of_string ("sqlite3:" ^ output_file) in
     let%bind (module Conn : Caqti_blocking.CONNECTION) = Caqti_blocking.connect uri in
@@ -54,7 +52,6 @@ let%expect_test _ =
   |> Or_error.ok_exn;
   [%expect
     {| 
-    Database created successfully.
-    respondent1 Event 2 0.47000362924573558
+    respondent1 Event 2 0.
     respondent2 Event 2 0.58778666490211906 |}]
 ;;

@@ -85,7 +85,12 @@ module Make (Collection : Collection.S) = struct
         Map.map responses ~f:(fun responses ->
           Scores.create (module Collection) responses)
       in
-      Db.create_and_populate (module Collection) ~output_file ~responses ~scores
+      let db = Db.create ~output_file in
+      Db.with_connection db ~f:(fun conn ->
+        let%bind.Or_error () = Db.Connection.make_events conn (module Collection) in
+        let%bind.Or_error () = Db.Connection.make_responses conn responses in
+        let%bind.Or_error () = Db.Connection.make_scores conn scores in
+        Ok ())
       |> Or_error.ok_exn
   ;;
 
