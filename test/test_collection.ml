@@ -6,17 +6,17 @@ let name = "2025_test"
 let all =
   [ Event.create
       ~id:(Event_id.of_int 1)
-      ~short:"Event 1"
+      ~short:"Event1"
       ~precise:"Precise description for event 1"
       ~outcome:Pending
   ; Event.create
       ~id:(Event_id.of_int 2)
-      ~short:"Event 2"
+      ~short:"Event2"
       ~precise:"Precise description for event 2"
       ~outcome:Yes
   ; Event.create
       ~id:(Event_id.of_int 3)
-      ~short:"Event 3"
+      ~short:"Event3"
       ~precise:"Precise description for event 3"
       ~outcome:No
   ]

@@ -12,6 +12,13 @@ let to_string = function
   | No -> "No"
 ;;
 
+let of_string = function
+  | "Pending" -> Ok Pending
+  | "Yes" -> Ok Yes
+  | "No" -> Ok No
+  | s -> Error [%string "unknown outcome %{s}"]
+;;
+
 let score t ~probability =
   let ln = Float.log in
   match t with
@@ -20,11 +27,4 @@ let score t ~probability =
   | No -> ln (1.0 -. probability) -. ln 0.5
 ;;
 
-let caqti_type =
-  Caqti_type.enum "Outcome.t" ~encode:to_string ~decode:(fun s ->
-    match String.lowercase s with
-    | "Pending" -> Ok Pending
-    | "Yes" -> Ok Yes
-    | "No" -> Ok No
-    | s -> Error [%string "unknown outcome %{s}"])
-;;
+let caqti_type = Caqti_type.enum "Outcome.t" ~encode:to_string ~decode:of_string

@@ -58,21 +58,24 @@ let%expect_test _ =
     let print_results query =
       let%bind rows = Conn.collect_list query () in
       List.iter rows ~f:(fun (respondent, event_short, score) ->
-        print_endline [%string "%{respondent} %{event_short} %{score#Float}"]);
+        print_endline
+          [%string
+            "%{respondent} scored the highest on %{event_short} with a score of \
+             %{score#Float}"]);
       Ok ()
     in
     let%bind () = print_results max_score_per_respondent_query in
     [%expect
       {|
-      respondent1 Event 2 0.
-      respondent2 Event 2 0.58778666490211906 |}];
+      respondent1 scored the highest on Event2 with a score of 0.
+      respondent2 scored the highest on Event2 with a score of 0.58778666490211906 |}];
     let%bind () =
       print_results max_score_per_respondent_from_responses_and_scores_query
     in
     [%expect
       {|
-      respondent1 Event 2 0.
-      respondent2 Event 2 0.58778666490211906 |}];
+      respondent1 scored the highest on Event2 with a score of 0.
+      respondent2 scored the highest on Event2 with a score of 0.58778666490211906 |}];
     Ok ()
   in
   Sys.remove output_file;
