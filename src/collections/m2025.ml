@@ -143,6 +143,11 @@ let all =
     ]
 ;;
 
+include Collection.Make (struct
+    let name = name
+    let all = all
+  end)
+
 let%expect_test _ =
   let columns =
     let c = Ascii_table.Column.create in

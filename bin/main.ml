@@ -31,34 +31,41 @@ module Make (Collection : Collection.S) = struct
       print_endline (Yojson.Safe.pretty_to_string yojson)
   ;;
 
-  let scores_command =
-    Command.basic ~summary:"Print scores"
+  let responses_and_scores_command =
+    Command.basic ~summary:"Print responses and scores"
     @@
     let%map_open.Command () = return ()
     and responses_file =
       flag "responses" (required Filename.arg_type) ~doc:"FILE responses csv file"
     in
     fun () ->
-      let responses = Response.of_csv (In_channel.read_all responses_file) in
-      let respondent_event_scores = String.Table.create () in
-      List.iter responses ~f:(fun (response : Response.t) ->
-        let respondent = Response.respondent response in
-        List.iter Collection.all ~f:(fun (event : Event.t) ->
-          let event_id = Event.id event in
-          let probability = Response.probability response event_id in
-          let score = Event.score event ~probability in
-          Hashtbl.update respondent_event_scores respondent ~f:(function
-            | Some scores_map -> Map.add_exn scores_map ~key:event_id ~data:score
-            | None -> Map.singleton (module Event_id) event_id score)));
-      let respondent_event_scores = String.Map.of_hashtbl_exn respondent_event_scores in
-      let all_respondent_scores =
-        Scores.of_respondent_event_scores respondent_event_scores
+      let responses = Responses.of_csv (In_channel.read_all responses_file) in
+      let scores =
+        Map.map responses ~f:(fun responses ->
+          Scores.create (module Collection) responses)
+      in
+      let responses_and_scores =
+        Map.merge responses scores ~f:(fun ~key:respondent -> function
+          | `Left responses ->
+            raise_s
+              [%message
+                "No scores found for respondent"
+                  (respondent : string)
+                  (responses : Responses.t)]
+          | `Right scores ->
+            raise_s
+              [%message
+                "No responses provided for respondent"
+                  (respondent : string)
+                  (scores : Scores.t)]
+          | `Both (responses, scores) ->
+            Some (Responses_and_scores.create responses scores))
       in
       let json_output =
         `Assoc
-          (Map.to_alist all_respondent_scores
-           |> List.map ~f:(fun (respondent, scores_data) ->
-             respondent, [%yojson_of: Scores.t] scores_data))
+          (Map.to_alist responses_and_scores
+           |> List.map ~f:(fun (respondent, responses_and_scores) ->
+             respondent, [%yojson_of: Responses_and_scores.t] responses_and_scores))
       in
       print_endline (Yojson.Safe.pretty_to_string json_output)
   ;;
@@ -69,7 +76,7 @@ module Make (Collection : Collection.S) = struct
       [ "markdown", markdown_command
       ; "sexp", sexp_command
       ; "json", json_command
-      ; "scores", scores_command
+      ; "responses-and-scores", responses_and_scores_command
       ]
   ;;
 end

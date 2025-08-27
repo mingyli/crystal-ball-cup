@@ -15,10 +15,15 @@
   (run pandoc -s -t html5 --css ../style.css index.md -o index.html)))
 
 (rule
- (target scores.json)
- (deps %{project_root}/bin/main.exe responses.csv)
+ (target responses_and_scores.json)
+ (deps %{project_root}/bin/main.exe %{project_root}/etc/2025/responses.csv)
  (mode promote)
  (action
   (with-stdout-to
-   scores.json
-   (run %{project_root}/bin/main.exe 2025 scores -responses responses.csv))))
+   responses_and_scores.json
+   (run
+    %{project_root}/bin/main.exe
+    2025
+    responses-and-scores
+    -responses
+    %{project_root}/etc/2025/responses.csv))))
