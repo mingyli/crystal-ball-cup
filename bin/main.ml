@@ -80,17 +80,13 @@ module Make (Collection : Collection.S) = struct
       flag "responses" (required Filename.arg_type) ~doc:"FILE responses csv file"
     in
     fun () ->
-      let responses_by_respondent =
-        Responses.of_csv (In_channel.read_all responses_file)
+      let responses = Responses.of_csv (In_channel.read_all responses_file) in
+      let scores =
+        Map.map responses ~f:(fun responses ->
+          Scores.create (module Collection) responses)
       in
-      match
-        Db.create_and_populate
-          ~output_path:output_file
-          (module Collection)
-          ~responses_by_respondent
-      with
-      | Ok () -> ()
-      | Error e -> prerr_endline e
+      Db.create_and_populate (module Collection) ~output_file ~responses ~scores
+      |> Or_error.ok_exn
   ;;
 
   let command =

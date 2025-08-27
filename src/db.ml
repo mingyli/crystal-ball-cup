@@ -43,16 +43,17 @@ let insert_score_req =
     "INSERT INTO scores (respondent, event_id, score) VALUES (?, ?, ?)"
 ;;
 
-let create_and_populate ~output_path (module C : Collection.S) ~responses_by_respondent =
+let create_and_populate (module Collection : Collection.S) ~output_file ~responses ~scores
+  =
   let open Result.Let_syntax in
-  let uri = Uri.of_string ("sqlite3:" ^ output_path) in
+  let uri = Uri.of_string ("sqlite3:" ^ output_file) in
   let result =
     let%bind (module Conn : Caqti_blocking.CONNECTION) = connect uri in
     let%bind () = Conn.exec create_events_req () in
     let%bind () = Conn.exec create_responses_req () in
     let%bind () = Conn.exec create_scores_req () in
     let%bind () =
-      let events = C.all in
+      let events = Collection.all in
       List.fold events ~init:(Ok ()) ~f:(fun acc event ->
         let%bind () = acc in
         let event_id = Event.id event in
@@ -62,24 +63,26 @@ let create_and_populate ~output_path (module C : Collection.S) ~responses_by_res
         Conn.exec insert_event_req (event_id, short, precise, outcome))
     in
     let%bind () =
-      Map.fold
-        responses_by_respondent
-        ~init:(Ok ())
-        ~f:(fun ~key:respondent ~data:responses acc ->
-          let%bind () = acc in
-          Map.fold
-            (Responses.probabilities responses)
-            ~init:(Ok ())
-            ~f:(fun ~key:event_id ~data:probability acc ->
-              let%bind () = acc in
-              let%bind () =
-                Conn.exec insert_response_req (respondent, event_id, probability)
-              in
-              let event = Map.find_exn C.all' event_id in
-              let score = Event.score event ~probability in
-              Conn.exec insert_score_req (respondent, event_id, score)))
+      Map.fold responses ~init:(Ok ()) ~f:(fun ~key:respondent ~data:responses acc ->
+        let%bind () = acc in
+        Map.fold
+          (Responses.probabilities responses)
+          ~init:(Ok ())
+          ~f:(fun ~key:event_id ~data:probability acc ->
+            let%bind () = acc in
+            Conn.exec insert_response_req (respondent, event_id, probability)))
+    in
+    let%bind () =
+      Map.fold scores ~init:(Ok ()) ~f:(fun ~key:respondent ~data:scores acc ->
+        let%bind () = acc in
+        Map.fold
+          (Scores.event_scores scores)
+          ~init:(Ok ())
+          ~f:(fun ~key:event_id ~data:score acc ->
+            let%bind () = acc in
+            Conn.exec insert_score_req (respondent, event_id, score)))
     in
     Ok ()
   in
-  Result.map_error result ~f:Caqti_error.show
+  Result.map_error result ~f:(fun e -> e |> Caqti_error.show |> Error.of_string)
 ;;

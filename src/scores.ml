@@ -4,7 +4,7 @@ type t =
   { event_scores : float Event_id.Map.t
   ; mean_score : float
   }
-[@@deriving sexp_of, yojson_of]
+[@@deriving fields, sexp_of, yojson_of]
 
 let create (module Collection : Collection.S) responses =
   let probabilities = Responses.probabilities responses in
