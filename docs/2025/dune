@@ -27,3 +27,17 @@
     responses-and-scores
     -responses
     %{project_root}/etc/2025/responses.csv))))
+
+(rule
+ (target crystal.db)
+ (deps %{project_root}/bin/main.exe %{project_root}/etc/2025/responses.csv)
+ (mode promote)
+ (action
+  (run
+   %{project_root}/bin/main.exe
+   2025
+   create-db
+   -output
+   %{target}
+   -responses
+   %{project_root}/etc/2025/responses.csv)))
