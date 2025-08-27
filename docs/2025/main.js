@@ -217,7 +217,7 @@ Promise.all([
 
   const plotTypeDropdown = d3.select('#plot-type-dropdown');
   const eventDropdown = d3.select('#event-dropdown');
-  const emailDropdown = d3.select('#email-dropdown');
+  const respondentDropdown = d3.select('#respondent-dropdown');
 
   eventDropdown.selectAll('option')
     .data(allEvents)
@@ -227,7 +227,7 @@ Promise.all([
     .text(d => d.short);
 
   const respondents = responses.map(r => r['Email Address']).sort();
-  emailDropdown.selectAll('option')
+  respondentDropdown.selectAll('option')
     .data(['No respondent selected', ...respondents])
     .enter()
     .append('option')
@@ -237,7 +237,7 @@ Promise.all([
   // Set initial dropdown values
   plotTypeDropdown.property('value', 'density');
   eventDropdown.property('value', 'all');
-  emailDropdown.property('value', 'No respondent selected');
+  respondentDropdown.property('value', 'No respondent selected');
 
   const attachClickHandler = (plotContainerId) => {
     document.getElementById(plotContainerId).on('plotly_click', function (data) {
@@ -245,7 +245,7 @@ Promise.all([
         const point = data.points[0];
         if (point.curveNumber === 1) { // scatter plot trace
           const respondent = point.text;
-          emailDropdown.property('value', respondent);
+          respondentDropdown.property('value', respondent);
           plotData(eventDropdown.property('value'), respondent, plotTypeDropdown.property('value'));
         }
       }
@@ -357,18 +357,18 @@ Promise.all([
   };
 
   plotTypeDropdown.on('change', function () {
-    plotData(eventDropdown.property('value'), emailDropdown.property('value'), this.value);
+    plotData(eventDropdown.property('value'), respondentDropdown.property('value'), this.value);
   });
 
   eventDropdown.on('change', function () {
     const selectedEventId = this.value;
-    plotData(selectedEventId, emailDropdown.property('value'), plotTypeDropdown.property('value'));
+    plotData(selectedEventId, respondentDropdown.property('value'), plotTypeDropdown.property('value'));
   });
 
-  emailDropdown.on('change', function () {
+  respondentDropdown.on('change', function () {
     plotData(eventDropdown.property('value'), this.value, plotTypeDropdown.property('value'));
   });
 
-  plotData(eventDropdown.property('value'), emailDropdown.property('value'), plotTypeDropdown.property('value'));
+  plotData(eventDropdown.property('value'), respondentDropdown.property('value'), plotTypeDropdown.property('value'));
   renderStandings(scores);
 });

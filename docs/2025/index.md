@@ -124,7 +124,7 @@ select {
     <option value="density">Density</option>
     <option value="cumulative">Cumulative</option>
 </select>
-<select id="email-dropdown"></select>
+<select id="respondent-dropdown"></select>
 </div>
 <div id="event-description" style="margin-top: 1rem; font-style: italic;"></div>
 <div id="plot"></div>
