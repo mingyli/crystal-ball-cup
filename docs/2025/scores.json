@@ -1,6 +1,6 @@
 {
   "GPT-5": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -25,7 +25,7 @@
     "mean_score": -0.5108256237659908
   },
   "aagottlie@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -50,7 +50,7 @@
     "mean_score": -1.203972804325936
   },
   "abaruah117@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -75,7 +75,7 @@
     "mean_score": -0.6931471805599453
   },
   "allanlwu@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -100,7 +100,7 @@
     "mean_score": -0.2231435513142097
   },
   "andreahe99@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -125,7 +125,7 @@
     "mean_score": -0.24846135929849966
   },
   "aninditg98@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -150,7 +150,7 @@
     "mean_score": -0.10536051565782634
   },
   "brandbest1@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -175,7 +175,7 @@
     "mean_score": -0.10536051565782634
   },
   "bryan1999chen@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -200,7 +200,7 @@
     "mean_score": -0.5108256237659908
   },
   "cao.anton@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -225,7 +225,7 @@
     "mean_score": -0.2231435513142097
   },
   "ccchoi139@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -250,7 +250,7 @@
     "mean_score": 0.4700036292457356
   },
   "chriszheng135@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -275,7 +275,7 @@
     "mean_score": -1.203972804325936
   },
   "donotmakefunofmyemail@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -300,7 +300,7 @@
     "mean_score": -0.06187540371808753
   },
   "hsdharam@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -325,7 +325,7 @@
     "mean_score": -0.10536051565782634
   },
   "jiyoonm00@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -350,7 +350,7 @@
     "mean_score": -0.2231435513142097
   },
   "kunal.upadya@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -375,7 +375,7 @@
     "mean_score": -0.916290731874155
   },
   "lavamitt4@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -400,7 +400,7 @@
     "mean_score": -Infinity
   },
   "lilly0510@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -425,7 +425,7 @@
     "mean_score": -0.916290731874155
   },
   "malikpriyansh98@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -450,7 +450,7 @@
     "mean_score": -Infinity
   },
   "maliksiddhant95@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -475,7 +475,7 @@
     "mean_score": 0.18232155679395456
   },
   "mingyli34@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -500,7 +500,7 @@
     "mean_score": -0.916290731874155
   },
   "rohan.c.choudhury@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -525,7 +525,7 @@
     "mean_score": -3.9120230054281455
   },
   "sambhav.reddy@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -550,7 +550,7 @@
     "mean_score": -0.2231435513142097
   },
   "simplyme.lucy@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -575,7 +575,7 @@
     "mean_score": -1.6094379124341
   },
   "stephanie.y.shi@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,
@@ -600,7 +600,7 @@
     "mean_score": -0.6931471805599453
   },
   "tree.kevinc@gmail.com": {
-    "question_scores": {
+    "event_scores": {
       "1": NaN,
       "2": NaN,
       "3": NaN,

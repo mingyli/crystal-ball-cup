@@ -5,7 +5,7 @@ let name = "2025"
 
 let all =
   List.mapi
-    ~f:(fun i create -> create ~id:(i + 1))
+    ~f:(fun i create -> create ~id:(Event_id.of_int (i + 1)))
     [ Event.create
         ~short:"Nintendo announces a new Super Smash Bros. game"
         ~precise:
@@ -146,7 +146,7 @@ let all =
 let%expect_test _ =
   let columns =
     let c = Ascii_table.Column.create in
-    [ c "id" (fun event -> event |> Event.id |> Int.to_string)
+    [ c "id" (fun event -> event |> Event.id |> Event_id.to_string)
     ; c "short" (fun event -> event |> Event.short)
     ; c "precise" (fun event -> event |> Event.precise)
     ; c "outcome" (fun event -> event |> Event.outcome |> Outcome.to_string)
@@ -176,8 +176,8 @@ let%expect_test _ =
     │    │ f Q4 2025 is based on an origina │  2025 (October through December), ac │         │
     │    │ l screenplay                     │ cording to Box Office Mojo, is based │         │
     │    │                                  │  on an original screenplay—meaning │         │
-    │    │                                  │  not adapted from existing material� │         │
-    │    │                                  │ ��as determined by Oscar eligibility │         │
+    │    │                                  │  not adapted from existing material� │         │
+    │    │                                  │ ��as determined by Oscar eligibility │         │
     │    │                                  │  or expert consensus (e.g., Writer's │         │
     │    │                                  │  Branch of the Academy of Motion Pic │         │
     │    │                                  │ ture Arts and Sciences).             │         │

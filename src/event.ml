@@ -1,7 +1,7 @@
 open! Core
 
 type t =
-  { id : int
+  { id : Event_id.t
   ; short : string
   ; precise : string
   ; outcome : Outcome.t
