@@ -64,7 +64,7 @@ function renderStandings(scores) {
   const standings = [];
   for (const respondent in scores) {
     const respondentData = scores[respondent];
-    const meanTotalScore = respondentData.mean_score;
+    const meanTotalScore = respondentData.scores.mean_score;
     standings.push({ respondent: respondent, meanTotalScore: meanTotalScore });
   }
 
@@ -162,8 +162,8 @@ function renderSubmissionsTable(eventId, responses, scores, highlightedResponden
   const sortedResponses = [...responses].sort((a, b) => {
     const respondentA = a['Email Address'];
     const respondentB = b['Email Address'];
-    const scoreA = (scores[respondentA] && scores[respondentA].event_scores && scores[respondentA].event_scores[eventId]) ? scores[respondentA].event_scores[eventId] : -Infinity;
-    const scoreB = (scores[respondentB] && scores[respondentB].event_scores && scores[respondentB].event_scores[eventId]) ? scores[respondentB].event_scores[eventId] : -Infinity;
+    const scoreA = (scores[respondentA] && scores[respondentA].scores.mean_score) ? scores[respondentA].scores.mean_score : -Infinity;
+    const scoreB = (scores[respondentB] && scores[respondentB].scores.mean_score) ? scores[respondentB].scores.mean_score : -Infinity;
     return scoreB - scoreA;
   });
 
@@ -188,8 +188,8 @@ function renderSubmissionsTable(eventId, responses, scores, highlightedResponden
   rows.append('td').text(d => d[eventId]);
   rows.append('td').text(d => {
     const respondent = d['Email Address'];
-    if (scores[respondent] && scores[respondent].event_scores && scores[respondent].event_scores[eventId]) {
-      return scores[respondent].event_scores[eventId].toFixed(3);
+    if (scores[respondent] && scores[respondent].scores.event_scores && scores[respondent].scores.event_scores[eventId]) {
+      return scores[respondent].scores.event_scores[eventId].toFixed(3);
     }
     return 'N/A';
   });
@@ -197,11 +197,8 @@ function renderSubmissionsTable(eventId, responses, scores, highlightedResponden
 
 Promise.all([
   d3.json('events.json'),
-  d3.csv('responses.csv'),
   d3.text('scores.json')
-]).then(([events, responses, scoresText]) => {
-  const allEvents = [{ id: 'all', short: 'All' }, ...events];
-
+]).then(([events, scoresText]) => {
   // Parse scores.json with custom reviver
   const scores = JSON.parse(scoresText
     .replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"')
@@ -214,6 +211,20 @@ Promise.all([
       }
       return value;
     });
+
+  // Extract responses from the scores object
+  const responses = [];
+  for (const respondentEmail in scores) {
+    const respondentData = scores[respondentEmail];
+    const probabilities = respondentData.responses.probabilities;
+    const responseEntry = { 'Email Address': respondentEmail };
+    for (const eventId in probabilities) {
+      responseEntry[eventId] = probabilities[eventId];
+    }
+    responses.push(responseEntry);
+  }
+
+  const allEvents = [{ id: 'all', short: 'All' }, ...events];
 
   const plotTypeDropdown = d3.select('#plot-type-dropdown');
   const eventDropdown = d3.select('#event-dropdown');
