@@ -18,6 +18,8 @@ depends: [
   "csv" {= "2.4"}
   "textutils" {= "v0.14.0"}
   "ocamlformat"
+  "caqti" {= "2.0.1"}
+  "caqti-driver-sqlite3" {= "2.0.1"}
 ]
 build: [
   ["dune" "build" "-p" name "-j" jobs]

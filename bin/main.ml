@@ -40,26 +40,8 @@ module Make (Collection : Collection.S) = struct
     in
     fun () ->
       let responses = Responses.of_csv (In_channel.read_all responses_file) in
-      let scores =
-        Map.map responses ~f:(fun responses ->
-          Scores.create (module Collection) responses)
-      in
       let responses_and_scores =
-        Map.merge responses scores ~f:(fun ~key:respondent -> function
-          | `Left responses ->
-            raise_s
-              [%message
-                "No scores found for respondent"
-                  (respondent : string)
-                  (responses : Responses.t)]
-          | `Right scores ->
-            raise_s
-              [%message
-                "No responses provided for respondent"
-                  (respondent : string)
-                  (scores : Scores.t)]
-          | `Both (responses, scores) ->
-            Some (Responses_and_scores.create responses scores))
+        Map.map responses ~f:(Responses_and_scores.of_responses (module Collection))
       in
       let json_output =
         `Assoc
@@ -70,6 +52,31 @@ module Make (Collection : Collection.S) = struct
       print_endline (Yojson.Safe.pretty_to_string json_output)
   ;;
 
+  let create_db_command =
+    Command.basic ~summary:"Create and populate a sqlite database"
+    @@
+    let%map_open.Command () = return ()
+    and output_file =
+      flag "output" (required Filename.arg_type) ~doc:"FILE output sqlite database file"
+    and responses_file =
+      flag "responses" (required Filename.arg_type) ~doc:"FILE responses csv file"
+    in
+    fun () ->
+      let responses = Responses.of_csv (In_channel.read_all responses_file) in
+      let scores =
+        Map.map responses ~f:(fun responses ->
+          Scores.create (module Collection) responses)
+      in
+      let db = Db.create ~output_file in
+      Db.with_connection db ~f:(fun conn ->
+        let%bind.Or_error () = Db.Connection.make_events conn (module Collection) in
+        let%bind.Or_error () = Db.Connection.make_responses conn responses in
+        let%bind.Or_error () = Db.Connection.make_scores conn scores in
+        let%bind.Or_error () = Db.Connection.make_responses_and_scores conn in
+        Ok ())
+      |> Or_error.ok_exn
+  ;;
+
   let command =
     Command.group
       ~summary:[%string "Crystal Ball Cup %{Collection.name}"]
@@ -77,6 +84,7 @@ module Make (Collection : Collection.S) = struct
       ; "sexp", sexp_command
       ; "json", json_command
       ; "responses-and-scores", responses_and_scores_command
+      ; "create-db", create_db_command
       ]
   ;;
 end

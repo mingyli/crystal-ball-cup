@@ -1,6 +1,6 @@
 (library
  (name collections)
- (libraries core crystal)
+ (libraries core crystal textutils.ascii_table)
  (inline_tests (deps))
  (preprocess
   (pps ppx_jane ppx_inline_test ppx_expect)))

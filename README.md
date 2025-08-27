@@ -19,6 +19,4 @@ running `dune build`.
     generated from `index.md` according to the `dune` build rules within this
     directory. You can serve it locally by running `python3 -m http.server`
     from this directory.
-*   **`etc/`**: Stores intermediate artifacts generated during the build
-    process.
-
+*   **`etc/`**: Stores miscellaneous assets for this project.
