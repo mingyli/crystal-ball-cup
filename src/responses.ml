@@ -1,10 +1,6 @@
 open! Core
 
-type t =
-  { email : string
-  ; probabilities : float Event_id.Map.t
-  }
-[@@deriving sexp_of, fields]
+type t = { probabilities : float Event_id.Map.t } [@@deriving sexp_of, fields, yojson_of]
 
 let of_csv csv =
   let channel = Csv.of_string csv in
@@ -25,18 +21,16 @@ let of_csv csv =
         | n -> Some (Event_id.of_int n, i))
     in
     List.map data ~f:(fun row ->
-      let email = List.nth_exn row email_idx in
+      let respondent = List.nth_exn row email_idx in
       let probabilities =
         List.map event_ids ~f:(fun (e, i) ->
           let p = Float.of_string (List.nth_exn row i) in
           e, p)
         |> Map.of_alist_exn (module Event_id)
       in
-      { email; probabilities })
+      respondent, { probabilities })
+    |> String.Map.of_alist_exn
 ;;
-
-let probability t event_id = Map.find_exn t.probabilities event_id
-let respondent t = t.email
 
 let%expect_test "of_csv" =
   let csv =
@@ -45,9 +39,10 @@ let%expect_test "of_csv" =
      8/9/2025 15:27:02,def@gmail.com,0.32,0.999,more feedback"
   in
   let responses = of_csv csv in
-  print_s [%sexp (responses : t list)];
+  print_s [%sexp (responses : t String.Map.t)];
   [%expect
-    {|
-    (((email abc@gmail.com) (probabilities ((1 0.75) (2 0.9))))
-     ((email def@gmail.com) (probabilities ((1 0.32) (2 0.999)))))    |}]
+    {| 
+    ((abc@gmail.com ((probabilities ((1 0.75) (2 0.9))))) 
+     (def@gmail.com ((probabilities ((1 0.32) (2 0.999))))) 
+    )    |}]
 ;;
