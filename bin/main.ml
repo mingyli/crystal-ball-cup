@@ -31,8 +31,8 @@ module Make (Collection : Collection.S) = struct
       print_endline (Yojson.Safe.pretty_to_string yojson)
   ;;
 
-  let scores_command =
-    Command.basic ~summary:"Print scores"
+  let responses_and_scores_command =
+    Command.basic ~summary:"Print responses and scores"
     @@
     let%map_open.Command () = return ()
     and responses_file =
@@ -76,7 +76,7 @@ module Make (Collection : Collection.S) = struct
       [ "markdown", markdown_command
       ; "sexp", sexp_command
       ; "json", json_command
-      ; "scores", scores_command
+      ; "responses-and-scores", responses_and_scores_command
       ]
   ;;
 end

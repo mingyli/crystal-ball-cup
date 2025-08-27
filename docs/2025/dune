@@ -21,4 +21,9 @@
  (action
   (with-stdout-to
    responses_and_scores.json
-   (run %{project_root}/bin/main.exe 2025 scores -responses %{project_root}/etc/2025/responses.csv))))
+   (run
+    %{project_root}/bin/main.exe
+    2025
+    responses-and-scores
+    -responses
+    %{project_root}/etc/2025/responses.csv))))
