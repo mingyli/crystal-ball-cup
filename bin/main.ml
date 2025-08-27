@@ -40,23 +40,25 @@ module Make (Collection : Collection.S) = struct
     in
     fun () ->
       let responses = Response.of_csv (In_channel.read_all responses_file) in
-      let user_event_scores = String.Table.create () in
+      let respondent_event_scores = String.Table.create () in
       List.iter responses ~f:(fun (response : Response.t) ->
-        let user = Response.user response in
+        let respondent = Response.respondent response in
         List.iter Collection.all ~f:(fun (event : Event.t) ->
           let event_id = Event.id event in
-          let probability = Response.probability response ~event_id in
+          let probability = Response.probability response event_id in
           let score = Event.score event ~probability in
-          Hashtbl.update user_event_scores user ~f:(function
+          Hashtbl.update respondent_event_scores respondent ~f:(function
             | Some scores_map -> Map.add_exn scores_map ~key:event_id ~data:score
-            | None -> Int.Map.singleton event_id score)));
-      let user_event_scores = String.Map.of_hashtbl_exn user_event_scores in
-      let all_user_scores = Scores.of_user_event_scores user_event_scores in
+            | None -> Map.singleton (module Event_id) event_id score)));
+      let respondent_event_scores = String.Map.of_hashtbl_exn respondent_event_scores in
+      let all_respondent_scores =
+        Scores.of_respondent_event_scores respondent_event_scores
+      in
       let json_output =
         `Assoc
-          (Map.to_alist all_user_scores
-           |> List.map ~f:(fun (user, scores_data) ->
-             user, [%yojson_of: Scores.t] scores_data))
+          (Map.to_alist all_respondent_scores
+           |> List.map ~f:(fun (respondent, scores_data) ->
+             respondent, [%yojson_of: Scores.t] scores_data))
       in
       print_endline (Yojson.Safe.pretty_to_string json_output)
   ;;

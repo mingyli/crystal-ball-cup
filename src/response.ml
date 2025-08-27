@@ -2,7 +2,7 @@ open! Core
 
 type t =
   { email : string
-  ; probabilities : float Int.Map.t
+  ; probabilities : float Event_id.Map.t
   }
 [@@deriving sexp_of, fields]
 
@@ -22,21 +22,21 @@ let of_csv csv =
       List.filter_mapi header ~f:(fun i h ->
         match Int.of_string h with
         | exception _ -> None
-        | n -> Some (n, i))
+        | n -> Some (Event_id.of_int n, i))
     in
     List.map data ~f:(fun row ->
       let email = List.nth_exn row email_idx in
       let probabilities =
-        List.map event_ids ~f:(fun (q, i) ->
+        List.map event_ids ~f:(fun (e, i) ->
           let p = Float.of_string (List.nth_exn row i) in
-          q, p)
-        |> Int.Map.of_alist_exn
+          e, p)
+        |> Map.of_alist_exn (module Event_id)
       in
       { email; probabilities })
 ;;
 
-let probability t ~event_id = Map.find_exn t.probabilities event_id
-let user t = t.email
+let probability t event_id = Map.find_exn t.probabilities event_id
+let respondent t = t.email
 
 let%expect_test "of_csv" =
   let csv =

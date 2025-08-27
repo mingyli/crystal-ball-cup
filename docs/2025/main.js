@@ -9,7 +9,7 @@ const UNHIGHLIGHT_COLOR = 'rgba(128, 128, 128, 0.2)';
 
 
 
-const createLayout = (event, questionId, outcomeText, outcomeClass) => {
+const createLayout = (event, eventId, outcomeText, outcomeClass) => {
   const layout = {
     showlegend: false,
     xaxis: {
@@ -21,23 +21,23 @@ const createLayout = (event, questionId, outcomeText, outcomeClass) => {
     yaxis: { fixedrange: true },
   };
 
-  if (questionId !== 'all') {
+  if (eventId !== 'all') {
     layout.title = event.short;
     layout.margin = { l: 20, r: 20, b: 20, t: 40 };
     layout.height = 150;
-    d3.select('#question-description').text(event.precise);
-    d3.select('#question-description').append('div').html(`<span class="outcome-chip">${outcomeText}</span>`).attr('class', outcomeClass).style('font-weight', 'bold');
+    d3.select('#event-description').text(event.precise);
+    d3.select('#event-description').append('div').html(`<span class="outcome-chip">${outcomeText}</span>`).attr('class', outcomeClass).style('font-weight', 'bold');
   } else {
     layout.margin = { l: 20, r: 20, b: 20, t: 20 };
     layout.height = 100;
-    d3.select('#question-description').text('');
+    d3.select('#event-description').text('');
   }
   return layout;
 };
 
-const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores) => {
-  const colors = allUsernames.map(u => u === highlightedUsername ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
-  const customdata = allUsernames.map((_, index) => {
+const createScatterTrace = (x, y, allRespondents, highlightedRespondent, scores) => {
+  const colors = allRespondents.map(u => u === highlightedRespondent ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
+  const customdata = allRespondents.map((_, index) => {
     const prediction = x[index].toFixed(2);
     return { prediction };
   });
@@ -47,7 +47,7 @@ const createScatterTrace = (x, y, allUsernames, highlightedUsername, scores) => 
     y: y,
     type: 'scatter',
     mode: 'markers',
-    text: allUsernames,
+    text: allRespondents,
     customdata: customdata,
     hovertemplate: '<b>%{customdata.prediction}</b> %{text}<extra></extra>',
     marker: {
@@ -62,10 +62,10 @@ function renderStandings(scores) {
   container.innerHTML = '';
 
   const standings = [];
-  for (const user in scores) {
-    const userData = scores[user];
-    const meanTotalScore = userData.mean_score;
-    standings.push({ user: user, meanTotalScore: meanTotalScore });
+  for (const respondent in scores) {
+    const respondentData = scores[respondent];
+    const meanTotalScore = respondentData.mean_score;
+    standings.push({ respondent: respondent, meanTotalScore: meanTotalScore });
   }
 
   standings.sort((a, b) => {
@@ -75,7 +75,7 @@ function renderStandings(scores) {
     return b.meanTotalScore - a.meanTotalScore; // Sort descending
   });
 
-  const users = standings.map(s => s.user);
+  const respondents = standings.map(s => s.respondent);
   const displayScores = standings.map(s => s.meanTotalScore);
 
   const finiteScores = displayScores.filter(s => isFinite(s));
@@ -88,7 +88,7 @@ function renderStandings(scores) {
   });
 
   const data = [{
-    y: users,
+    y: respondents,
     x: finalDisplayScores,
     type: 'bar',
     orientation: 'h',
@@ -133,7 +133,7 @@ function renderStandings(scores) {
       x0: 0,
       y0: -0.5,
       x1: 0,
-      y1: users.length - 0.5,
+      y1: respondents.length - 0.5,
       line: {
         color: 'black',
         width: 1,
@@ -145,25 +145,25 @@ function renderStandings(scores) {
       t: 40,
       b: 40
     },
-    height: 20 * users.length + 80,
+    height: 20 * respondents.length + 80,
   };
 
   Plotly.newPlot(container, data, layout, { displayModeBar: false });
 }
 
-function renderSubmissionsTable(questionId, responses, scores, highlightedUsername) {
+function renderSubmissionsTable(eventId, responses, scores, highlightedRespondent) {
   const container = document.getElementById('submissions-table-container');
   container.innerHTML = '';
 
-  if (questionId === 'all') {
+  if (eventId === 'all') {
     return;
   }
 
   const sortedResponses = [...responses].sort((a, b) => {
-    const userA = a['Email Address'];
-    const userB = b['Email Address'];
-    const scoreA = (scores[userA] && scores[userA].question_scores && scores[userA].question_scores[questionId]) ? scores[userA].question_scores[questionId] : -Infinity;
-    const scoreB = (scores[userB] && scores[userB].question_scores && scores[userB].question_scores[questionId]) ? scores[userB].question_scores[questionId] : -Infinity;
+    const respondentA = a['Email Address'];
+    const respondentB = b['Email Address'];
+    const scoreA = (scores[respondentA] && scores[respondentA].event_scores && scores[respondentA].event_scores[eventId]) ? scores[respondentA].event_scores[eventId] : -Infinity;
+    const scoreB = (scores[respondentB] && scores[respondentB].event_scores && scores[respondentB].event_scores[eventId]) ? scores[respondentB].event_scores[eventId] : -Infinity;
     return scoreB - scoreA;
   });
 
@@ -182,14 +182,14 @@ function renderSubmissionsTable(questionId, responses, scores, highlightedUserna
     .data(sortedResponses)
     .enter()
     .append('tr')
-    .attr('class', d => d['Email Address'] === highlightedUsername ? 'highlighted' : null);
+    .attr('class', d => d['Email Address'] === highlightedRespondent ? 'highlighted' : null);
 
   rows.append('td').text(d => d['Email Address']);
-  rows.append('td').text(d => d[questionId]);
+  rows.append('td').text(d => d[eventId]);
   rows.append('td').text(d => {
-    const user = d['Email Address'];
-    if (scores[user] && scores[user].question_scores && scores[user].question_scores[questionId]) {
-      return scores[user].question_scores[questionId].toFixed(3);
+    const respondent = d['Email Address'];
+    if (scores[respondent] && scores[respondent].event_scores && scores[respondent].event_scores[eventId]) {
+      return scores[respondent].event_scores[eventId].toFixed(3);
     }
     return 'N/A';
   });
@@ -216,19 +216,19 @@ Promise.all([
     });
 
   const plotTypeDropdown = d3.select('#plot-type-dropdown');
-  const questionDropdown = d3.select('#question-dropdown');
-  const emailDropdown = d3.select('#email-dropdown');
+  const eventDropdown = d3.select('#event-dropdown');
+  const respondentDropdown = d3.select('#respondent-dropdown');
 
-  questionDropdown.selectAll('option')
+  eventDropdown.selectAll('option')
     .data(allEvents)
     .enter()
     .append('option')
     .attr('value', d => d.id)
     .text(d => d.short);
 
-  const usernames = responses.map(r => r['Email Address']).sort();
-  emailDropdown.selectAll('option')
-    .data(['No user selected', ...usernames])
+  const respondents = responses.map(r => r['Email Address']).sort();
+  respondentDropdown.selectAll('option')
+    .data(['No respondent selected', ...respondents])
     .enter()
     .append('option')
     .attr('value', d => d)
@@ -236,31 +236,31 @@ Promise.all([
 
   // Set initial dropdown values
   plotTypeDropdown.property('value', 'density');
-  questionDropdown.property('value', 'all');
-  emailDropdown.property('value', 'No user selected');
+  eventDropdown.property('value', 'all');
+  respondentDropdown.property('value', 'No respondent selected');
 
   const attachClickHandler = (plotContainerId) => {
     document.getElementById(plotContainerId).on('plotly_click', function (data) {
       if (data.points.length > 0) {
         const point = data.points[0];
         if (point.curveNumber === 1) { // scatter plot trace
-          const username = point.text;
-          emailDropdown.property('value', username);
-          plotData(questionDropdown.property('value'), username, plotTypeDropdown.property('value'));
+          const respondent = point.text;
+          respondentDropdown.property('value', respondent);
+          plotData(eventDropdown.property('value'), respondent, plotTypeDropdown.property('value'));
         }
       }
     });
   };
 
-  const renderPlot = (plotContainer, event, questionData, allUsernames,
-    highlightedUsername, scores, plotType, fillColor, lineColor, outcomeText,
-    outcomeClass, questionId) => {
-    const layout = createLayout(event, questionId, outcomeText, outcomeClass);
+  const renderPlot = (plotContainer, event, eventData, allRespondents,
+    highlightedRespondent, scores, plotType, fillColor, lineColor, outcomeText,
+    outcomeClass, eventId) => {
+    const layout = createLayout(event, eventId, outcomeText, outcomeClass);
     let traces;
 
     if (plotType === 'density') {
       const trace1 = {
-        x: questionData,
+        x: eventData,
         type: 'violin',
         name: ' ',
         orientation: 'h',
@@ -274,11 +274,11 @@ Promise.all([
         },
         points: false
       };
-      const trace2 = createScatterTrace(questionData, Array(questionData.length).fill(' '), allUsernames, highlightedUsername, scores, event.id);
+      const trace2 = createScatterTrace(eventData, Array(eventData.length).fill(' '), allRespondents, highlightedRespondent, scores, event.id);
       traces = [trace1, trace2];
     } else { // CDF
-      const n = questionData.length;
-      const sortedData = [...questionData].sort(d3.ascending);
+      const n = eventData.length;
+      const sortedData = [...eventData].sort(d3.ascending);
 
       const cdfX = [0, ...sortedData, 1];
       const cdfY = [0, ...sortedData.map((d, i) => (i + 1) / n), 1];
@@ -295,7 +295,7 @@ Promise.all([
         fillcolor: fillColor
       };
 
-      const freqMap = d3.rollup(questionData, v => v.length, d => d);
+      const freqMap = d3.rollup(eventData, v => v.length, d => d);
       const uniqueSorted = Array.from(freqMap.keys()).sort(d3.ascending);
       const cdfMap = new Map();
       let cumulative = 0;
@@ -303,8 +303,8 @@ Promise.all([
         cumulative += freqMap.get(val);
         cdfMap.set(val, cumulative / n);
       }
-      const userPointsY = questionData.map(p => cdfMap.get(p));
-      const scatterTrace = createScatterTrace(questionData, userPointsY, allUsernames, highlightedUsername, scores, event.id);
+      const respondentPointsY = eventData.map(p => cdfMap.get(p));
+      const scatterTrace = createScatterTrace(eventData, respondentPointsY, allRespondents, highlightedRespondent, scores, event.id);
       traces = [cdfTrace, scatterTrace];
       layout.yaxis.range = [0, 1.1];
     }
@@ -313,17 +313,17 @@ Promise.all([
     attachClickHandler(plotContainer.attr('id'));
   }
 
-  const plotData = (questionId, highlightedUsername, plotType) => {
+  const plotData = (eventId, highlightedRespondent, plotType) => {
     const plotDiv = d3.select('#plot');
     plotDiv.html(''); // Clear previous plot(s)
 
-    renderSubmissionsTable(questionId, responses, scores, highlightedUsername);
+    renderSubmissionsTable(eventId, responses, scores, highlightedRespondent);
 
-    const questionsToPlot = (questionId === 'all') ? events : events.filter(e => e.id == questionId);
+    const eventsToPlot = (eventId === 'all') ? events : events.filter(e => e.id == eventId);
 
-    questionsToPlot.forEach(event => {
-      const questionData = responses.map(r => +r[event.id]);
-      const allUsernames = responses.map(r => r['Email Address']);
+    eventsToPlot.forEach(event => {
+      const eventData = responses.map(r => +r[event.id]);
+      const allRespondents = responses.map(r => r['Email Address']);
 
       const outcomeText = event.outcome[0];
       const outcomeClass = `outcome-${outcomeText.toLowerCase()}`;
@@ -341,7 +341,7 @@ Promise.all([
       }
 
       let plotContainer;
-      if (questionId === 'all') {
+      if (eventId === 'all') {
         const row = plotDiv.append('div').attr('class', 'plot-row');
         row.append('div').attr('class', `plot-outcome ${outcomeClass}`)
           .html(`<span class="outcome-chip">${outcomeText}</span>`);
@@ -352,23 +352,23 @@ Promise.all([
         plotContainer = plotDiv.append('div').attr('id', 'plot-single');
       }
 
-      renderPlot(plotContainer, event, questionData, allUsernames, highlightedUsername, scores, plotType, fillColor, lineColor, outcomeText, outcomeClass, questionId);
+      renderPlot(plotContainer, event, eventData, allRespondents, highlightedRespondent, scores, plotType, fillColor, lineColor, outcomeText, outcomeClass, eventId);
     });
   };
 
   plotTypeDropdown.on('change', function () {
-    plotData(questionDropdown.property('value'), emailDropdown.property('value'), this.value);
+    plotData(eventDropdown.property('value'), respondentDropdown.property('value'), this.value);
   });
 
-  questionDropdown.on('change', function () {
-    const selectedQuestionId = this.value;
-    plotData(selectedQuestionId, emailDropdown.property('value'), plotTypeDropdown.property('value'));
+  eventDropdown.on('change', function () {
+    const selectedEventId = this.value;
+    plotData(selectedEventId, respondentDropdown.property('value'), plotTypeDropdown.property('value'));
   });
 
-  emailDropdown.on('change', function () {
-    plotData(questionDropdown.property('value'), this.value, plotTypeDropdown.property('value'));
+  respondentDropdown.on('change', function () {
+    plotData(eventDropdown.property('value'), this.value, plotTypeDropdown.property('value'));
   });
 
-  plotData(questionDropdown.property('value'), emailDropdown.property('value'), plotTypeDropdown.property('value'));
+  plotData(eventDropdown.property('value'), respondentDropdown.property('value'), plotTypeDropdown.property('value'));
   renderStandings(scores);
 });

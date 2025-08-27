@@ -5,7 +5,7 @@ let name = "2025"
 
 let all =
   List.mapi
-    ~f:(fun i create -> create ~id:(i + 1))
+    ~f:(fun i create -> create ~id:(Event_id.of_int (i + 1)))
     [ Event.create
         ~short:"Nintendo announces a new Super Smash Bros. game"
         ~precise:
@@ -146,7 +146,7 @@ let all =
 let%expect_test _ =
   let columns =
     let c = Ascii_table.Column.create in
-    [ c "id" (fun event -> event |> Event.id |> Int.to_string)
+    [ c "id" (fun event -> event |> Event.id |> Event_id.to_string)
     ; c "short" (fun event -> event |> Event.short)
     ; c "precise" (fun event -> event |> Event.precise)
     ; c "outcome" (fun event -> event |> Event.outcome |> Outcome.to_string)

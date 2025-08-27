@@ -119,14 +119,14 @@ select {
 ## Events
 
 <div class="all-dropdowns-container">
-<select id="question-dropdown"></select>
+<select id="event-dropdown"></select>
 <select id="plot-type-dropdown">
     <option value="density">Density</option>
     <option value="cumulative">Cumulative</option>
 </select>
-<select id="email-dropdown"></select>
+<select id="respondent-dropdown"></select>
 </div>
-<div id="question-description" style="margin-top: 1rem; font-style: italic;"></div>
+<div id="event-description" style="margin-top: 1rem; font-style: italic;"></div>
 <div id="plot"></div>
 <div id="submissions-table-container"></div>
 <script src="main.js"></script>
