@@ -43,6 +43,5 @@ let%expect_test "of_csv" =
   [%expect
     {| 
     ((abc@gmail.com ((probabilities ((1 0.75) (2 0.9))))) 
-     (def@gmail.com ((probabilities ((1 0.32) (2 0.999))))) 
-    )    |}]
+     (def@gmail.com ((probabilities ((1 0.32) (2 0.999))))))    |}]
 ;;

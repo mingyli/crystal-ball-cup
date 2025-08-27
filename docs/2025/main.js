@@ -33,7 +33,7 @@ const createLayout = (event, eventId, outcomeText, outcomeClass) => {
   return layout;
 };
 
-const createScatterTrace = (x, y, allRespondents, highlightedRespondent, scores) => {
+const createScatterTrace = (x, y, allRespondents, highlightedRespondent, responsesAndScores) => {
   const colors = allRespondents.map(u => u === highlightedRespondent ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR);
   const customdata = allRespondents.map((_, index) => {
     const prediction = x[index].toFixed(2);
@@ -55,13 +55,13 @@ const createScatterTrace = (x, y, allRespondents, highlightedRespondent, scores)
   };
 };
 
-function renderStandings(scores) {
+function renderStandings(responsesAndScores) {
   const container = document.getElementById('standings-container');
   container.innerHTML = '';
 
   const standings = [];
-  for (const respondent in scores) {
-    const respondentData = scores[respondent];
+  for (const respondent in responsesAndScores) {
+    const respondentData = responsesAndScores[respondent];
     const meanTotalScore = respondentData.scores.mean_score;
     standings.push({ respondent: respondent, meanTotalScore: meanTotalScore });
   }
@@ -149,7 +149,7 @@ function renderStandings(scores) {
   Plotly.newPlot(container, data, layout, { displayModeBar: false });
 }
 
-function renderSubmissionsTable(eventId, scores, highlightedRespondent) {
+function renderSubmissionsTable(eventId, responsesAndScores, highlightedRespondent) {
   const container = document.getElementById('submissions-table-container');
   container.innerHTML = '';
 
@@ -157,9 +157,9 @@ function renderSubmissionsTable(eventId, scores, highlightedRespondent) {
     return;
   }
 
-  const sortedRespondents = Object.keys(scores).sort((a, b) => {
-    const scoreA = (scores[a] && scores[a].scores.mean_score) ? scores[a].scores.mean_score : -Infinity;
-    const scoreB = (scores[b] && scores[b].scores.mean_score) ? scores[b].scores.mean_score : -Infinity;
+  const sortedRespondents = Object.keys(responsesAndScores).sort((a, b) => {
+    const scoreA = (responsesAndScores[a] && responsesAndScores[a].scores.mean_score) ? responsesAndScores[a].scores.mean_score : -Infinity;
+    const scoreB = (responsesAndScores[b] && responsesAndScores[b].scores.mean_score) ? responsesAndScores[b].scores.mean_score : -Infinity;
     return scoreB - scoreA;
   });
 
@@ -181,11 +181,11 @@ function renderSubmissionsTable(eventId, scores, highlightedRespondent) {
     .attr('class', d => d === highlightedRespondent ? 'highlighted' : null);
 
   rows.append('td').text(d => d);
-  rows.append('td').text(d => scores[d].responses.probabilities[eventId]);
+  rows.append('td').text(d => responsesAndScores[d].responses.probabilities[eventId]);
   rows.append('td').text(d => {
     const respondent = d;
-    if (scores[respondent] && scores[respondent].scores.event_scores && scores[respondent].scores.event_scores[eventId]) {
-      return scores[respondent].scores.event_scores[eventId].toFixed(3);
+    if (responsesAndScores[respondent] && responsesAndScores[respondent].scores.event_scores && responsesAndScores[respondent].scores.event_scores[eventId]) {
+      return responsesAndScores[respondent].scores.event_scores[eventId].toFixed(3);
     }
     return 'N/A';
   });
@@ -194,9 +194,8 @@ function renderSubmissionsTable(eventId, scores, highlightedRespondent) {
 Promise.all([
   d3.json('events.json'),
   d3.text('scores.json')
-]).then(([events, scoresText]) => {
-  // Parse scores.json with custom reviver
-  const scores = JSON.parse(scoresText
+]).then(([events, responsesAndScoresText]) => {
+  const responsesAndScores = JSON.parse(responsesAndScoresText
     .replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"')
     .replace(/Infinity/g, '"__INFINITY__"')
     .replace(/NaN/g, '"__NAN__"'), function (key, value) {
@@ -221,7 +220,7 @@ Promise.all([
     .attr('value', d => d.id)
     .text(d => d.short);
 
-  const respondents = Object.keys(scores).sort();
+  const respondents = Object.keys(responsesAndScores).sort();
   respondentDropdown.selectAll('option')
     .data(['No respondent selected', ...respondents])
     .enter()
@@ -248,7 +247,7 @@ Promise.all([
   };
 
   const renderPlot = (plotContainer, event, eventData, allRespondents,
-    highlightedRespondent, scores, plotType, fillColor, lineColor, outcomeText,
+    highlightedRespondent, responsesAndScores, plotType, fillColor, lineColor, outcomeText,
     outcomeClass, eventId) => {
     const layout = createLayout(event, eventId, outcomeText, outcomeClass);
     let traces;
@@ -269,7 +268,7 @@ Promise.all([
         },
         points: false
       };
-      const trace2 = createScatterTrace(eventData, Array(eventData.length).fill(' '), allRespondents, highlightedRespondent, scores, event.id);
+      const trace2 = createScatterTrace(eventData, Array(eventData.length).fill(' '), allRespondents, highlightedRespondent, responsesAndScores, event.id);
       traces = [trace1, trace2];
     } else { // CDF
       const n = eventData.length;
@@ -299,7 +298,7 @@ Promise.all([
         cdfMap.set(val, cumulative / n);
       }
       const respondentPointsY = eventData.map(p => cdfMap.get(p));
-      const scatterTrace = createScatterTrace(eventData, respondentPointsY, allRespondents, highlightedRespondent, scores, event.id);
+      const scatterTrace = createScatterTrace(eventData, respondentPointsY, allRespondents, highlightedRespondent, responsesAndScores, event.id);
       traces = [cdfTrace, scatterTrace];
       layout.yaxis.range = [0, 1.1];
     }
@@ -312,13 +311,13 @@ Promise.all([
     const plotDiv = d3.select('#plot');
     plotDiv.html(''); // Clear previous plot(s)
 
-    renderSubmissionsTable(eventId, scores, highlightedRespondent);
+    renderSubmissionsTable(eventId, responsesAndScores, highlightedRespondent);
 
     const eventsToPlot = (eventId === 'all') ? events : events.filter(e => e.id == eventId);
 
     eventsToPlot.forEach(event => {
-      const allRespondents = Object.keys(scores);
-      const eventData = allRespondents.map(respondent => scores[respondent].responses.probabilities[event.id]);
+      const allRespondents = Object.keys(responsesAndScores);
+      const eventData = allRespondents.map(respondent => responsesAndScores[respondent].responses.probabilities[event.id]);
 
       const outcomeText = event.outcome[0];
       const outcomeClass = `outcome-${outcomeText.toLowerCase()}`;
@@ -347,7 +346,7 @@ Promise.all([
         plotContainer = plotDiv.append('div').attr('id', 'plot-single');
       }
 
-      renderPlot(plotContainer, event, eventData, allRespondents, highlightedRespondent, scores, plotType, fillColor, lineColor, outcomeText, outcomeClass, eventId);
+      renderPlot(plotContainer, event, eventData, allRespondents, highlightedRespondent, responsesAndScores, plotType, fillColor, lineColor, outcomeText, outcomeClass, eventId);
     });
   };
 
@@ -365,5 +364,5 @@ Promise.all([
   });
 
   plotData(eventDropdown.property('value'), respondentDropdown.property('value'), plotTypeDropdown.property('value'));
-  renderStandings(scores);
+  renderStandings(responsesAndScores);
 });
