@@ -45,9 +45,19 @@ module Make (Collection : Collection.S) = struct
           Scores.create (module Collection) responses)
       in
       let responses_and_scores =
-        Map.merge responses scores ~f:(fun ~key:_ -> function
-          | `Left _responses -> None
-          | `Right _scores -> None
+        Map.merge responses scores ~f:(fun ~key:respondent -> function
+          | `Left responses ->
+            raise_s
+              [%message
+                "No scores found for respondent"
+                  (respondent : string)
+                  (responses : Responses.t)]
+          | `Right scores ->
+            raise_s
+              [%message
+                "No responses provided for respondent"
+                  (respondent : string)
+                  (scores : Scores.t)]
           | `Both (responses, scores) ->
             Some (Responses_and_scores.create responses scores))
       in

@@ -1,5 +1,5 @@
 open! Core
 
-type t [@@deriving yojson_of]
+type t [@@deriving sexp_of, yojson_of]
 
 val create : (module Collection.S) -> Responses.t -> t

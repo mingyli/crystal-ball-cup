@@ -4,21 +4,21 @@ type t =
   { event_scores : float Event_id.Map.t
   ; mean_score : float
   }
-[@@deriving yojson_of]
+[@@deriving sexp_of, yojson_of]
 
 let create (module Collection : Collection.S) responses =
   let probabilities = Responses.probabilities responses in
   let events = Collection.all' in
   let event_scores =
     Map.merge probabilities events ~f:(fun ~key:event_id -> function
-      | `Right event ->
-        raise_s
-          [%message
-            "No probability provided for event" (event_id : Event_id.t) (event : Event.t)]
       | `Left probability ->
         raise_s
           [%message
             "No event found for probability" (event_id : Event_id.t) (probability : float)]
+      | `Right event ->
+        raise_s
+          [%message
+            "No probability provided for event" (event_id : Event_id.t) (event : Event.t)]
       | `Both (probability, event) -> Some (Event.score event ~probability))
   in
   let mean_score =
