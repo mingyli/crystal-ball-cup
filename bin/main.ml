@@ -70,6 +70,19 @@ module Make (Collection : Collection.S) = struct
       print_endline (Yojson.Safe.pretty_to_string json_output)
   ;;
 
+  let create_db_command =
+    Command.basic ~summary:"Create and populate a sqlite database"
+    @@
+    let%map_open.Command () = return ()
+    and output_file =
+      flag "output" (required Filename.arg_type) ~doc:"FILE output sqlite database file"
+    in
+    fun () ->
+      match Db.create_and_populate ~output_path:output_file (module Collection) with
+      | Ok () -> ()
+      | Error e -> prerr_endline e
+  ;;
+
   let command =
     Command.group
       ~summary:[%string "Crystal Ball Cup %{Collection.name}"]
@@ -77,6 +90,7 @@ module Make (Collection : Collection.S) = struct
       ; "sexp", sexp_command
       ; "json", json_command
       ; "responses-and-scores", responses_and_scores_command
+      ; "create-db", create_db_command
       ]
   ;;
 end

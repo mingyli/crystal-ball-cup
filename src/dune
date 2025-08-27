@@ -1,6 +1,12 @@
 (library
  (name crystal)
- (libraries core yojson textutils.ascii_table csv)
+ (libraries
+  core
+  yojson
+  textutils.ascii_table
+  csv
+  caqti.blocking
+  caqti-driver-sqlite3)
  (inline_tests (deps))
  (preprocess
   (pps ppx_jane ppx_inline_test ppx_expect ppx_yojson_conv)))
