@@ -33,5 +33,3 @@ let of_csv csv =
       respondent, { probabilities })
     |> String.Map.of_alist_exn
 ;;
-
-

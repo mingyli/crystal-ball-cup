@@ -1,6 +1,11 @@
 (library
  (name test_crystal)
- (libraries core crystal caqti.blocking caqti-driver-sqlite3)
+ (libraries
+  core
+  crystal
+  caqti.blocking
+  caqti-driver-sqlite3
+  textutils.ascii_table)
  (inline_tests (deps))
  (preprocess
   (pps ppx_jane ppx_inline_test ppx_expect)))
