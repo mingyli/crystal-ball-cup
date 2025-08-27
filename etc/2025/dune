@@ -20,17 +20,3 @@
  (mode promote)
  (action
   (run pandoc -t beamer slides.md -o slides.pdf --pdf-engine=xelatex)))
-
-(rule
- (target crystal.db)
- (deps %{project_root}/bin/main.exe responses.csv)
- (mode promote)
- (action
-  (run
-   %{project_root}/bin/main.exe
-   2025
-   create-db
-   -output
-   %{target}
-   -responses
-   responses.csv)))

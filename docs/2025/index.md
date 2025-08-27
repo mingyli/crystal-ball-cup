@@ -8,6 +8,8 @@ title: Crystal Ball Cup 2025
 
 <script src="https://cdn.plot.ly/plotly-3.0.3.min.js"></script>
 <script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+
 <style>
 
 .dropdowns-container {
@@ -128,6 +130,14 @@ select {
 </div>
 <div id="event-description" style="margin-top: 1rem; font-style: italic;"></div>
 <div id="plot"></div>
-<div id="submissions-table-container"></div>
-<script src="main.js"></script>
 
+## Explorer
+
+<div id="explorer-section">
+  <textarea id="query-editor">SELECT name, sql FROM sqlite_master WHERE type='table';</textarea>
+  <button id="run-query-btn">Run (ctrl+enter)</button>
+  <pre id="query-error" style="color: red;"></pre>
+  <table id="query-results" class="data-table"></table>
+</div>
+
+<script src="main.js"></script>
