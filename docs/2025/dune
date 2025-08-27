@@ -16,9 +16,9 @@
 
 (rule
  (target scores.json)
- (deps %{project_root}/bin/main.exe responses.csv)
+ (deps %{project_root}/bin/main.exe %{project_root}/etc/2025/responses.csv)
  (mode promote)
  (action
   (with-stdout-to
    scores.json
-   (run %{project_root}/bin/main.exe 2025 scores -responses responses.csv))))
+   (run %{project_root}/bin/main.exe 2025 scores -responses %{project_root}/etc/2025/responses.csv))))
