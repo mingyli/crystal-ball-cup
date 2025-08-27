@@ -193,7 +193,7 @@ function renderSubmissionsTable(eventId, responsesAndScores, highlightedResponde
 
 Promise.all([
   d3.json('events.json'),
-  d3.text('scores.json')
+  d3.text('responses_and_scores.json')
 ]).then(([events, responsesAndScoresText]) => {
   const responsesAndScores = JSON.parse(responsesAndScoresText
     .replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"')
