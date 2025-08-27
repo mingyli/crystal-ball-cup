@@ -2,6 +2,8 @@ open! Core
 
 type t = { probabilities : float Event_id.Map.t } [@@deriving sexp_of, fields, yojson_of]
 
+let create probabilities = { probabilities }
+
 let of_csv csv =
   let channel = Csv.of_string csv in
   let all_rows = Csv.input_all channel in

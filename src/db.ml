@@ -1,5 +1,4 @@
 open! Core
-open Caqti_blocking
 
 let create_events_req =
   let open Caqti_request.Infix in
@@ -48,7 +47,7 @@ let create_and_populate (module Collection : Collection.S) ~output_file ~respons
   let open Result.Let_syntax in
   let uri = Uri.of_string ("sqlite3:" ^ output_file) in
   let result =
-    let%bind (module Conn : Caqti_blocking.CONNECTION) = connect uri in
+    let%bind (module Conn : Caqti_blocking.CONNECTION) = Caqti_blocking.connect uri in
     let%bind () = Conn.exec create_events_req () in
     let%bind () = Conn.exec create_responses_req () in
     let%bind () = Conn.exec create_scores_req () in
@@ -86,3 +85,5 @@ let create_and_populate (module Collection : Collection.S) ~output_file ~respons
   in
   Result.map_error result ~f:(fun e -> e |> Caqti_error.show |> Error.of_string)
 ;;
+
+
