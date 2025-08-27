@@ -27,8 +27,19 @@ let max_score_per_respondent_query =
         );|}
 ;;
 
+let max_score_per_respondent_from_responses_and_scores_query =
+  let open Caqti_request.Infix in
+  (Caqti_type.unit ->* Caqti_type.(t3 string string float))
+    {|SELECT rs.respondent, e.short AS event_short, rs.score 
+      FROM responses_and_scores rs 
+      JOIN events e 
+      ON rs.event_id = e.event_id 
+      WHERE rs.score = (
+        SELECT MAX(score) FROM responses_and_scores WHERE respondent = rs.respondent
+        );|}
+;;
+
 let%expect_test _ =
-  let open Result.Let_syntax in
   let output_file = Filename.temp_file "test_db" ".sqlite" in
   let db = Db.create ~output_file in
   let () =
@@ -36,22 +47,34 @@ let%expect_test _ =
       let%bind.Or_error () = Db.Connection.make_events conn (module Test_collection) in
       let%bind.Or_error () = Db.Connection.make_responses conn dummy_responses in
       let%bind.Or_error () = Db.Connection.make_scores conn dummy_scores in
+      let%bind.Or_error () = Db.Connection.make_responses_and_scores conn in
       Ok ())
     |> Or_error.ok_exn
   in
   let result =
+    let open Result.Let_syntax in
     let uri = Uri.of_string ("sqlite3:" ^ output_file) in
     let%bind (module Conn : Caqti_blocking.CONNECTION) = Caqti_blocking.connect uri in
-    let%bind rows = Conn.collect_list max_score_per_respondent_query () in
-    List.iter rows ~f:(fun (respondent, event_short, score) ->
-      print_endline [%string "%{respondent} %{event_short} %{score#Float}"]);
-    Sys.remove output_file;
+    let print_results query =
+      let%bind rows = Conn.collect_list query () in
+      List.iter rows ~f:(fun (respondent, event_short, score) ->
+        print_endline [%string "%{respondent} %{event_short} %{score#Float}"]);
+      Ok ()
+    in
+    let%bind () = print_results max_score_per_respondent_query in
+    [%expect
+      {|
+      respondent1 Event 2 0.
+      respondent2 Event 2 0.58778666490211906 |}];
+    let%bind () =
+      print_results max_score_per_respondent_from_responses_and_scores_query
+    in
+    [%expect
+      {|
+      respondent1 Event 2 0.
+      respondent2 Event 2 0.58778666490211906 |}];
     Ok ()
   in
-  Result.map_error result ~f:(fun e -> e |> Caqti_error.show |> Error.of_string)
-  |> Or_error.ok_exn;
-  [%expect
-    {| 
-    respondent1 Event 2 0.
-    respondent2 Event 2 0.58778666490211906 |}]
+  Sys.remove output_file;
+  Caqti_blocking.or_fail result
 ;;

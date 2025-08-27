@@ -42,6 +42,14 @@ module Queries = struct
     (Caqti_type.(t3 string Event_id.caqti_type float) ->. Caqti_type.unit)
       "INSERT INTO scores (respondent, event_id, score) VALUES (?, ?, ?)"
   ;;
+
+  let create_responses_and_scores =
+    let open Caqti_request.Infix in
+    (Caqti_type.unit ->. Caqti_type.unit)
+      "CREATE TABLE responses_and_scores AS SELECT r.respondent, r.event_id, \
+       r.probability, s.score FROM responses AS r JOIN scores AS s ON r.respondent = \
+       s.respondent AND r.event_id = s.event_id"
+  ;;
 end
 
 module Connection = struct
@@ -94,6 +102,10 @@ module Connection = struct
   ;;
 
   let make_scores t scores = make_scores t scores |> caqti_or_error
+
+  let make_responses_and_scores ((module Conn) : t) =
+    Conn.exec Queries.create_responses_and_scores () |> caqti_or_error
+  ;;
 end
 
 type t = { uri : Uri.t }
