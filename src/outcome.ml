@@ -20,6 +20,15 @@ let score t ~probability =
   | No -> ln (1.0 -. probability) -. ln 0.5
 ;;
 
+let caqti_type =
+  Caqti_type.enum "Outcome.t" ~encode:to_string ~decode:(fun s ->
+    match String.lowercase s with
+    | "Pending" -> Ok Pending
+    | "Yes" -> Ok Yes
+    | "No" -> Ok No
+    | s -> Error [%string "unknown outcome %{s}"])
+;;
+
 let%expect_test "score" =
   let outcomes = [ Pending; Yes; No ] in
   let probabilities = [ 0.0; 0.1; 0.5; 0.9; 1.0 ] in

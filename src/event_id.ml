@@ -2,6 +2,7 @@ open! Core
 include Int
 
 let yojson_of_t = yojson_of_int
+let caqti_type = Caqti_type.int
 
 module Map = struct
   include Map
