@@ -76,9 +76,19 @@ module Make (Collection : Collection.S) = struct
     let%map_open.Command () = return ()
     and output_file =
       flag "output" (required Filename.arg_type) ~doc:"FILE output sqlite database file"
+    and responses_file =
+      flag "responses" (required Filename.arg_type) ~doc:"FILE responses csv file"
     in
     fun () ->
-      match Db.create_and_populate ~output_path:output_file (module Collection) with
+      let responses_by_respondent =
+        Responses.of_csv (In_channel.read_all responses_file)
+      in
+      match
+        Db.create_and_populate
+          ~output_path:output_file
+          (module Collection)
+          ~responses_by_respondent
+      with
       | Ok () -> ()
       | Error e -> prerr_endline e
   ;;

@@ -43,7 +43,7 @@ let insert_score_req =
     "INSERT INTO scores (respondent, event_id, score) VALUES (?, ?, ?)"
 ;;
 
-let create_and_populate ~output_path (module C : Collection.S) =
+let create_and_populate ~output_path (module C : Collection.S) ~responses_by_respondent =
   let open Result.Let_syntax in
   let uri = Uri.of_string ("sqlite3:" ^ output_path) in
   let result =
@@ -62,9 +62,6 @@ let create_and_populate ~output_path (module C : Collection.S) =
         Conn.exec insert_event_req (event_id, short, precise, outcome))
     in
     let%bind () =
-      let responses_by_respondent =
-        In_channel.read_all "etc/2025/responses.csv" |> Responses.of_csv
-      in
       Map.fold
         responses_by_respondent
         ~init:(Ok ())

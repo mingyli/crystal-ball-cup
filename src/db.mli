@@ -6,4 +6,5 @@ open! Core
 val create_and_populate
   :  output_path:string
   -> (module Collection.S)
+  -> responses_by_respondent:Responses.t String.Map.t
   -> (unit, string) result
