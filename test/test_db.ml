@@ -18,10 +18,10 @@ let dummy_scores =
 let max_score_per_respondent_query =
   let open Caqti_request.Infix in
   (Caqti_type.unit ->* Caqti_type.(t3 string string float))
-    {|SELECT s.respondent, e.short AS event_short, s.score 
-      FROM scores s 
-      JOIN events e 
-      ON s.event_id = e.event_id 
+    {|SELECT s.respondent, e.short AS event_short, s.score
+      FROM scores s
+      JOIN events e
+      ON s.event_id = e.event_id
       WHERE s.score = (
         SELECT MAX(score) FROM scores WHERE respondent = s.respondent
         );|}
@@ -30,17 +30,17 @@ let max_score_per_respondent_query =
 let max_score_per_respondent_from_responses_and_scores_query =
   let open Caqti_request.Infix in
   (Caqti_type.unit ->* Caqti_type.(t3 string string float))
-    {|SELECT rs.respondent, e.short AS event_short, rs.score 
-      FROM responses_and_scores rs 
-      JOIN events e 
-      ON rs.event_id = e.event_id 
+    {|SELECT rs.respondent, e.short AS event_short, rs.score
+      FROM responses_and_scores rs
+      JOIN events e
+      ON rs.event_id = e.event_id
       WHERE rs.score = (
         SELECT MAX(score) FROM responses_and_scores WHERE respondent = rs.respondent
         );|}
 ;;
 
 let%expect_test _ =
-  let output_file = Filename.temp_file "test_db" ".sqlite" in
+  let output_file = Filename_unix.temp_file "test_db" ".sqlite" in
   let db = Db.create ~output_file in
   let () =
     Db.with_connection db ~f:(fun conn ->
@@ -78,6 +78,6 @@ let%expect_test _ =
       respondent2 scored the highest on Event2 with a score of 0.58778666490211906 |}];
     Ok ()
   in
-  Sys.remove output_file;
+  Sys_unix.remove output_file;
   Caqti_blocking.or_fail result
 ;;

@@ -1,4 +1,5 @@
 open! Core
+open Ppx_yojson_conv_lib.Yojson_conv
 include Int
 
 let yojson_of_t = yojson_of_int
@@ -9,7 +10,7 @@ module Map = struct
 
   let yojson_of_t yojson_of_a t =
     `Assoc
-      (Int.Map.to_alist t
+      (Core.Map.to_alist t
        |> List.map ~f:(fun (event_id, score) -> Int.to_string event_id, yojson_of_a score)
       )
   ;;

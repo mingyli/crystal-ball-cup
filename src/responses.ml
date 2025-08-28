@@ -1,4 +1,5 @@
 open! Core
+open Ppx_yojson_conv_lib.Yojson_conv
 
 type t = { probabilities : float Event_id.Map.t } [@@deriving sexp_of, fields, yojson_of]
 

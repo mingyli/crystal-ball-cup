@@ -1,4 +1,5 @@
 open! Core
+open Ppx_yojson_conv_lib.Yojson_conv
 
 type t = { event_scores : float Event_id.Map.t } [@@deriving fields, sexp_of, yojson_of]
 

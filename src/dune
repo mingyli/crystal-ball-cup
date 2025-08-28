@@ -1,5 +1,11 @@
 (library
  (name crystal)
- (libraries core yojson csv caqti.blocking caqti-driver-sqlite3)
+ (libraries
+  core
+  yojson
+  csv
+  caqti.blocking
+  caqti-driver-sqlite3
+  ppx_yojson_conv_lib)
  (preprocess
   (pps ppx_jane ppx_yojson_conv)))
