@@ -140,4 +140,4 @@ select {
   <table id="query-results" class="data-table"></table>
 </div>
 
-<script src="main.js"></script>
+<script type="module" src="main.js"></script>

@@ -1,3 +1,5 @@
+import { Explorer } from "./explorer.js";
+
 const GREEN = "green";
 const RED = "red";
 const GRAY = "gray";
@@ -419,72 +421,6 @@ function renderEverything(events, responsesAndScores) {
   );
 }
 
-async function loadDb() {
-  const SQL = await initSqlJs({
-    locateFile: (file) =>
-      `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`,
-  });
-
-  const response = await fetch("crystal.db");
-  const buffer = await response.arrayBuffer();
-  const db = new SQL.Database(new Uint8Array(buffer));
-  return db;
-}
-
-function initializeDatabaseExplorer(db) {
-  const queryEditor = document.getElementById("query-editor");
-  const runQueryBtn = document.getElementById("run-query-btn");
-  const queryResults = document.getElementById("query-results");
-  const queryError = document.getElementById("query-error");
-
-  const executeQuery = () => {
-    queryError.textContent = "";
-    queryResults.innerHTML = "";
-    try {
-      const stmt = queryEditor.value;
-      const res = db.exec(stmt);
-
-      if (res.length === 0) {
-        queryResults.innerHTML = "<tr><td>No results</td></tr>";
-        return;
-      }
-
-      res.forEach((table) => {
-        const headerRow = document.createElement("tr");
-        table.columns.forEach((col) => {
-          const th = document.createElement("th");
-          th.textContent = col;
-          headerRow.appendChild(th);
-        });
-        queryResults.appendChild(headerRow);
-
-        table.values.forEach((row) => {
-          const dataRow = document.createElement("tr");
-          row.forEach((val) => {
-            const td = document.createElement("td");
-            td.textContent = val;
-            dataRow.appendChild(td);
-          });
-          queryResults.appendChild(dataRow);
-        });
-      });
-    } catch (err) {
-      queryError.textContent = err.message;
-    }
-  };
-
-  runQueryBtn.addEventListener("click", executeQuery);
-
-  queryEditor.addEventListener("keydown", (event) => {
-    if (event.ctrlKey && event.key === "Enter") {
-      event.preventDefault();
-      executeQuery();
-    }
-  });
-
-  executeQuery();
-}
-
 Promise.all([
   d3.json("events.json"),
   d3.text("responses_and_scores.json"),
@@ -510,4 +446,5 @@ Promise.all([
   renderEverything(events, responsesAndScores);
 });
 
-loadDb().then((db) => initializeDatabaseExplorer(db));
+const explorer = await Explorer.loadDb();
+explorer.initializeDatabaseExplorer();
