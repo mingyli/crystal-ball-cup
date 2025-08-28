@@ -140,4 +140,9 @@ select {
   <table id="query-results" class="data-table"></table>
 </div>
 
+## Test bonsai
+
+<div id="testbonsai"></div>
+
 <script type="module" src="main.js"></script>
+<script defer src="./main.bc.js"></script>

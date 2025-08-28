@@ -70,6 +70,7 @@ module Make (Collection : Collection.S) = struct
         Map.map responses ~f:(fun responses ->
           Scores.create (module Collection) responses)
       in
+      let module Db = Crystal_sqlite.Db in
       let db = Db.create ~output_file in
       Db.with_connection db ~f:(fun conn ->
         let%bind.Or_error () = Db.Connection.make_events conn (module Collection) in
@@ -93,7 +94,7 @@ module Make (Collection : Collection.S) = struct
 end
 
 let command =
-  let collections : Collection.t list = [ (module Collections.M2025) ] in
+  let collections : Collection.t list = [ (module Crystal_collections.M2025) ] in
   Command.group ~summary:"Crystal Ball Cup"
   @@ List.map collections ~f:(fun (module Collection) ->
     let module Commands = Make (Collection) in

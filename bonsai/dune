@@ -1,0 +1,12 @@
+(executable
+ (name main)
+ (modes js)
+ (libraries
+  core
+  crystal_collections
+  bonsai
+  bonsai.web
+  plotly.jsoo
+  js_of_ocaml)
+ (preprocess
+  (pps ppx_jane bonsai.ppx_bonsai js_of_ocaml-ppx)))

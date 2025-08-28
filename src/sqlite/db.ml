@@ -1,4 +1,5 @@
 open! Core
+open Crystal
 
 module Queries = struct
   open Caqti_request.Infix

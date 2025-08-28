@@ -36,6 +36,13 @@
    %{target})))
 
 (rule
+ (target main.bc.js)
+ (mode promote)
+ (deps %{project_root}/bonsai/main.bc.js)
+ (action
+  (copy %{deps} %{target})))
+
+(rule
  (target index.html)
  (deps index.md ../style.css)
  (mode promote)
