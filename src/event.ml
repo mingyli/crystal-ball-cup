@@ -1,5 +1,5 @@
 open! Core
-open Ppx_yojson_conv_lib.Yojson_conv
+open Import
 
 type t =
   { id : Event_id.t
