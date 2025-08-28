@@ -6,9 +6,9 @@ type t =
   }
 [@@deriving fields, sexp_of, yojson_of]
 
-let create (module Collection : Collection.S) responses =
+let create collection responses =
   let probabilities = Responses.probabilities responses in
-  let events = Collection.all' in
+  let events = Collection.all' collection in
   let event_scores =
     Map.merge probabilities events ~f:(fun ~key:event_id -> function
       | `Left probability ->

@@ -61,9 +61,9 @@ module Connection = struct
     result |> Result.map_error ~f:(fun e -> Caqti_error.Exn e) |> Or_error.of_exn_result
   ;;
 
-  let make_events ((module Conn) : t) (module Collection : Collection.S) =
+  let make_events ((module Conn) : t) collection =
     let%bind () = Conn.exec Queries.create_events () in
-    let events = Collection.all in
+    let events = Collection.all collection in
     List.fold events ~init:(Ok ()) ~f:(fun acc event ->
       let%bind () = acc in
       let event_id = Event.id event in
