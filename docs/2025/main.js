@@ -62,26 +62,28 @@ function renderStandings(responsesAndScores) {
   const standings = [];
   for (const respondent in responsesAndScores) {
     const respondentData = responsesAndScores[respondent];
-    const meanTotalScore = respondentData.scores.mean_score;
-    standings.push({ respondent: respondent, meanTotalScore: meanTotalScore });
+    const eventScores = Object.values(respondentData.scores.event_scores);
+    const validScores = eventScores.filter(score => !isNaN(score));
+    const totalScore = validScores.reduce((sum, score) => sum + score, 0);
+    standings.push({ respondent: respondent, totalScore: totalScore });
   }
 
   standings.sort((a, b) => {
-    if (isNaN(a.meanTotalScore) && isNaN(b.meanTotalScore)) return 0;
-    if (isNaN(a.meanTotalScore)) return 1;
-    if (isNaN(b.meanTotalScore)) return -1;
-    return b.meanTotalScore - a.meanTotalScore; // Sort descending
+    if (isNaN(a.totalScore) && isNaN(b.totalScore)) return 0;
+    if (isNaN(a.totalScore)) return 1;
+    if (isNaN(b.totalScore)) return -1;
+    return b.totalScore - a.totalScore; // Sort descending
   });
 
   const respondents = standings.map(s => s.respondent);
-  const displayScores = standings.map(s => s.meanTotalScore);
+  const displayScores = standings.map(s => s.totalScore);
 
   const finiteScores = displayScores.filter(s => isFinite(s));
   const maxAbsScore = finiteScores.length > 0 ? Math.max(...finiteScores.map(s => Math.abs(s))) : 1;
 
   const finalDisplayScores = displayScores.map(s => {
-    if (s === Infinity) return maxAbsScore * 1.1;
-    if (s === -Infinity) return -maxAbsScore * 1.1;
+    if (s === Infinity) return maxAbsScore * 1.4;
+    if (s === -Infinity) return -maxAbsScore * 1.4;
     return s;
   });
 
@@ -111,7 +113,7 @@ function renderStandings(responsesAndScores) {
   }];
 
   const layout = {
-    title: 'Standings',
+    title: { text: 'Total Score' },
     yaxis: {
       autorange: 'reversed',
       automargin: true,
@@ -140,7 +142,7 @@ function renderStandings(responsesAndScores) {
     margin: {
       l: 200,
       r: 20,
-      t: 40,
+      t: 60,
       b: 40
     },
     height: 20 * respondents.length + 80,

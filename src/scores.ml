@@ -2,7 +2,6 @@ open! Core
 
 type t =
   { event_scores : float Event_id.Map.t
-  ; mean_score : float
   }
 [@@deriving fields, sexp_of, yojson_of]
 
@@ -21,19 +20,5 @@ let create collection responses =
             "No probability provided for event" (event_id : Event_id.t) (event : Event.t)]
       | `Both (probability, event) -> Some (Event.score event ~probability))
   in
-  let mean_score =
-    let count_of_valid_scores =
-      Map.data event_scores |> List.count ~f:(fun score -> not (Float.is_nan score))
-    in
-    if count_of_valid_scores = 0
-    then Float.nan
-    else (
-      let total_sum_of_valid_scores =
-        Map.data event_scores
-        |> List.filter ~f:(fun score -> not (Float.is_nan score))
-        |> List.sum (module Float) ~f:Fn.id
-      in
-      total_sum_of_valid_scores /. Float.of_int count_of_valid_scores)
-  in
-  { event_scores; mean_score }
+  { event_scores }
 ;;
