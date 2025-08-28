@@ -8,23 +8,6 @@
    (run %{project_root}/bin/main.exe 2025 json))))
 
 (rule
- (target index.html)
- (deps index.md ../style.css)
- (mode promote)
- (action
-  (run
-   pandoc
-   -s
-   -t
-   html5
-   --css
-   ../style.css
-   --table-of-contents=true
-   index.md
-   -o
-   index.html)))
-
-(rule
  (target responses_and_scores.json)
  (deps %{project_root}/bin/main.exe %{project_root}/etc/2025/responses.csv)
  (mode promote)
@@ -47,7 +30,24 @@
    %{project_root}/bin/main.exe
    2025
    create-db
-   -output
-   %{target}
    -responses
-   %{project_root}/etc/2025/responses.csv)))
+   %{project_root}/etc/2025/responses.csv
+   -output
+   %{target})))
+
+(rule
+ (target index.html)
+ (deps index.md ../style.css)
+ (mode promote)
+ (action
+  (run
+   pandoc
+   -s
+   -t
+   html5
+   --css
+   ../style.css
+   --table-of-contents=true
+   index.md
+   -o
+   %{target})))
