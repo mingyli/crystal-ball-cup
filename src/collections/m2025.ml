@@ -180,12 +180,12 @@ let%expect_test _ =
     │ 3  │ The top grossing domestic film o │ The top grossing domestic film of Q4 │ Pending │
     │    │ f Q4 2025 is based on an origina │  2025 (October through December), ac │         │
     │    │ l screenplay                     │ cording to Box Office Mojo, is based │         │
-    │    │                                  │  on an original screenplay—meaning │         │
-    │    │                                  │  not adapted from existing material� │         │
-    │    │                                  │ ��as determined by Oscar eligibility │         │
-    │    │                                  │  or expert consensus (e.g., Writer's │         │
-    │    │                                  │  Branch of the Academy of Motion Pic │         │
-    │    │                                  │ ture Arts and Sciences).             │         │
+    │    │                                  │  on an original screenplay—meaning n │         │
+    │    │                                  │ ot adapted from existing material—as │         │
+    │    │                                  │  determined by Oscar eligibility or  │         │
+    │    │                                  │ expert consensus (e.g., Writer's Bra │         │
+    │    │                                  │ nch of the Academy of Motion Picture │         │
+    │    │                                  │  Arts and Sciences).                 │         │
     ├────┼──────────────────────────────────┼──────────────────────────────────────┼─────────┤
     │ 4  │ A young man wins the 2025 US Ope │ The winner of the 2025 US Open Men's │ Pending │
     │    │ n Men's Singles tournament       │  Singles Final is under 25 years old │         │
@@ -283,8 +283,8 @@ let%expect_test _ =
     │    │ a Breeders' Cup race             │ sly won any Breeders' Cup race in an │         │
     │    │                                  │  earlier year, as confirmed by the o │         │
     │    │                                  │ fficial race results published by th │         │
-    │    │                                  │ e Breeders’ Cup or other recognize │         │
-    │    │                                  │ d racing authority.                  │         │
+    │    │                                  │ e Breeders’ Cup or other recognized  │         │
+    │    │                                  │ racing authority.                    │         │
     ├────┼──────────────────────────────────┼──────────────────────────────────────┼─────────┤
     │ 20 │ New York City has a white Christ │ At least one inch of snow is on the  │ Pending │
     │    │ mas                              │ ground in Central Park on December 2 │         │
