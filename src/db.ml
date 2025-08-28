@@ -46,9 +46,13 @@ module Queries = struct
   let create_responses_and_scores =
     let open Caqti_request.Infix in
     (Caqti_type.unit ->. Caqti_type.unit)
-      "CREATE TABLE responses_and_scores AS SELECT r.respondent, r.event_id, \
-       r.probability, s.score FROM responses AS r JOIN scores AS s ON r.respondent = \
-       s.respondent AND r.event_id = s.event_id"
+      {|BEGIN;
+        CREATE TABLE responses_and_scores AS SELECT r.respondent, r.event_id,
+          r.probability, s.score FROM responses AS r JOIN scores AS s ON r.respondent =
+          s.respondent AND r.event_id = s.event_id;
+        CREATE INDEX idx_responses_and_scores ON responses_and_scores (respondent,
+          event_id);
+        COMMIT;|}
   ;;
 end
 
