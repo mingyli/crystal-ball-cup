@@ -4,7 +4,7 @@ type t =
   | Pending
   | Yes
   | No
-[@@deriving sexp, yojson_of]
+[@@deriving sexp]
 
 let to_string = function
   | Pending -> "Pending"
@@ -18,6 +18,8 @@ let of_string = function
   | "No" -> Ok No
   | s -> Error [%string "unknown outcome %{s}"]
 ;;
+
+let yojson_of_t t = `String (to_string t)
 
 let score t ~probability =
   let ln = Float.log in

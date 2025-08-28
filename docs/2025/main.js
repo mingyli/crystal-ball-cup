@@ -7,6 +7,15 @@ const GRAY_FILL = 'rgba(128, 128, 128, 0.1)';
 const HIGHLIGHT_COLOR = 'blue';
 const UNHIGHLIGHT_COLOR = 'rgba(128, 128, 128, 0.2)';
 
+class Event {
+  constructor(id, short, precise, outcome) {
+    this.id = id;
+    this.short = short;
+    this.precise = precise;
+    this.outcome = outcome;
+  }
+}
+
 const createLayout = (event, eventId, outcomeText, outcomeClass) => {
   const layout = {
     showlegend: false,
@@ -151,25 +160,10 @@ function renderStandings(responsesAndScores) {
   Plotly.newPlot(container, data, layout, { displayModeBar: false });
 }
 
+function renderEverything(events, responsesAndScores) {
+  renderStandings(responsesAndScores);
 
-
-Promise.all([
-  d3.json('events.json'),
-  d3.text('responses_and_scores.json')
-]).then(([events, responsesAndScoresText]) => {
-  const responsesAndScores = JSON.parse(responsesAndScoresText
-    .replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"')
-    .replace(/Infinity/g, '"__INFINITY__"')
-    .replace(/NaN/g, '"__NAN__"'), function (key, value) {
-      if (typeof value === 'string') {
-        if (value === '__INFINITY__') return Infinity;
-        if (value === '__NEGATIVE_INFINITY__') return -Infinity;
-        if (value === '__NAN__') return NaN;
-      }
-      return value;
-    });
-
-  const allEvents = [{ id: 'all', short: 'All' }, ...events];
+  const allEvents = [new Event('all', 'All', 'All', 'All'), ...events];
 
   const plotTypeDropdown = d3.select('#plot-type-dropdown');
   const eventDropdown = d3.select('#event-dropdown');
@@ -279,7 +273,7 @@ Promise.all([
       const allRespondents = Object.keys(responsesAndScores);
       const eventData = allRespondents.map(respondent => responsesAndScores[respondent].responses.probabilities[event.id]);
 
-      const outcomeText = event.outcome[0];
+      const outcomeText = event.outcome;
       const outcomeClass = `outcome-${outcomeText.toLowerCase()}`;
 
       let fillColor, lineColor;
@@ -324,76 +318,93 @@ Promise.all([
   });
 
   plotData(eventDropdown.property('value'), respondentDropdown.property('value'), plotTypeDropdown.property('value'));
-  renderStandings(responsesAndScores);
-});
+};
 
-async function initializeDatabaseExplorer() {
-  try {
-    const SQL = await initSqlJs({
-      locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
-    });
+async function loadDb() {
+  const SQL = await initSqlJs({
+    locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+  });
 
-    const response = await fetch('crystal.db');
-    const buffer = await response.arrayBuffer();
-    const db = new SQL.Database(new Uint8Array(buffer));
-
-    const queryEditor = document.getElementById('query-editor');
-    const runQueryBtn = document.getElementById('run-query-btn');
-    const queryResults = document.getElementById('query-results');
-    const queryError = document.getElementById('query-error');
-
-    const executeQuery = () => {
-      queryError.textContent = '';
-      queryResults.innerHTML = '';
-      try {
-        const stmt = queryEditor.value;
-        const res = db.exec(stmt);
-
-        if (res.length === 0) {
-          queryResults.innerHTML = '<tr><td>No results</td></tr>';
-          return;
-        }
-
-        res.forEach(table => {
-          const headerRow = document.createElement('tr');
-          table.columns.forEach(col => {
-            const th = document.createElement('th');
-            th.textContent = col;
-            headerRow.appendChild(th);
-          });
-          queryResults.appendChild(headerRow);
-
-          table.values.forEach(row => {
-            const dataRow = document.createElement('tr');
-            row.forEach(val => {
-              const td = document.createElement('td');
-              td.textContent = val;
-              dataRow.appendChild(td);
-            });
-            queryResults.appendChild(dataRow);
-          });
-        });
-
-      } catch (err) {
-        queryError.textContent = err.message;
-      }
-    };
-
-    runQueryBtn.addEventListener('click', executeQuery);
-
-    queryEditor.addEventListener('keydown', (event) => {
-      if (event.ctrlKey && event.key === 'Enter') {
-        event.preventDefault();
-        executeQuery();
-      }
-    });
-
-    executeQuery();
-
-  } catch (err) {
-    console.error("Failed to load SQL.js or database:", err);
-    document.getElementById('explorer-section').innerHTML = `<p style="color: red;">Failed to load database explorer: ${err.message}</p>`;
-  }
+  const response = await fetch('crystal.db');
+  const buffer = await response.arrayBuffer();
+  const db = new SQL.Database(new Uint8Array(buffer));
+  return db;
 }
 
-initializeDatabaseExplorer();
+function initializeDatabaseExplorer(db) {
+  const queryEditor = document.getElementById('query-editor');
+  const runQueryBtn = document.getElementById('run-query-btn');
+  const queryResults = document.getElementById('query-results');
+  const queryError = document.getElementById('query-error');
+
+  const executeQuery = () => {
+    queryError.textContent = '';
+    queryResults.innerHTML = '';
+    try {
+      const stmt = queryEditor.value;
+      const res = db.exec(stmt);
+
+      if (res.length === 0) {
+        queryResults.innerHTML = '<tr><td>No results</td></tr>';
+        return;
+      }
+
+      res.forEach(table => {
+        const headerRow = document.createElement('tr');
+        table.columns.forEach(col => {
+          const th = document.createElement('th');
+          th.textContent = col;
+          headerRow.appendChild(th);
+        });
+        queryResults.appendChild(headerRow);
+
+        table.values.forEach(row => {
+          const dataRow = document.createElement('tr');
+          row.forEach(val => {
+            const td = document.createElement('td');
+            td.textContent = val;
+            dataRow.appendChild(td);
+          });
+          queryResults.appendChild(dataRow);
+        });
+      });
+
+    } catch (err) {
+      queryError.textContent = err.message;
+    }
+  };
+
+  runQueryBtn.addEventListener('click', executeQuery);
+
+  queryEditor.addEventListener('keydown', (event) => {
+    if (event.ctrlKey && event.key === 'Enter') {
+      event.preventDefault();
+      executeQuery();
+    }
+  });
+
+  executeQuery();
+}
+
+Promise.all([
+  d3.json('events.json'),
+  d3.text('responses_and_scores.json')
+]).then(([eventsJson, responsesAndScoresText]) => {
+  const events = eventsJson.map(e => new Event(e.id, e.short, e.precise, e.outcome));
+  const responsesAndScores = JSON.parse(responsesAndScoresText
+    .replace(/-Infinity/g, '"__NEGATIVE_INFINITY__"')
+    .replace(/Infinity/g, '"__INFINITY__"')
+    .replace(/NaN/g, '"__NAN__"'), function (key, value) {
+      if (typeof value === 'string') {
+        if (value === '__INFINITY__') return Infinity;
+        if (value === '__NEGATIVE_INFINITY__') return -Infinity;
+        if (value === '__NAN__') return NaN;
+      }
+      return value;
+    });
+
+  renderEverything(events, responsesAndScores);
+});
+
+loadDb().then(db =>
+  initializeDatabaseExplorer((db)));
