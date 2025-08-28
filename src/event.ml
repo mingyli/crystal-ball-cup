@@ -1,5 +1,4 @@
 open! Core
-open Yojson
 
 type t =
   { id : Event_id.t
@@ -7,7 +6,7 @@ type t =
   ; precise : string
   ; outcome : Outcome.t
   }
-[@@deriving fields, sexp, yojson_of]
+[@@deriving fields, sexp]
 
 let create = Fields.create
 let score t ~probability = Outcome.score t.outcome ~probability

@@ -1,6 +1,6 @@
 open! Core
 
-type t [@@deriving sexp, yojson_of]
+type t [@@deriving sexp]
 
 val create : id:Event_id.t -> short:string -> precise:string -> outcome:Outcome.t -> t
 val id : t -> Event_id.t

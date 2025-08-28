@@ -1,6 +1,6 @@
 open! Core
 
-type t [@@deriving sexp_of, yojson_of]
+type t [@@deriving sexp_of]
 
 val create : float Event_id.Map.t -> t
 val of_csv : string -> t String.Map.t

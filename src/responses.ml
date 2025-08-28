@@ -1,7 +1,6 @@
 open! Core
-open Yojson
 
-type t = { probabilities : float Event_id.Map.t } [@@deriving sexp_of, fields, yojson_of]
+type t = { probabilities : float Event_id.Map.t } [@@deriving sexp_of, fields]
 
 let create probabilities = { probabilities }
 

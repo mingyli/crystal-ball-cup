@@ -1,6 +1,6 @@
 open! Core
 
-type t [@@deriving yojson_of]
+type t
 
 val create : Responses.t -> Scores.t -> t
 val of_responses : Collection.t -> Responses.t -> t

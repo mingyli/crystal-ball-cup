@@ -1,4 +1,5 @@
 (library
  (name crystal)
- (libraries core yojson csv caqti.blocking caqti-driver-sqlite3 ppx_deriving_yojson.runtime)
- (preprocess (pps ppx_jane ppx_yojson_conv)))
+ (libraries core csv caqti.blocking caqti-driver-sqlite3)
+ (preprocess
+  (pps ppx_jane)))
