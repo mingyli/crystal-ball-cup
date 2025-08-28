@@ -14,5 +14,11 @@ end
 module type Collection = sig
   module type S = S
 
+  type t = (module S)
+
+  val name : t -> string
+  val all : t -> Event.t list
+  val all' : t -> Event.t Event_id.Map.t
+
   module Make (_ : Arg) : S
 end

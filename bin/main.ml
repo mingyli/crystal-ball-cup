@@ -90,7 +90,7 @@ module Make (Collection : Collection.S) = struct
 end
 
 let command =
-  let collections : (module Collection.S) list = [ (module Collections.M2025) ] in
+  let collections : Collection.t list = [ (module Collections.M2025) ] in
   Command.group ~summary:"Crystal Ball Cup"
   @@ List.map collections ~f:(fun (module Collection) ->
     let module Commands = Make (Collection) in

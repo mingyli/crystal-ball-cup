@@ -8,6 +8,6 @@ type t =
 
 let create responses scores = { responses; scores }
 
-let of_responses (module Collection : Collection.S) responses =
-  create responses (Scores.create (module Collection) responses)
+let of_responses collection responses =
+  create responses (Scores.create collection responses)
 ;;
