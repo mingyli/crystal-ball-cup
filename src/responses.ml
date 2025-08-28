@@ -1,4 +1,5 @@
 open! Core
+open Yojson
 
 type t = { probabilities : float Event_id.Map.t } [@@deriving sexp_of, fields, yojson_of]
 

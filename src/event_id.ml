@@ -1,4 +1,5 @@
 open! Core
+open Yojson
 include Int
 
 let yojson_of_t = yojson_of_int

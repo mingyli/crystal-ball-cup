@@ -36,7 +36,7 @@ module Make (Collection : Collection.S) = struct
     @@
     let%map_open.Command () = return ()
     and responses_file =
-      flag "responses" (required Filename.arg_type) ~doc:"FILE responses csv file"
+      flag "responses" (required Filename_unix.arg_type) ~doc:"FILE responses csv file"
     in
     fun () ->
       let responses = Responses.of_csv (In_channel.read_all responses_file) in
@@ -57,9 +57,9 @@ module Make (Collection : Collection.S) = struct
     @@
     let%map_open.Command () = return ()
     and output_file =
-      flag "output" (required Filename.arg_type) ~doc:"FILE output sqlite database file"
+      flag "output" (required Filename_unix.arg_type) ~doc:"FILE output sqlite database file"
     and responses_file =
-      flag "responses" (required Filename.arg_type) ~doc:"FILE responses csv file"
+      flag "responses" (required Filename_unix.arg_type) ~doc:"FILE responses csv file"
     in
     fun () ->
       let responses = Responses.of_csv (In_channel.read_all responses_file) in
@@ -97,4 +97,4 @@ let command =
     Collection.name, Commands.command)
 ;;
 
-let () = Command.run command
+let () = Command_unix.run command

@@ -1,4 +1,5 @@
 open! Core
+open Yojson
 
 type t =
   { id : Event_id.t

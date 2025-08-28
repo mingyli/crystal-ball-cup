@@ -7,12 +7,12 @@ authors: "Ming Li <mingyli34@gmail.com>"
 homepage: "https://github.com/mingyli/crystal-ball-cup"
 bug-reports: "https://github.com/mingyli/crystal-ball-cup/issues"
 depends: [
-  "ocaml" {>= "4.10.2"}
+  "ocaml" {>= "5.1.0"}
   "dune" {>= "3.19.1"}
   "core" {>= "v0.14.1"}
-  "yojson" {>= "3.0.0"}
+  "yojson"
+  "ppx_yojson_conv"
   "ppx_jane" {>= "v0.14.0"}
-  "ppx_yojson_conv" {>= "v0.14.0"}
   "ppx_inline_test" {>= "v0.14.1"}
   "ppx_expect" {>= "v0.14.2"}
   "csv" {>= "2.4"}
