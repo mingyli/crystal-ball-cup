@@ -1,15 +1,15 @@
 open! Core
 
 module Queries = struct
+  open Caqti_request.Infix
+
   let create_events =
-    let open Caqti_request.Infix in
     (Caqti_type.unit ->. Caqti_type.unit)
       "CREATE TABLE events ( event_id INTEGER PRIMARY KEY, short TEXT, precise TEXT, \
        outcome TEXT )"
   ;;
 
   let create_responses =
-    let open Caqti_request.Infix in
     (Caqti_type.unit ->. Caqti_type.unit)
       "CREATE TABLE responses ( respondent TEXT NOT NULL, event_id INTEGER NOT NULL, \
        probability REAL NOT NULL, PRIMARY KEY (respondent, event_id), FOREIGN KEY \
@@ -17,7 +17,6 @@ module Queries = struct
   ;;
 
   let create_scores =
-    let open Caqti_request.Infix in
     (Caqti_type.unit ->. Caqti_type.unit)
       "CREATE TABLE scores ( respondent TEXT NOT NULL, event_id INTEGER NOT NULL, score \
        REAL, PRIMARY KEY (respondent, event_id), FOREIGN KEY (event_id) REFERENCES \
@@ -25,34 +24,39 @@ module Queries = struct
   ;;
 
   let insert_event =
-    let open Caqti_request.Infix in
     (Caqti_type.(t4 Event_id.caqti_type string string Outcome.caqti_type)
      ->. Caqti_type.unit)
       "INSERT INTO events (event_id, short, precise, outcome) VALUES (?, ?, ?, ?)"
   ;;
 
   let insert_response =
-    let open Caqti_request.Infix in
     (Caqti_type.(t3 string Event_id.caqti_type float) ->. Caqti_type.unit)
       "INSERT INTO responses (respondent, event_id, probability) VALUES (?, ?, ?)"
   ;;
 
   let insert_score =
-    let open Caqti_request.Infix in
     (Caqti_type.(t3 string Event_id.caqti_type float) ->. Caqti_type.unit)
       "INSERT INTO scores (respondent, event_id, score) VALUES (?, ?, ?)"
   ;;
 
-  let create_responses_and_scores =
-    let open Caqti_request.Infix in
+  let create_responses_and_scores_table =
     (Caqti_type.unit ->. Caqti_type.unit)
-      {|BEGIN;
-        CREATE TABLE responses_and_scores AS SELECT r.respondent, r.event_id,
-          r.probability, s.score FROM responses AS r JOIN scores AS s ON r.respondent =
-          s.respondent AND r.event_id = s.event_id;
-        CREATE INDEX idx_responses_and_scores ON responses_and_scores (respondent,
-          event_id);
-        COMMIT;|}
+      {| CREATE TABLE responses_and_scores AS
+           SELECT
+             r.respondent,
+             r.event_id,
+             r.probability,
+             s.score
+           FROM responses AS r
+           JOIN scores AS s
+             ON r.respondent = s.respondent AND r.event_id = s.event_id
+        |}
+  ;;
+
+  let create_responses_and_scores_index =
+    (Caqti_type.unit ->. Caqti_type.unit)
+      "CREATE INDEX idx_responses_and_scores ON responses_and_scores (respondent, \
+       event_id)"
   ;;
 end
 
@@ -108,7 +112,11 @@ module Connection = struct
   let make_scores t scores = make_scores t scores |> caqti_or_error
 
   let make_responses_and_scores ((module Conn) : t) =
-    Conn.exec Queries.create_responses_and_scores () |> caqti_or_error
+    let work () =
+      let%bind () = Conn.exec Queries.create_responses_and_scores_table () in
+      Conn.exec Queries.create_responses_and_scores_index ()
+    in
+    Conn.with_transaction work |> caqti_or_error
   ;;
 end
 
