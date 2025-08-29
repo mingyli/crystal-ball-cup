@@ -1,9 +1,7 @@
-name: Dune Build Check
+# This workflow runs on pull requests to check the build, tests, and formatting.
+name: CI Checks
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
 
 jobs:
@@ -19,12 +17,14 @@ jobs:
         with:
           ocaml-compiler: "4.14.0"
 
-      - name: Install system dependencies
+      - name: Install system dependencies (Pandoc)
         run: |
           sudo apt-get update
           sudo apt-get install -y texlive-xetex wget
+          # Pandoc is needed to build index.html, which is part of the default dune build target
           wget https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-1-amd64.deb
           sudo dpkg -i pandoc-3.7.0.2-1-amd64.deb
+          # Install any missing dependencies for pandoc
           sudo apt-get -f install -y
 
       - name: Install dependencies and build
@@ -34,10 +34,10 @@ jobs:
           dune build
           dune runtest
 
-      - name: Run ocamlformat
+      - name: Check formatting with ocamlformat
         run: |
           eval $(opam env)
           dune fmt
 
       - name: Check for unclean workspace
-        run: git diff --exit-code -- . ':(exclude)*.db'
+        run: git diff --exit-code
