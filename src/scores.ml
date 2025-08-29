@@ -20,3 +20,10 @@ let create collection responses =
   in
   { event_scores }
 ;;
+
+let total t =
+  t.event_scores
+  |> Map.data
+  |> List.filter ~f:(fun f -> not (Float.is_nan f))
+  |> List.sum (module Float) ~f:Fn.id
+;;

@@ -1,5 +1,6 @@
 open! Core
 open Crystal
+open Crystal_sqlite
 
 let dummy_responses =
   let event = Event_id.of_int in
