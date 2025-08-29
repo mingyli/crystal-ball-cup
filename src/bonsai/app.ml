@@ -3,6 +3,8 @@ open Crystal
 open Js_of_ocaml
 open Bonsai_web
 open Bonsai.Let_syntax
+(* open Bonsai_web_ui_toggle
+open Bonsai_web_ui_multi_select *)
 
 let events collection =
   let node =

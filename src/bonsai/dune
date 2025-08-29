@@ -6,6 +6,7 @@
   crystal_collections
   bonsai
   bonsai.web
+  bonsai.web_ui_multi_select
   plotly.jsoo
   js_of_ocaml)
  (preprocess
