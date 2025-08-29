@@ -38,14 +38,14 @@ p {
 }
 
 #query-editor {
+    margin: auto;
     width: 100%;
-    height: 150px;
+    height: 50px;
     font-family: monospace;
-    margin-bottom: 10px;
 }
 
 #query-results {
-    width: 100%;
+    margin: auto;
     border-collapse: collapse;
     margin-top: 10px;
 }
@@ -53,11 +53,24 @@ p {
 #query-results th,
 #query-results td {
     border: 1px solid #ddd;
-    padding: 8px;
     text-align: left;
+    padding: 4px;
+    font-size: 0.8em;
     font-family: monospace;
 }
 
 #query-results th {
     background-color: #f2f2f2;
+}
+
+#query-results tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+#query-results tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+#query-results tr:hover {
+    background-color: #e9ecef;
 }

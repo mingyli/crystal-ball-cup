@@ -135,7 +135,7 @@ select {
 
 <div id="explorer-section">
   <textarea id="query-editor">SELECT name, sql FROM sqlite_master WHERE type='table';</textarea>
-  <button id="run-query-btn">Run (ctrl+enter)</button>
+  <button id="run-query-btn" style="font-family: monospace">Run (ctrl+enter)</button>
   <pre id="query-error" style="color: red;"></pre>
   <table id="query-results" class="data-table"></table>
 </div>
