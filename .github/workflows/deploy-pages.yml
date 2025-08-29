@@ -1,0 +1,60 @@
+# This workflow builds and deploys the site to GitHub Pages.
+name: Build and Deploy GitHub Pages
+
+# Run this workflow only on pushes to the main branch
+on:
+  push:
+    branches:
+      - main
+
+# Grant the necessary permissions for the deployment job
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  # The build job generates the static site files
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up OCaml
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: "4.14.0"
+
+      - name: Install system dependencies (Pandoc)
+        run: |
+          sudo apt-get update
+          wget https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-1-amd64.deb
+          sudo dpkg -i pandoc-3.7.0.2-1-amd64.deb
+          sudo apt-get -f install -y
+
+      - name: Install dependencies and build artifacts
+        run: |
+          opam install . --deps-only
+          eval $(opam env)
+          # This command builds all targets, including your JSON files, DB, and index.html
+          dune build
+
+      # This step uploads the generated site files as an artifact
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_build/default/docs/
+
+  # The deploy job takes the artifact and deploys it
+  deploy:
+    # This job depends on the build job finishing successfully
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
