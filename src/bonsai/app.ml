@@ -89,7 +89,7 @@ let standings _collection scores =
            (Ui_effect.of_sync_fun
               (fun () ->
                  let container = Dom_html.getElementById_exn "standings-plot" in
-                 Crystal_plotly.Foo.create
+                 Crystal_plotly.Plotly.create
                    container
                    [ data ]
                    layout
