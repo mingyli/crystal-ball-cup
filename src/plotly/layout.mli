@@ -1,3 +1,5 @@
+open Js_of_ocaml
+
 type title = { text : string }
 type tickfont = { size : int }
 
@@ -44,5 +46,4 @@ type t =
   ; margin : margin
   ; height : int
   }
-
-val to_js : t -> t Js_of_ocaml.Js.t
+[@@deriving js]

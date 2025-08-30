@@ -24,6 +24,7 @@ depends: [
   "js_of_ocaml"
   "js_of_ocaml-ppx"
   "js_of_ocaml-compiler"
+  "metaquot"
 ]
 build: [
   ["dune" "build" "-p" name "-j" jobs]

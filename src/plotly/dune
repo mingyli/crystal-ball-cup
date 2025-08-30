@@ -2,4 +2,4 @@
  (name crystal_plotly)
  (libraries js_of_ocaml)
  (preprocess
-  (pps ppx_jane js_of_ocaml-ppx)))
+  (pps ppx_jane js_of_ocaml-ppx ppx_deriving_js)))

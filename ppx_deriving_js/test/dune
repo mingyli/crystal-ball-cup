@@ -1,0 +1,15 @@
+(rule
+ (target input.actual)
+ (deps
+  (:pp ../bin/pp.exe)
+  (:input input.ml))
+ (action
+  (with-stdout-to
+   %{target}
+   (run ./%{pp} --impl %{input}))))
+
+(rule
+ (alias runtest)
+ (deps input.actual)
+ (action
+  (diff? input.expected input.actual)))
