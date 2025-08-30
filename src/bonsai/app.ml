@@ -3,6 +3,8 @@ open Crystal
 open Js_of_ocaml
 open Bonsai_web
 open Bonsai.Let_syntax
+(* open Bonsai_web_ui_toggle
+open Bonsai_web_ui_multi_select *)
 
 let events collection =
   let node =
@@ -16,72 +18,70 @@ let events collection =
   Bonsai.const node
 ;;
 
-let standings _collection (scores : Scores.t String.Map.t) =
-  let open Plotly in
-  let total_scores = Map.map scores ~f:Scores.total |> Map.to_alist in
-  let () =
-    let open Js_of_ocaml in
-    Firebug.console##log total_scores
-  in
-  let respondents = List.map total_scores ~f:fst in
-  let scores = List.map total_scores ~f:snd in
-  let figure =
-    let data =
-      [ Data.orientation "h"
-      ; Data.text
-          (List.to_array scores
-           |> Array.map ~f:(fun score ->
-             if Float.is_inf score then "-∞" else Float.to_string_hum ~decimals:3 score))
-      ; Data.x (List.to_array scores)
-      ; Data.data
-          [ "y", Value (Value.array String (List.to_array respondents))
-          ; "textposition", Value (Value.string "auto")
-          ; "hoverinfo", Value (Value.string "none")
-            (* ; ( "textfont"
-            , {|{"size":10}|}
-              |> Ezjsonm.from_string
-              |> Ezjsonm.unwrap
-              |> Value.of_json
-              |> Option.value_exn ) *)
-          ]
-        (* ; {|{"textfont":{"size":10}}|}
-        |> Ezjsonm.from_string
-        |> Ezjsonm.unwrap
-        |> Data.of_json
-        |> Option.value_exn *)
-        (* ; Data.of_json
-          (Ezjsonm.from_string
-             {|[{"y":["ming","obama"],"textposition":"auto","hoverinfo":"none","type":"bar"}]|}
-           |> Ezjsonm.unwrap)
-        |> Option.value_exn *)
-        (* ; Data.of_json (Ezjsonm.from_string {|[{"type":"bar"}]|} |> Ezjsonm.unwrap)
-        |> Option.value_exn *)
-      ]
+let standings _collection scores =
+  let data : Crystal_plotly.Data.t =
+    let total_scores =
+      Map.map scores ~f:Scores.total
+      |> Map.to_alist
+      |> List.sort ~compare:(fun (_, a) (_, b) -> Float.compare b a)
     in
-    let () =
-      let data =
-        Data.data
-          [ "y", Value (Value.array String (List.to_array respondents))
-          ; "textposition", Value (Value.string "auto")
-          ; "hoverinfo", Value (Value.string "none")
-          ; "type", Value (Value.string "bar")
-          ]
-      in
-      let data' =
-        Data.of_json
-          (Ezjsonm.from_string
-             {|[{"y":["ming","obama"],"textposition":"auto","hoverinfo":"none","type":"bar"}]|}
-           |> Ezjsonm.unwrap)
-        |> Option.value_exn
-      in
-      Js_of_ocaml.Firebug.console##log
-        (Data.to_json data |> Ezjsonm.wrap |> Ezjsonm.to_string);
-      Js_of_ocaml.Firebug.console##log
-        (Data.to_json data' |> Ezjsonm.wrap |> Ezjsonm.to_string)
+    let respondents = List.map total_scores ~f:fst in
+    let scores = List.map total_scores ~f:snd in
+    let text_array =
+      List.to_array scores
+      |> Array.map ~f:(fun score ->
+        if Float.is_inf score && Float.(score > 0.0)
+        then "∞"
+        else if Float.is_inf score
+        then "-∞"
+        else if Float.is_nan score
+        then "NaN"
+        else Float.to_string_hum ~decimals:3 score)
     in
-    Figure.figure [ Graph.bar data ] [ Layout.title "Total Scores" ]
+    let color_array =
+      List.to_array scores
+      |> Array.map ~f:(fun score ->
+        if Float.(score >= 0.0) then "rgba(0, 128, 0, 0.1)" else "rgba(255, 0, 0, 0.1)")
+    in
+    let line_color_array =
+      List.to_array scores
+      |> Array.map ~f:(fun score -> if Float.(score >= 0.0) then "green" else "red")
+    in
+    Bar
+      { y = Array.of_list respondents
+      ; x = Array.of_list scores
+      ; type_ = "bar"
+      ; orientation = "h"
+      ; text = text_array
+      ; textposition = "auto"
+      ; hoverinfo = "none"
+      ; textfont = { size = 10 }
+      ; marker = { color = color_array; line = { color = line_color_array; width = 1 } }
+      }
   in
-  (* Hook into Bonsai lifecycle to render *)
+  let respondents_length = Map.length scores in
+  let layout : Crystal_plotly.Layout.t =
+    { title = { text = "Total Score" }
+    ; yaxis =
+        { autorange = "reversed"
+        ; automargin = true
+        ; tickfont = { size = 10 }
+        ; fixedrange = true
+        }
+    ; xaxis = { title = ""; showticklabels = false; zeroline = false; fixedrange = true }
+    ; shapes =
+        [ { type_ = "line"
+          ; x0 = 0.0
+          ; y0 = -0.5
+          ; x1 = 0.0
+          ; y1 = Float.of_int respondents_length -. 0.5
+          ; line = { color = "black"; width = 1 }
+          }
+        ]
+    ; margin = { l = 200; r = 20; t = 60; b = 40 }
+    ; height = (20 * respondents_length) + 80
+    }
+  in
   let%sub () =
     Bonsai.Edge.lifecycle
       ~on_activate:
@@ -89,8 +89,11 @@ let standings _collection (scores : Scores.t String.Map.t) =
            (Ui_effect.of_sync_fun
               (fun () ->
                  let container = Dom_html.getElementById_exn "standings-plot" in
-                 (* Render the figure using Plotly_jsoo *)
-                 Plotly_jsoo.Jsoo.create container figure)
+                 Crystal_plotly.Plotly.create
+                   container
+                   [ data ]
+                   layout
+                   { display_mode_bar = false })
               ()))
       ()
   in
