@@ -23,7 +23,10 @@ type variant =
 [@@deriving js]
 
 type keyed_record =
-  { ocaml_name : string [@key "jsName"]
+  { ocaml_name : string [@js_key "jsName"]
   ; other_field : int
   }
 [@@deriving js]
+
+type int_alias = int [@@deriving js]
+type string_array_alias = string array [@@deriving js]

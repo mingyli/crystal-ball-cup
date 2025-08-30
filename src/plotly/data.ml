@@ -18,7 +18,7 @@ module Bar = struct
   type t =
     { y : string array
     ; x : float array
-    ; type_ : string [@key "type"]
+    ; type_ : string [@js_key "type"]
     ; orientation : string
     ; text : string array
     ; textposition : string

@@ -4,7 +4,7 @@ open Ast_builder.Default
 
 let get_key_attribute (attributes : attribute list) : string option =
   List.find_map attributes ~f:(fun (attr : attribute) ->
-    if String.equal attr.attr_name.txt "key"
+    if String.equal attr.attr_name.txt "js_key"
     then (
       match attr.attr_payload with
       | PStr
@@ -17,43 +17,33 @@ let get_key_attribute (attributes : attribute list) : string option =
     else None)
 ;;
 
-let js_conversion_expr ~loc _field_name field_type field_value =
+let rec toplevel_conversion_expr ~loc (field_type : core_type) (field_value : expression) =
   match field_type.ptyp_desc with
-  | Ptyp_constr ({ txt = Lident "string"; _ }, []) ->
-    [%expr Js.Unsafe.inject (Js.string [%e field_value])]
-  | Ptyp_constr ({ txt = Lident "int"; _ }, []) ->
-    [%expr Js.Unsafe.inject [%e field_value]]
-  | Ptyp_constr ({ txt = Lident "float"; _ }, []) ->
-    [%expr Js.Unsafe.inject [%e field_value]]
-  | Ptyp_constr ({ txt = Lident "bool"; _ }, []) ->
-    [%expr Js.Unsafe.inject (Js.bool [%e field_value])]
+  | Ptyp_constr ({ txt = Lident "string"; _ }, []) -> [%expr Js.string [%e field_value]]
+  | Ptyp_constr ({ txt = Lident "int"; _ }, []) -> field_value
+  | Ptyp_constr ({ txt = Lident "float"; _ }, []) -> field_value
+  | Ptyp_constr ({ txt = Lident "bool"; _ }, []) -> [%expr Js.bool [%e field_value]]
   | Ptyp_constr ({ txt = Lident "array"; _ }, [ inner_type ]) ->
     (match inner_type.ptyp_desc with
      | Ptyp_constr ({ txt = Lident "string"; _ }, []) ->
        [%expr
          let arr = Array.map (fun s -> Js.string s) [%e field_value] in
-         Js.Unsafe.inject (Js.array arr)]
-     | Ptyp_constr ({ txt = Lident "float"; _ }, []) ->
-       [%expr Js.Unsafe.inject (Js.array [%e field_value])]
-     | Ptyp_constr ({ txt = Lident "int"; _ }, []) ->
-       [%expr Js.Unsafe.inject (Js.array [%e field_value])]
-     | _ -> [%expr Js.Unsafe.inject (Js.array [%e field_value])])
+         Js.array arr]
+     | Ptyp_constr ({ txt = Lident "float"; _ }, []) -> [%expr Js.array [%e field_value]]
+     | Ptyp_constr ({ txt = Lident "int"; _ }, []) -> [%expr Js.array [%e field_value]]
+     | _ -> [%expr Js.array [%e field_value]])
   | Ptyp_constr ({ txt = Lident type_name; _ }, []) ->
-    (* Assume it's a custom type with its own to_js function *)
     let to_js_name = type_name ^ "_to_js" in
-    [%expr
-      Js.Unsafe.inject
-        ([%e pexp_ident ~loc { loc; txt = lident to_js_name }] [%e field_value])]
+    [%expr [%e pexp_ident ~loc { loc; txt = lident to_js_name }] [%e field_value]]
   | Ptyp_constr ({ txt = Ldot (module_path, type_name); _ }, []) ->
-    (* Handle module-qualified types *)
     let to_js_name = type_name ^ "_to_js" in
     let qualified_to_js = Ldot (module_path, to_js_name) in
-    [%expr
-      Js.Unsafe.inject
-        ([%e pexp_ident ~loc { loc; txt = qualified_to_js }] [%e field_value])]
-  | _ ->
-    (* Default: assume direct injection *)
-    [%expr Js.Unsafe.inject [%e field_value]]
+    [%expr [%e pexp_ident ~loc { loc; txt = qualified_to_js }] [%e field_value]]
+  | _ -> field_value
+
+and js_conversion_expr ~loc _field_name field_type field_value =
+  let expr = toplevel_conversion_expr ~loc field_type field_value in
+  [%expr Js.Unsafe.inject [%e expr]]
 ;;
 
 let to_js_impl ~type_name (fields : label_declaration list) =
@@ -91,6 +81,25 @@ let to_js_impl ~type_name (fields : label_declaration list) =
     ]
 ;;
 
+let abstract_to_js_impl ~type_name ~manifest =
+  let loc = Location.none in
+  let function_name = if type_name = "t" then "to_js" else type_name ^ "_to_js" in
+  let param_name = "t" in
+  let param_pat = ppat_var ~loc { loc; txt = param_name } in
+  let param_expr = pexp_ident ~loc { loc; txt = lident param_name } in
+  let conversion_body = toplevel_conversion_expr ~loc manifest param_expr in
+  let body = [%expr Js.Unsafe.coerce (Js.Unsafe.inject [%e conversion_body])] in
+  pstr_value
+    ~loc
+    Nonrecursive
+    [ { pvb_pat = ppat_var ~loc { loc; txt = function_name }
+      ; pvb_expr = pexp_fun ~loc Nolabel None param_pat body
+      ; pvb_attributes = []
+      ; pvb_loc = loc
+      }
+    ]
+;;
+
 let to_js_intf ~type_name (_fields : label_declaration list) =
   let loc = Location.none in
   let param_type = ptyp_constr ~loc { loc; txt = lident type_name } [] in
@@ -109,28 +118,33 @@ let to_js_intf ~type_name (_fields : label_declaration list) =
 let generate_impl ~ctxt (_rec_flag, type_declarations) =
   let loc = Expansion_context.Deriver.derived_item_loc ctxt in
   List.map type_declarations ~f:(fun (td : type_declaration) ->
-    match td with
-    | { ptype_kind = Ptype_abstract | Ptype_variant _ | Ptype_open; ptype_loc; _ } ->
+    match td.ptype_kind, td.ptype_manifest with
+    | Ptype_record fields, _ -> [ to_js_impl ~type_name:td.ptype_name.txt fields ]
+    | Ptype_abstract, Some manifest ->
+      [ abstract_to_js_impl ~type_name:td.ptype_name.txt ~manifest ]
+    | _ ->
       let ext =
-        Location.error_extensionf ~loc:ptype_loc "Cannot derive js for non record types"
+        Location.error_extensionf
+          ~loc:td.ptype_loc
+          "ppx_deriving_js supports only records and type aliases"
       in
-      [ Ast_builder.Default.pstr_extension ~loc ext [] ]
-    | { ptype_kind = Ptype_record fields; ptype_name; _ } ->
-      [ to_js_impl ~type_name:ptype_name.txt fields ])
+      [ Ast_builder.Default.pstr_extension ~loc ext [] ])
   |> List.concat
 ;;
 
 let generate_intf ~ctxt (_rec_flag, type_declarations) =
   let loc = Expansion_context.Deriver.derived_item_loc ctxt in
   List.map type_declarations ~f:(fun (td : type_declaration) ->
-    match td with
-    | { ptype_kind = Ptype_abstract | Ptype_variant _ | Ptype_open; ptype_loc; _ } ->
+    match td.ptype_kind with
+    | Ptype_record fields -> [ to_js_intf ~type_name:td.ptype_name.txt fields ]
+    | Ptype_abstract -> [ to_js_intf ~type_name:td.ptype_name.txt [] ]
+    | _ ->
       let ext =
-        Location.error_extensionf ~loc:ptype_loc "Cannot derive js for non record types"
+        Location.error_extensionf
+          ~loc:td.ptype_loc
+          "ppx_deriving_js supports only records and type aliases"
       in
-      [ Ast_builder.Default.psig_extension ~loc ext [] ]
-    | { ptype_kind = Ptype_record fields; ptype_name; _ } ->
-      [ to_js_intf ~type_name:ptype_name.txt fields ])
+      [ Ast_builder.Default.psig_extension ~loc ext [] ])
   |> List.concat
 ;;
 

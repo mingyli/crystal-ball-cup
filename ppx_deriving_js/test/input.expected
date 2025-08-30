@@ -45,10 +45,10 @@ type variant =
 include
   struct
     let _ = fun (_ : variant) -> ()
-    [%%ocaml.error "Cannot derive js for non record types"]
+    [%%ocaml.error "ppx_deriving_js supports only records and type aliases"]
   end[@@ocaml.doc "@inline"][@@merlin.hide ]
 type keyed_record = {
-  ocaml_name: string [@key "jsName"];
+  ocaml_name: string [@js_key "jsName"];
   other_field: int }[@@deriving js]
 include
   struct
@@ -60,4 +60,21 @@ include
                                                                     Js.Unsafe.inject
                                                                     t.other_field))|]
     let _ = keyed_record_to_js
+  end[@@ocaml.doc "@inline"][@@merlin.hide ]
+type int_alias = int[@@deriving js]
+include
+  struct
+    let _ = fun (_ : int_alias) -> ()
+    let int_alias_to_js t = Js.Unsafe.coerce (Js.Unsafe.inject t)
+    let _ = int_alias_to_js
+  end[@@ocaml.doc "@inline"][@@merlin.hide ]
+type string_array_alias = string array[@@deriving js]
+include
+  struct
+    let _ = fun (_ : string_array_alias) -> ()
+    let string_array_alias_to_js t =
+      Js.Unsafe.coerce
+        (Js.Unsafe.inject
+           (let arr = Array.map (fun s -> Js.string s) t in Js.array arr))
+    let _ = string_array_alias_to_js
   end[@@ocaml.doc "@inline"][@@merlin.hide ]
