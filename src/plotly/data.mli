@@ -24,8 +24,7 @@ module Bar : sig
     ; textfont : textfont
     ; marker : marker
     }
-
-  val to_js : t -> t Js.t
+  [@@deriving js]
 end
 
 type t = Bar of Bar.t
