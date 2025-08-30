@@ -1,6 +1,6 @@
 open Js_of_ocaml
 
-type plotly =
+type t =
   < newPlot :
       Dom_html.divElement Js.t
       -> Data.t Js.t Js.js_array Js.t
@@ -8,5 +8,5 @@ type plotly =
       -> Config.t Js.t
       -> unit Js.meth >
 
-val plotly : plotly Js.t
+val plotly : t Js.t
 val create : Dom_html.divElement Js.t -> Data.t list -> Layout.t -> Config.t -> unit
