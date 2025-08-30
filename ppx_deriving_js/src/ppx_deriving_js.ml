@@ -2,6 +2,21 @@ open Ppxlib
 module List = ListLabels
 open Ast_builder.Default
 
+let get_key_attribute (attributes : attribute list) : string option =
+  List.find_map attributes ~f:(fun (attr : attribute) ->
+    if String.equal attr.attr_name.txt "key"
+    then (
+      match attr.attr_payload with
+      | PStr
+          [ { pstr_desc =
+                Pstr_eval ({ pexp_desc = Pexp_constant (Pconst_string (s, _, _)); _ }, _)
+            ; _
+            }
+          ] -> Some s
+      | _ -> None)
+    else None)
+;;
+
 let js_conversion_expr ~loc _field_name field_type field_value =
   match field_type.ptyp_desc with
   | Ptyp_constr ({ txt = Lident "string"; _ }, []) ->
@@ -51,7 +66,11 @@ let to_js_impl ~type_name (fields : label_declaration list) =
     List.map fields ~f:(fun ld ->
       let field_name = ld.pld_name.txt in
       let field_access = pexp_field ~loc param_expr { loc; txt = lident field_name } in
-      let js_field_name = field_name in
+      let js_field_name =
+        match get_key_attribute ld.pld_attributes with
+        | Some key -> key
+        | None -> field_name
+      in
       let conversion_expr = js_conversion_expr ~loc field_name ld.pld_type field_access in
       [%expr
         [%e pexp_constant ~loc (Pconst_string (js_field_name, loc, None))]

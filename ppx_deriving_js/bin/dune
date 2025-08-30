@@ -1,0 +1,3 @@
+(executable
+ (name pp)
+ (libraries ppx_deriving_js ppxlib))

@@ -1,0 +1,63 @@
+type t = {
+  s: string ;
+  i: int }[@@deriving js]
+include
+  struct
+    let _ = fun (_ : t) -> ()
+    let to_js t =
+      Js.Unsafe.obj
+        [|("s", (Js.Unsafe.inject (Js.string t.s)));("i",
+                                                      (Js.Unsafe.inject t.i))|]
+    let _ = to_js
+  end[@@ocaml.doc "@inline"][@@merlin.hide ]
+type record_with_array = {
+  name: string ;
+  values: int array }[@@deriving js]
+include
+  struct
+    let _ = fun (_ : record_with_array) -> ()
+    let record_with_array_to_js t =
+      Js.Unsafe.obj
+        [|("name", (Js.Unsafe.inject (Js.string t.name)));("values",
+                                                            (Js.Unsafe.inject
+                                                               (Js.array
+                                                                  t.values)))|]
+    let _ = record_with_array_to_js
+  end[@@ocaml.doc "@inline"][@@merlin.hide ]
+type nested_record = {
+  label: string ;
+  data: record_with_array }[@@deriving js]
+include
+  struct
+    let _ = fun (_ : nested_record) -> ()
+    let nested_record_to_js t =
+      Js.Unsafe.obj
+        [|("label", (Js.Unsafe.inject (Js.string t.label)));("data",
+                                                              (Js.Unsafe.inject
+                                                                 (record_with_array_to_js
+                                                                    t.data)))|]
+    let _ = nested_record_to_js
+  end[@@ocaml.doc "@inline"][@@merlin.hide ]
+type variant =
+  | Simple 
+  | WithPayload of string 
+  | WithRecord of t [@@deriving js]
+include
+  struct
+    let _ = fun (_ : variant) -> ()
+    [%%ocaml.error "Cannot derive js for non record types"]
+  end[@@ocaml.doc "@inline"][@@merlin.hide ]
+type keyed_record = {
+  ocaml_name: string [@key "jsName"];
+  other_field: int }[@@deriving js]
+include
+  struct
+    let _ = fun (_ : keyed_record) -> ()
+    let keyed_record_to_js t =
+      Js.Unsafe.obj
+        [|("jsName", (Js.Unsafe.inject (Js.string t.ocaml_name)));("other_field",
+                                                                    (
+                                                                    Js.Unsafe.inject
+                                                                    t.other_field))|]
+    let _ = keyed_record_to_js
+  end[@@ocaml.doc "@inline"][@@merlin.hide ]
