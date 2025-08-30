@@ -1,7 +1,7 @@
 open! Core
 open Import
 
-type t = { probabilities : float Event_id.Map.t } [@@deriving sexp_of, fields, yojson_of]
+type t = { probabilities : float Event_id.Map.t } [@@deriving sexp, fields, yojson_of]
 
 let create probabilities = { probabilities }
 

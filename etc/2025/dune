@@ -20,3 +20,16 @@
  (mode promote)
  (action
   (run pandoc -t beamer slides.md -o slides.pdf --pdf-engine=xelatex)))
+
+(rule
+ (target responses_and_scores.sexp)
+ (deps %{project_root}/bin/main.exe responses.csv)
+ (action
+  (with-stdout-to
+   responses_and_scores.sexp
+   (run
+    %{project_root}/bin/main.exe
+    2025
+    responses-and-scores-sexp
+    -responses
+    responses.csv))))

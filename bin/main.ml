@@ -52,6 +52,21 @@ module Make (Collection : Collection.S) = struct
       print_endline (Yojson.Safe.pretty_to_string json_output)
   ;;
 
+  let responses_and_scores_sexp_command =
+    Command.basic ~summary:"Print responses and scores"
+    @@
+    let%map_open.Command () = return ()
+    and responses_file =
+      flag "responses" (required Filename_unix.arg_type) ~doc:"FILE responses csv file"
+    in
+    fun () ->
+      let responses = Responses.of_csv (In_channel.read_all responses_file) in
+      let responses_and_scores =
+        Map.map responses ~f:(Responses_and_scores.of_responses (module Collection))
+      in
+      print_s [%sexp (responses_and_scores : Responses_and_scores.t String.Map.t)]
+  ;;
+
   let create_db_command =
     Command.basic ~summary:"Create and populate a sqlite database"
     @@
@@ -88,6 +103,7 @@ module Make (Collection : Collection.S) = struct
       ; "sexp", sexp_command
       ; "json", json_command
       ; "responses-and-scores", responses_and_scores_command
+      ; "responses-and-scores-sexp", responses_and_scores_sexp_command
       ; "create-db", create_db_command
       ]
   ;;

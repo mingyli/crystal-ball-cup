@@ -6,19 +6,7 @@ open Bonsai.Let_syntax
 (* open Bonsai_web_ui_toggle
 open Bonsai_web_ui_multi_select *)
 
-let events collection =
-  let node =
-    Vdom.Node.div
-    @@ List.map (Collection.all collection) ~f:(fun event ->
-      Vdom.Node.div
-        [ Vdom.Node.h3 [ Vdom.Node.text (Event.short event) ]
-        ; Vdom.Node.p [ Vdom.Node.text (Event.precise event) ]
-        ])
-  in
-  Bonsai.const node
-;;
-
-let standings _collection scores =
+let standings scores =
   let data : Crystal_plotly.Data.t =
     let total_scores =
       Map.map scores ~f:Scores.total
@@ -27,10 +15,22 @@ let standings _collection scores =
     in
     let respondents = List.map total_scores ~f:fst in
     let scores = List.map total_scores ~f:snd in
+    let max_abs_score =
+      scores
+      |> List.filter ~f:Float.is_finite
+      |> List.map ~f:Float.abs
+      |> List.max_elt ~compare:[%compare: float]
+      |> Option.value ~default:1.0
+    in
+    let final_display_scores =
+      List.map
+        scores
+        ~f:(Float.clamp_exn ~min:(-.max_abs_score *. 1.4) ~max:(max_abs_score *. 1.4))
+    in
     let text_array =
       List.to_array scores
       |> Array.map ~f:(fun score ->
-        if Float.is_inf score && Float.(score > 0.0)
+        if Float.is_inf score && Float.is_positive score
         then "∞"
         else if Float.is_inf score
         then "-∞"
@@ -49,7 +49,7 @@ let standings _collection scores =
     in
     Bar
       { y = Array.of_list respondents
-      ; x = Array.of_list scores
+      ; x = Array.of_list final_display_scores
       ; type_ = "bar"
       ; orientation = "h"
       ; text = text_array
@@ -97,12 +97,5 @@ let standings _collection scores =
               ()))
       ()
   in
-  Bonsai.const
-  @@ Vdom.Node.div
-       ~attrs:
-         [ Vdom.Attr.id "standings-plot"
-         ; Vdom.Attr.style (Css_gen.width (`Px 600))
-         ; Vdom.Attr.style (Css_gen.height (`Px 400))
-         ]
-       []
+  Bonsai.const @@ Vdom.Node.div ~attrs:[ Vdom.Attr.id "standings-plot" ] []
 ;;

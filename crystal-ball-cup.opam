@@ -15,6 +15,7 @@ depends: [
   "ppx_yojson_conv"
   "ppx_inline_test"
   "ppx_expect"
+  "ppx_blob"
   "csv"
   "textutils"
   "ocamlformat"
