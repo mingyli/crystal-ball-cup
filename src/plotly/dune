@@ -1,0 +1,7 @@
+
+(library
+ (name crystal_plotly)
+ (libraries js_of_ocaml )
+ (inline_tests (deps))
+ (preprocess
+  (pps ppx_jane js_of_ocaml-ppx)))

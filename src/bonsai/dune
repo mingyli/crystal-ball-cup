@@ -4,10 +4,10 @@
  (libraries
   core
   crystal_collections
+  crystal_plotly
   bonsai
   bonsai.web
   bonsai.web_ui_multi_select
-  plotly.jsoo
   js_of_ocaml)
  (preprocess
   (pps ppx_jane bonsai.ppx_bonsai js_of_ocaml-ppx)))

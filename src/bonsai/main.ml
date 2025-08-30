@@ -34,11 +34,27 @@ let () =
     let scores = Scores.create (module Crystal_collections.M2025) fake_responses in
     scores
   in
-  let scores = String.Map.of_alist_exn [ "ming", scores (); "obama", scores () ] in
+  let scores =
+    String.Map.of_alist_exn
+      [ "ming", scores ()
+      ; "obama", scores ()
+      ; "trump", scores ()
+      ; "biden", scores ()
+      ; "clinton", scores ()
+      ; "bush", scores ()
+      ; "one", scores ()
+      ; "two", scores ()
+      ; "three", scores ()
+      ; "four", scores ()
+      ; "five", scores ()
+      ; "six", scores ()
+      ]
+  in
   let computation = App.standings (module Crystal_collections.M2025) scores in
-  (* Bonsai_web.Start.start ~bind_to_element_with_id:"testbonsai" computation *)
-  ignore computation
+  Bonsai_web.Start.start ~bind_to_element_with_id:"testbonsai" computation
 ;;
+
+(* ignore computation *)
 
 module Attribute = struct
   module T = struct
@@ -96,4 +112,4 @@ let bonsai_computation =
     ]
 ;;
 
-let () = Bonsai_web.Start.start ~bind_to_element_with_id:"testbonsai" bonsai_computation
+let () = Bonsai_web.Start.start ~bind_to_element_with_id:"app" bonsai_computation
