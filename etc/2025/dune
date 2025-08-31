@@ -14,9 +14,9 @@
    slides.md
    (run cat rules.md events.md))))
 
-(rule
- (targets slides.pdf)
- (deps slides.md score.png form.png)
- (mode promote)
- (action
-  (run pandoc -t beamer slides.md -o slides.pdf --pdf-engine=xelatex)))
+;; (rule
+;;  (targets slides.pdf)
+;;  (deps slides.md score.png form.png)
+;;  (mode promote)
+;;  (action
+;;   (run pandoc -t beamer slides.md -o slides.pdf --pdf-engine=xelatex)))

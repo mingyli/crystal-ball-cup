@@ -10,11 +10,12 @@ const HIGHLIGHT_COLOR = "blue";
 const UNHIGHLIGHT_COLOR = "rgba(128, 128, 128, 0.2)";
 
 class Event {
-  constructor(id, short, precise, outcome) {
+  constructor(id, short, precise, outcome, explanation) {
     this.id = id;
     this.short = short;
     this.precise = precise;
     this.outcome = outcome;
+    this.explanation = explanation;
   }
 }
 
@@ -37,9 +38,46 @@ const createLayout = (event, eventId, outcomeText, outcomeClass) => {
     d3.select("#event-description").text(event.precise);
     d3.select("#event-description")
       .append("div")
-      .html(`<span class="outcome-chip">${outcomeText}</span>`)
+      .html(
+        `<span class="outcome-chip">${
+          event.explanation && event.explanation.link
+            ? `<a href="${event.explanation.link}" target="_blank" rel="noopener noreferrer">${outcomeText}</a>`
+            : outcomeText
+        }</span>`
+      )
       .attr("class", outcomeClass)
       .style("font-weight", "bold");
+
+    // Add explanation details if available
+    if (
+      event.explanation &&
+      (event.explanation.text || event.explanation.date)
+    ) {
+      const explanationDiv = d3
+        .select("#event-description")
+        .append("div")
+        .style("margin-top", "10px")
+        .style("padding", "8px")
+        .style("background-color", "#f8f9fa")
+        .style("border-radius", "4px")
+        .style("font-size", "0.9em");
+
+      if (event.explanation.text) {
+        explanationDiv
+          .append("div")
+          .style("font-style", "italic")
+          .style("margin-bottom", "4px")
+          .text(event.explanation.text);
+      }
+
+      if (event.explanation.date) {
+        explanationDiv
+          .append("div")
+          .style("font-size", "0.8em")
+          .style("color", "#666")
+          .text(`Date: ${event.explanation.date}`);
+      }
+    }
   } else {
     layout.margin = { l: 20, r: 20, b: 20, t: 20 };
     layout.height = 100;
@@ -53,10 +91,10 @@ const createScatterTrace = (
   y,
   allRespondents,
   highlightedRespondent,
-  responsesAndScores,
+  responsesAndScores
 ) => {
   const colors = allRespondents.map((u) =>
-    u === highlightedRespondent ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR,
+    u === highlightedRespondent ? HIGHLIGHT_COLOR : UNHIGHLIGHT_COLOR
   );
   const customdata = allRespondents.map((_, index) => {
     const prediction = x[index].toFixed(2);
@@ -132,7 +170,7 @@ function renderStandings(responsesAndScores) {
       },
       marker: {
         color: displayScores.map((score) =>
-          score >= 0 ? GREEN_FILL : RED_FILL,
+          score >= 0 ? GREEN_FILL : RED_FILL
         ),
         line: {
           color: displayScores.map((score) => (score >= 0 ? GREEN : RED)),
@@ -192,7 +230,7 @@ function renderEverything(events, responsesAndScores) {
 
   eventDropdown
     .selectAll("option")
-    .data([new Event("all", "All", "All", "All"), ...events])
+    .data([new Event("all", "All", "All", "All", null), ...events])
     .enter()
     .append("option")
     .attr("value", (d) => d.id)
@@ -225,7 +263,7 @@ function renderEverything(events, responsesAndScores) {
             plotData(
               eventDropdown.property("value"),
               respondent,
-              plotTypeDropdown.property("value"),
+              plotTypeDropdown.property("value")
             );
           }
         }
@@ -244,7 +282,7 @@ function renderEverything(events, responsesAndScores) {
     lineColor,
     outcomeText,
     outcomeClass,
-    eventId,
+    eventId
   ) => {
     const layout = createLayout(event, eventId, outcomeText, outcomeClass);
     let traces;
@@ -271,7 +309,7 @@ function renderEverything(events, responsesAndScores) {
         allRespondents,
         highlightedRespondent,
         responsesAndScores,
-        event.id,
+        event.id
       );
       traces = [trace1, trace2];
     } else {
@@ -297,7 +335,7 @@ function renderEverything(events, responsesAndScores) {
       const freqMap = d3.rollup(
         eventData,
         (v) => v.length,
-        (d) => d,
+        (d) => d
       );
       const uniqueSorted = Array.from(freqMap.keys()).sort(d3.ascending);
       const cdfMap = new Map();
@@ -313,7 +351,7 @@ function renderEverything(events, responsesAndScores) {
         allRespondents,
         highlightedRespondent,
         responsesAndScores,
-        event.id,
+        event.id
       );
       traces = [cdfTrace, scatterTrace];
       layout.yaxis.range = [0, 1.1];
@@ -336,7 +374,7 @@ function renderEverything(events, responsesAndScores) {
       const allRespondents = Object.keys(responsesAndScores);
       const eventData = allRespondents.map(
         (respondent) =>
-          responsesAndScores[respondent].responses.probabilities[event.id],
+          responsesAndScores[respondent].responses.probabilities[event.id]
       );
 
       const outcomeText = event.outcome;
@@ -361,7 +399,13 @@ function renderEverything(events, responsesAndScores) {
         row
           .append("div")
           .attr("class", `plot-outcome ${outcomeClass}`)
-          .html(`<span class="outcome-chip">${outcomeText}</span>`);
+          .html(
+            `<span class="outcome-chip">${
+              event.explanation && event.explanation.link
+                ? `<a href="${event.explanation.link}" target="_blank" rel="noopener noreferrer">${outcomeText}</a>`
+                : outcomeText
+            }</span>`
+          );
         row.append("div").attr("class", "plot-label").text(event.short);
         plotContainer = row
           .append("div")
@@ -384,7 +428,7 @@ function renderEverything(events, responsesAndScores) {
         lineColor,
         outcomeText,
         outcomeClass,
-        eventId,
+        eventId
       );
     });
   };
@@ -393,7 +437,7 @@ function renderEverything(events, responsesAndScores) {
     plotData(
       eventDropdown.property("value"),
       respondentDropdown.property("value"),
-      this.value,
+      this.value
     );
   });
 
@@ -402,7 +446,7 @@ function renderEverything(events, responsesAndScores) {
     plotData(
       selectedEventId,
       respondentDropdown.property("value"),
-      plotTypeDropdown.property("value"),
+      plotTypeDropdown.property("value")
     );
   });
 
@@ -410,14 +454,14 @@ function renderEverything(events, responsesAndScores) {
     plotData(
       eventDropdown.property("value"),
       this.value,
-      plotTypeDropdown.property("value"),
+      plotTypeDropdown.property("value")
     );
   });
 
   plotData(
     eventDropdown.property("value"),
     respondentDropdown.property("value"),
-    plotTypeDropdown.property("value"),
+    plotTypeDropdown.property("value")
   );
 }
 
@@ -426,7 +470,7 @@ Promise.all([
   d3.text("responses_and_scores.json"),
 ]).then(([eventsJson, responsesAndScoresText]) => {
   const events = eventsJson.map(
-    (e) => new Event(e.id, e.short, e.precise, e.outcome),
+    (e) => new Event(e.id, e.short, e.precise, e.outcome, e.explanation)
   );
   const responsesAndScores = JSON.parse(
     responsesAndScoresText
@@ -440,7 +484,7 @@ Promise.all([
         if (value === "__NAN__") return NaN;
       }
       return value;
-    },
+    }
   );
 
   renderEverything(events, responsesAndScores);
