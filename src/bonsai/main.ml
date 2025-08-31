@@ -17,11 +17,13 @@ let all =
   in
   let%sub text_form = Text_form.component in
   let%sub textbox = Textbox.component in
+  let%sub explorer = Explorer.component ~db_url:"../2025/crystal.db" in
   let%arr multi_select = multi_select
   and standings = standings
   and text_form = text_form
-  and textbox = textbox in
-  Vdom.Node.div [ multi_select; standings; text_form; textbox ]
+  and textbox = textbox
+  and explorer = explorer in
+  Vdom.Node.div [ multi_select; standings; text_form; textbox; explorer ]
 ;;
 
 let () = Bonsai_web.Start.start ~bind_to_element_with_id:"app" all

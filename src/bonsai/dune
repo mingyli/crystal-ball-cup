@@ -5,10 +5,12 @@
   core
   crystal
   crystal_plotly
+  crystal_sqljs
   bonsai
   bonsai.web
   bonsai.web_ui_multi_select
   bonsai.web_ui_form
+  promise_jsoo
   js_of_ocaml)
  (preprocessor_deps %{project_root}/etc/2025/responses_and_scores.sexp)
  (preprocess
