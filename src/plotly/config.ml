@@ -1,3 +1,4 @@
-open Js_of_ocaml
+open! Core
 
-type t = { display_mode_bar : bool [@js_key "displayModeBar"] } [@@deriving js]
+type t = { display_mode_bar : bool [@jsobject.key "displayModeBar"] }
+[@@deriving jsobject]

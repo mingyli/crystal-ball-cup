@@ -63,12 +63,21 @@ let standings scores =
   let layout : Crystal_plotly.Layout.t =
     { title = { text = "Total Score" }
     ; yaxis =
-        { autorange = "reversed"
-        ; automargin = true
-        ; tickfont = { size = 10 }
+        { autorange = None
+        ; automargin = Some true
+        ; tickfont = Some { size = 10 }
         ; fixedrange = true
+        ; range = None
         }
-    ; xaxis = { title = ""; showticklabels = false; zeroline = false; fixedrange = true }
+    ; xaxis =
+        { title = ""
+        ; showticklabels = false
+        ; zeroline = false
+        ; fixedrange = true
+        ; range = None
+        ; tickvals = None
+        ; ticktext = None
+        }
     ; shapes =
         [ { type_ = "line"
           ; x0 = 0.0
@@ -80,6 +89,7 @@ let standings scores =
         ]
     ; margin = { l = 200; r = 20; t = 60; b = 40 }
     ; height = (20 * respondents_length) + 80
+    ; showlegend = false
     }
   in
   let%sub () =

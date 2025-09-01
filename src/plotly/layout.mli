@@ -1,13 +1,15 @@
+open! Core
 open Js_of_ocaml
 
 type title = { text : string }
 type tickfont = { size : int }
 
 type yaxis =
-  { autorange : string
-  ; automargin : bool
-  ; tickfont : tickfont
+  { autorange : string option
+  ; automargin : bool option
+  ; tickfont : tickfont option
   ; fixedrange : bool
+  ; range : float list option
   }
 
 type xaxis =
@@ -15,6 +17,9 @@ type xaxis =
   ; showticklabels : bool
   ; zeroline : bool
   ; fixedrange : bool
+  ; range : float list option
+  ; tickvals : float list option
+  ; ticktext : string list option
   }
 
 type line =
@@ -45,5 +50,8 @@ type t =
   ; shapes : shape list
   ; margin : margin
   ; height : int
+  ; showlegend : bool
   }
-[@@deriving js]
+[@@deriving jsobject]
+
+val jsobject_of : t -> t Js.t
