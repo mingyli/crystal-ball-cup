@@ -3,11 +3,21 @@
  (modes js)
  (libraries
   core
-  crystal_collections
+  crystal
   crystal_plotly
+  crystal_sqljs
   bonsai
   bonsai.web
   bonsai.web_ui_multi_select
+  bonsai.web_ui_form
+  promise_jsoo
   js_of_ocaml)
+ (preprocessor_deps %{project_root}/etc/2025/responses_and_scores.sexp)
  (preprocess
-  (pps ppx_jane bonsai.ppx_bonsai js_of_ocaml-ppx)))
+  (pps
+   ppx_jane
+   ppx_css
+   ppx_typed_fields
+   ppx_blob
+   bonsai.ppx_bonsai
+   js_of_ocaml-ppx)))

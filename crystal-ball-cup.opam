@@ -15,6 +15,7 @@ depends: [
   "ppx_yojson_conv"
   "ppx_inline_test"
   "ppx_expect"
+  "ppx_blob"
   "csv"
   "textutils"
   "ocamlformat"
@@ -24,6 +25,7 @@ depends: [
   "js_of_ocaml"
   "js_of_ocaml-ppx"
   "js_of_ocaml-compiler"
+  "promise_jsoo"
   "metaquot"
 ]
 build: [
