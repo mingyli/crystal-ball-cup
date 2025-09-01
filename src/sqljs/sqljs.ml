@@ -12,4 +12,4 @@ end
 type t = < > Js.t
 
 let init_sql_js : t = Js.Unsafe.global##.initSqlJs
-let invoke t (config : Config.t) = Js.Unsafe.fun_call t [| Config.to_js config |]
+let init (config : Config.t) = Js.Unsafe.fun_call init_sql_js [| Config.to_js config |]

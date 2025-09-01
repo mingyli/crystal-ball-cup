@@ -17,7 +17,7 @@ let all =
   in
   let%sub text_form = Text_form.component in
   let%sub textbox = Textbox.component in
-  let%sub explorer = Explorer.component ~db_url:"../2025/crystal.db" in
+  let%sub explorer = Explorer.component ~db_path:"../2025/crystal.db" in
   let%arr multi_select = multi_select
   and standings = standings
   and text_form = text_form

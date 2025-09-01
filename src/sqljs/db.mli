@@ -1,8 +1,8 @@
 open! Js_of_ocaml
 
-type t
+type t [@@deriving equal]
 
-val load : url:string -> t Promise.t
+val load : db_path:string -> t Promise.t
 
 module Table : sig
   type t

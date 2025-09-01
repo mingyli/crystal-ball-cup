@@ -7,5 +7,5 @@ end
 
 type t
 
-val init_sql_js : t
-val invoke : t -> Config.t -> _ Js.t
+(** Returns a promise that resolves to a SQL.js instance *)
+val init : Config.t -> _ Js.t
