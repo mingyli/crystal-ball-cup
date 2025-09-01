@@ -40,7 +40,7 @@ module Scatter : sig
 
   type t =
     { x : float array
-    ; y : float array
+    ; y : string array
     ; type_ : string
     ; mode : string
     ; text : string array
@@ -58,6 +58,7 @@ module Violin : sig
   type box = { visible : bool }
   type meanline = { visible : bool }
   type line = { color : string }
+  type marker = { color : string array }
 
   type t =
     { x : float array

@@ -43,7 +43,7 @@ module Scatter = struct
 
   type t =
     { x : float array
-    ; y : float array
+    ; y : string array
     ; type_ : string [@jsobject.key "type"]
     ; mode : string
     ; text : string array
@@ -61,6 +61,7 @@ module Violin = struct
   type box = { visible : bool } [@@deriving jsobject]
   type meanline = { visible : bool } [@@deriving jsobject]
   type line = { color : string } [@@deriving jsobject]
+  type marker = { color : string array } [@@deriving jsobject]
 
   type t =
     { x : float array
