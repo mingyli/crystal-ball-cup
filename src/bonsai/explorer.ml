@@ -82,11 +82,9 @@ let execute_query db query set_results =
     set_results [ error ]
 ;;
 
-let component ~db_path =
+let component ~db_path ~initial_query =
   let%sub db, set_db = Bonsai.state None in
-  let%sub query, set_query =
-    Bonsai.state "SELECT name, sql FROM sqlite_master WHERE type = 'table';"
-  in
+  let%sub query, set_query = Bonsai.state initial_query in
   let%sub results, set_results = Bonsai.state [] in
   let%sub () =
     Bonsai.Edge.lifecycle
@@ -112,9 +110,7 @@ let component ~db_path =
          and query = query in
          function
          | None -> Effect.print_s [%message "Database not loaded yet"]
-         | Some db ->
-           let%bind.Effect () = execute_query db query set_results in
-           Effect.print_s [%message "Executed query" (query : string)])
+         | Some db -> execute_query db query set_results)
   in
   let%arr query = query
   and set_query = set_query
@@ -126,8 +122,7 @@ let component ~db_path =
   | None -> Node.div [ Node.text "Database not loaded yet" ]
   | Some db ->
     Node.div
-      [ Node.h2 [ Node.text "Explorer" ]
-      ; Node.textarea
+      [ Node.textarea
           ~attrs:
             [ Attr.on_input (fun _event -> set_query)
             ; Attr.on_keydown (fun event ->

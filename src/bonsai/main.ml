@@ -17,13 +17,29 @@ let all =
   in
   let%sub text_form = Text_form.component in
   let%sub textbox = Textbox.component in
-  let%sub explorer = Explorer.component ~db_path:"../2025/crystal.db" in
+  let%sub explorer =
+    Explorer.component
+      ~db_path:"../2025/crystal.db"
+      ~initial_query:"SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+  in
+  let%sub explorer_winners =
+    Explorer.component
+      ~db_path:"../2025/crystal.db"
+      ~initial_query:
+        {|SELECT respondent, SUM(score) AS total_score
+FROM scores
+GROUP BY respondent
+ORDER BY total_score DESC
+LIMIT 3|}
+  in
   let%arr multi_select = multi_select
   and standings = standings
   and text_form = text_form
   and textbox = textbox
-  and explorer = explorer in
-  Vdom.Node.div [ multi_select; standings; text_form; textbox; explorer ]
+  and explorer = explorer
+  and explorer_winners = explorer_winners in
+  Vdom.Node.div
+    [ multi_select; standings; text_form; textbox; explorer; explorer_winners ]
 ;;
 
 let () = Bonsai_web.Start.start ~bind_to_element_with_id:"app" all
