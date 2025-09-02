@@ -1,27 +1,4 @@
 (rule
- (target events.json)
- (deps %{project_root}/bin/main.exe)
- (mode promote)
- (action
-  (with-stdout-to
-   events.json
-   (run %{project_root}/bin/main.exe 2025 json))))
-
-(rule
- (target responses_and_scores.json)
- (deps %{project_root}/bin/main.exe %{project_root}/etc/2025/responses.csv)
- (mode promote)
- (action
-  (with-stdout-to
-   responses_and_scores.json
-   (run
-    %{project_root}/bin/main.exe
-    2025
-    responses-and-scores
-    -responses
-    %{project_root}/etc/2025/responses.csv))))
-
-(rule
  (target crystal.db)
  (deps %{project_root}/bin/main.exe %{project_root}/etc/2025/responses.csv)
  (mode promote)
@@ -36,18 +13,15 @@
    %{target})))
 
 (rule
+ (target main.bc.js)
+ (mode promote)
+ (deps %{project_root}/web/2025/main.bc.js)
+ (action
+  (copy %{deps} %{target})))
+
+(rule
  (target index.html)
  (deps index.md ../style.css)
  (mode promote)
  (action
-  (run
-   pandoc
-   -s
-   -t
-   html5
-   --css
-   ../style.css
-   --table-of-contents=true
-   index.md
-   -o
-   %{target})))
+  (run pandoc -s -t html5 --css ../style.css index.md -o %{target})))

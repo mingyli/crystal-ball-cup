@@ -2,6 +2,7 @@ open! Core
 open Bonsai_web
 open Bonsai.Let_syntax
 open Crystal
+open Crystal_bonsai
 
 let responses_and_scores =
   [%blob "./etc/2025/responses_and_scores.sexp"]
@@ -10,19 +11,18 @@ let responses_and_scores =
 ;;
 
 let all =
-  let%sub multi_select = Multi_select.bonsai_computation in
+  let plots = Plots.create ~events:Crystal_collections.M2025.all ~responses_and_scores in
   let%sub standings =
     let scores = Map.map responses_and_scores ~f:Responses_and_scores.scores in
-    App.standings scores
+    Standings.component scores
   in
-  let%sub text_form = Text_form.component in
-  let%sub textbox = Textbox.component in
+  let%sub plots = Plots.component plots in
   let%sub explorer =
     Explorer.component
       ~db_path:"../2025/crystal.db"
       ~initial_query:"SELECT name, sql FROM sqlite_master WHERE type = 'table'"
   in
-  let%sub explorer_winners =
+  (* let%sub explorer_winners =
     Explorer.component
       ~db_path:"../2025/crystal.db"
       ~initial_query:
@@ -31,15 +31,22 @@ FROM scores
 GROUP BY respondent
 ORDER BY total_score DESC
 LIMIT 3|}
+  in *)
+  let%arr standings = standings
+  and plots = plots
+  and explorer =
+    explorer
+    (* and explorer_winners = explorer_winners  *)
   in
-  let%arr multi_select = multi_select
-  and standings = standings
-  and text_form = text_form
-  and textbox = textbox
-  and explorer = explorer
-  and explorer_winners = explorer_winners in
-  Vdom.Node.div
-    [ multi_select; standings; text_form; textbox; explorer; explorer_winners ]
+  let open Vdom in
+  Node.div
+    [ Node.h2 [ Node.text "Standings" ]
+    ; standings
+    ; Node.h2 [ Node.text "Events" ]
+    ; plots
+    ; Node.h2 [ Node.text "Explorer" ]
+    ; explorer
+    ]
 ;;
 
 let () = Bonsai_web.Start.start ~bind_to_element_with_id:"app" all

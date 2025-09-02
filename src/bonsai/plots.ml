@@ -9,11 +9,6 @@ module Which_events = struct
     | All
     | One of Event.t
   [@@deriving equal, variants]
-
-  let to_string = function
-    | All -> "All events"
-    | One event -> Event.short event
-  ;;
 end
 
 module Which_respondents = struct
@@ -21,11 +16,6 @@ module Which_respondents = struct
     | None
     | One of string
   [@@deriving equal, variants]
-
-  let to_string = function
-    | None -> "No respondents"
-    | One respondent -> respondent
-  ;;
 end
 
 let create_dropdown
@@ -219,11 +209,6 @@ let component t =
   and set_which_respondents = set_which_respondents in
   let open Vdom in
   let plots =
-    (* let events_to_plot =
-      match which_events with
-      | All -> t.events
-      | One event -> [ event ]
-    in *)
     match which_events with
     | One event ->
       [ Node.div
@@ -316,14 +301,18 @@ let component t =
         ~on_change:set_which_events
         ~items:(Which_events.All :: List.map t.events ~f:Which_events.one)
         ~selected:which_events
-        ~item_to_string:Which_events.to_string
+        ~item_to_string:(function
+          | All -> "View all events"
+          | One event -> Event.short event)
         ~equal:[%equal: Which_events.t]
     ; create_dropdown
         ~on_change:set_which_respondents
         ~items:
           (Which_respondents.None :: List.map (respondents t) ~f:Which_respondents.one)
         ~selected:which_respondents
-        ~item_to_string:Which_respondents.to_string
+        ~item_to_string:(function
+          | None -> "No respondents highlighted"
+          | One respondent -> respondent)
         ~equal:[%equal: Which_respondents.t]
     ; Node.div plots ~attrs:[ {%css|width: 100%|} ]
     ]

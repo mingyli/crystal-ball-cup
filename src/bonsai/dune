@@ -1,23 +1,14 @@
-(executable
- (name main)
- (modes js)
+(library
+ (name crystal_bonsai)
  (libraries
   core
-  crystal
-  crystal_plotly
-  crystal_sqljs
   bonsai
   bonsai.web
   bonsai.web_ui_multi_select
   bonsai.web_ui_form
-  promise_jsoo
+  crystal
+  crystal_plotly
+  crystal_sqljs
   js_of_ocaml)
- (preprocessor_deps %{project_root}/etc/2025/responses_and_scores.sexp)
  (preprocess
-  (pps
-   ppx_jane
-   ppx_css
-   ppx_typed_fields
-   ppx_blob
-   bonsai.ppx_bonsai
-   js_of_ocaml-ppx)))
+  (pps ppx_jane ppx_typed_fields ppx_css bonsai.ppx_bonsai js_of_ocaml-ppx)))
