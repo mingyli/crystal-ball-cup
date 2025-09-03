@@ -55,7 +55,7 @@ let create_dropdown
 let render_plot div_id plotly_data layout =
   Effect.of_sync_fun
     (fun () ->
-       Crystal_plotly.Plotly.create
+       Crystal_plotly.Plotly.react
          (Dom_html.getElementById_exn div_id)
          plotly_data
          layout
