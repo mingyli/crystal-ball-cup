@@ -2,4 +2,4 @@
  (name crystal_sqljs)
  (libraries core js_of_ocaml promise_jsoo)
  (preprocess
-  (pps ppx_jane js_of_ocaml-ppx ppx_deriving_js)))
+  (pps ppx_jane js_of_ocaml-ppx)))

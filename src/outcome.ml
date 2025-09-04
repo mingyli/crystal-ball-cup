@@ -4,7 +4,7 @@ type t =
   | Pending
   | Yes
   | No
-[@@deriving sexp]
+[@@deriving equal, sexp]
 
 let to_string = function
   | Pending -> "Pending"

@@ -1,39 +1,43 @@
-open Js_of_ocaml
+open! Core
 
-type title = { text : string } [@@deriving js]
-type tickfont = { size : int } [@@deriving js]
+type title = { text : string } [@@deriving jsobject]
+type tickfont = { size : int } [@@deriving jsobject]
 
 type yaxis =
-  { autorange : string
-  ; automargin : bool
-  ; tickfont : tickfont
+  { autorange : string option [@jsobject.drop_none]
+  ; automargin : bool option [@jsobject.drop_none]
+  ; tickfont : tickfont option [@jsobject.drop_none]
   ; fixedrange : bool
+  ; range : float list option [@jsobject.drop_none]
   }
-[@@deriving js]
+[@@deriving jsobject]
 
 type xaxis =
   { title : string
   ; showticklabels : bool
   ; zeroline : bool
   ; fixedrange : bool
+  ; range : float list option [@jsobject.drop_none]
+  ; tickvals : float list option [@jsobject.drop_none]
+  ; ticktext : string list option [@jsobject.drop_none]
   }
-[@@deriving js]
+[@@deriving jsobject]
 
 type line =
   { color : string
   ; width : int
   }
-[@@deriving js]
+[@@deriving jsobject]
 
 type shape =
-  { type_ : string
+  { type_ : string [@jsobject.key "type"]
   ; x0 : float
   ; y0 : float
   ; x1 : float
   ; y1 : float
   ; line : line
   }
-[@@deriving js]
+[@@deriving jsobject]
 
 type margin =
   { l : int
@@ -41,7 +45,7 @@ type margin =
   ; t : int
   ; b : int
   }
-[@@deriving js]
+[@@deriving jsobject]
 
 type t =
   { title : title
@@ -50,5 +54,6 @@ type t =
   ; shapes : shape list
   ; margin : margin
   ; height : int
+  ; showlegend : bool
   }
-[@@deriving js]
+[@@deriving jsobject]
