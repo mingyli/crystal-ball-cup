@@ -1,6 +1,6 @@
 open! Core
 open Crystal
-open! Js_of_ocaml
+open Js_of_ocaml
 open Bonsai_web
 open Bonsai.Let_syntax
 
