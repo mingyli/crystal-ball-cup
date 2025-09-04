@@ -37,7 +37,7 @@ jobs:
         run: |
           opam install . --deps-only
           eval $(opam env)
-          dune build @docs/default
+          dune build @docs/default --profile=release
 
       # This step uploads the generated site files as an artifact
       - name: Upload GitHub Pages artifact
