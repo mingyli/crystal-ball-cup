@@ -1,7 +1,8 @@
 open! Core
 open Crystal
 open Js_of_ocaml
-open Bonsai_web
+module Bonsai = Bonsai.Cont
+open Bonsai_web.Cont
 open Bonsai.Let_syntax
 
 module Which_events = struct
@@ -188,21 +189,24 @@ let render_plots
   Effect.all_unit effects
 ;;
 
-let component t =
-  let%sub which_events, set_which_events = Bonsai.state Which_events.All in
-  let%sub which_respondents, set_which_respondents =
-    Bonsai.state Which_respondents.None
+let component t graph =
+  let which_events, set_which_events = Bonsai.state Which_events.All graph in
+  let which_respondents, set_which_respondents =
+    Bonsai.state Which_respondents.None graph
   in
-  let%sub () =
+  let () =
     Bonsai.Edge.on_change
       ~equal:[%equal: Which_events.t * Which_respondents.t]
-      (Value.both which_events which_respondents)
+      (let%arr which_events = which_events
+       and which_respondents = which_respondents in
+       which_events, which_respondents)
       ~callback:
-        (let%map () = Value.return () in
+        (let%arr () = return () in
          fun (which_events, which_respondents) ->
            render_plots t which_events which_respondents)
+      graph
   in
-  let%arr () = Value.return ()
+  let%arr () = return ()
   and which_events = which_events
   and set_which_events = set_which_events
   and which_respondents = which_respondents

@@ -1,6 +1,7 @@
 open! Core
-open Bonsai_web
+module Bonsai = Bonsai.Cont
 open Bonsai.Let_syntax
+open Bonsai_web.Cont
 open Js_of_ocaml
 
 let execute_query db query set_results =
@@ -82,13 +83,12 @@ let execute_query db query set_results =
     set_results [ error ]
 ;;
 
-let component ~db_path ~initial_query =
-  let%sub db, set_db = Bonsai.state None in
-  let%sub query, set_query = Bonsai.state initial_query in
-  let%sub results, set_results = Bonsai.state [] in
-  let%sub () =
+let component ~db_path ~initial_query graph =
+  let db, set_db = Bonsai.state None graph in
+  let query, set_query = Bonsai.state initial_query graph in
+  let results, set_results = Bonsai.state [] graph in
+  let () =
     Bonsai.Edge.lifecycle
-      ()
       ~on_activate:
         (let%map set_db = set_db in
          let (_promise : unit Promise.t) =
@@ -100,8 +100,9 @@ let component ~db_path ~initial_query =
            Promise.resolve ()
          in
          Effect.Ignore)
+      graph
   in
-  let%sub () =
+  let () =
     Bonsai.Edge.on_change
       db
       ~equal:[%equal: Crystal_sqljs.Db.t option]
@@ -111,6 +112,7 @@ let component ~db_path ~initial_query =
          function
          | None -> Effect.print_s [%message "Database not loaded yet"]
          | Some db -> execute_query db query set_results)
+      graph
   in
   let%arr query = query
   and set_query = set_query
@@ -134,7 +136,7 @@ let component ~db_path ~initial_query =
                 then (
                   Dom.preventDefault event;
                   execute_query db query set_results)
-                else Vdom.Effect.Ignore)
+                else Effect.Ignore)
             ; {%css|
           margin: auto;
           width: 100%;

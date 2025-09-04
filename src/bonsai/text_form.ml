@@ -1,5 +1,5 @@
 open! Core
-open Bonsai_web
+open Bonsai_web.Cont
 module Form = Bonsai_web_ui_form.With_automatic_view
 module E = Form.Elements
 
@@ -12,7 +12,7 @@ module T = struct
 
   let label_for_field = `Inferred
 
-  let form_for_field : type a. a Typed_field.t -> Bonsai.Cont.graph -> a Form.t Value.t =
+  let form_for_field : type a. a Typed_field.t -> Bonsai.graph -> a Form.t Bonsai.t =
     fun typed_field graph ->
     match typed_field with
     | A -> E.Multiple.list (E.Textbox.int ~allow_updates_when_focused:`Always ()) graph
