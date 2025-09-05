@@ -4,18 +4,22 @@ open Js_of_ocaml
 module Bonsai = Bonsai.Cont
 open Bonsai_web.Cont
 open Bonsai.Let_syntax
+module Query_box = Bonsai_web_ui_query_box
 
 module Style =
   [%css
-  stylesheet
-    {|
-      .dropdown {
-        padding: 0.5rem;
-        border: 1px solid #ced4da;
-        border-radius: 0.25rem;
-        flex: 1;
-        min-width: 150px;
-        max-width: 300px;
+    stylesheet
+      {|
+      .selected_item {
+        background-color: rgba(0, 0, 128, 0.2);
+        color: blue;
+      }
+
+      .list_container {
+        background: white;
+        border: solid 1px black;
+        padding: 5px;
+        z-index: 9999;
       }
 
       .outcome-chip {
@@ -69,47 +73,81 @@ module Style =
       .all-plots-wrapper {
         width: 100%;
       }
+
+      .query-box-container {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+
+      .query-box-item {
+        flex: 1;
+        margin: 0 0.5rem;
+        padding: 0.5rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        min-width: 150px;
+        max-width: 300px;
+      }
+
+      .query-box-input {
+        width: 100%;
+        box-sizing: border-box;
+      }
     |}]
 
 module Which_events = struct
-  type t =
-    | All
-    | One of Event.t
-  [@@deriving equal, variants]
+  module T = struct
+    type t =
+      | All
+      | One of Event.t
+    [@@deriving compare, equal, sexp_of, variants]
+  end
+
+  include T
+  include Comparable.Make_plain (T)
 end
 
 module Which_respondents = struct
-  type t =
-    | None
-    | One of string
-  [@@deriving equal, variants]
+  module T = struct
+    type t =
+      | None
+      | One of string
+    [@@deriving compare, equal, sexp, variants]
+  end
+
+  include T
+  include Comparable.Make (T)
 end
 
-let create_dropdown
-      (type a)
-      ~(on_change : a -> unit Vdom.Effect.t)
-      ~(items : a list)
-      ~(selected : a)
-      ~(item_to_string : a -> string)
-      ~(equal : a -> a -> bool)
+let create_query_box
+      (type a cmp)
+      (module M : Bonsai.Comparator with type t = a and type comparator_witness = cmp)
+      ~set_state
+      ~placeholder_text
+      ~(default_value : a)
+      ~items
+      graph
   =
-  let open Vdom in
-  Node.select
-    ~attrs:
-      [ Attr.on_change (fun _event value ->
-          let selection =
-            List.find_exn items ~f:(fun o -> String.equal (item_to_string o) value)
-          in
-          on_change selection)
-      ; Style.dropdown
-      ]
-    (List.map items ~f:(fun item ->
-       Node.option
-         ~attrs:
-           [ Attr.value (item_to_string item)
-           ; Attr.bool_property "selected" (equal item selected)
-           ]
-         [ Node.text (item_to_string item) ]))
+  Query_box.stringable
+    ~filter_strategy:Fuzzy_search_and_score
+    ~on_select:set_state
+    ~selected_item_attr:(return Style.selected_item)
+    ~extra_list_container_attr:(return Style.list_container)
+    ~extra_input_attr:
+      (let%arr set_state = set_state in
+       Vdom.Attr.many
+         [ Vdom.Attr.placeholder placeholder_text
+         ; Style.query_box_input
+         ; Vdom.Attr.on_change (fun _event value ->
+             if String.is_empty value then set_state default_value else Effect.Ignore)
+         ])
+    ~extra_attr:(return Style.query_box_item)
+    ~modify_input_on_select:(return `Autocomplete)
+    (module M)
+    items
+    graph
 ;;
 
 let render_plot div_id plotly_data layout =
@@ -253,6 +291,36 @@ let component t graph =
   let which_respondents, set_which_respondents =
     Bonsai.state Which_respondents.None graph
   in
+  let select_which_events =
+    create_query_box
+      (module Which_events)
+      ~set_state:set_which_events
+      ~placeholder_text:"View all events"
+      ~default_value:All
+      ~items:
+        (Which_events.All :: List.map (events t) ~f:Which_events.one
+         |> Which_events.Set.of_list
+         |> Which_events.Map.of_key_set ~f:(function
+           | All -> "View all events"
+           | One event -> Event.short event)
+         |> return)
+      graph
+  in
+  let select_which_respondents =
+    create_query_box
+      (module Which_respondents)
+      ~set_state:set_which_respondents
+      ~placeholder_text:"No respondent highlighted"
+      ~default_value:None
+      ~items:
+        (Which_respondents.None :: List.map (respondents t) ~f:Which_respondents.one
+         |> Which_respondents.Set.of_list
+         |> Which_respondents.Map.of_key_set ~f:(function
+           | None -> "No respondent highlighted"
+           | One respondent -> respondent)
+         |> return)
+      graph
+  in
   let () =
     Bonsai.Edge.on_change
       ~equal:[%equal: Which_events.t * Which_respondents.t]
@@ -265,27 +333,26 @@ let component t graph =
            render_plots t which_events which_respondents)
       graph
   in
-  let%arr () = return ()
-  and which_events = which_events
-  and set_which_events = set_which_events
-  and which_respondents = which_respondents
-  and set_which_respondents = set_which_respondents in
   let open Vdom in
   let plots =
+    let%arr which_events = which_events in
+    let render_outcome_chip event =
+      let outcome = Event.outcome event in
+      let outcome_style =
+        match outcome with
+        | Yes -> Style.outcome_chip_yes
+        | No -> Style.outcome_chip_no
+        | Pending -> Style.outcome_chip_pending
+      in
+      Node.span
+        ~attrs:[ Attr.class_ "outcome-chip"; Style.outcome_chip; outcome_style ]
+        [ Node.text (outcome |> Outcome.to_string) ]
+    in
     match which_events with
     | One event ->
       [ Node.div
           ~attrs:[]
-          [ Node.span
-              ~attrs:
-                [ Attr.class_ "outcome-chip"
-                ; Style.outcome_chip
-                ; (match Event.outcome event with
-                   | Yes -> Style.outcome_chip_yes
-                   | No -> Style.outcome_chip_no
-                   | Pending -> Style.outcome_chip_pending)
-                ]
-              [ Node.text (event |> Event.outcome |> Outcome.to_string) ]
+          [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
           ; Node.div [ Node.text (Event.precise event) ]
           ; Node.div ~attrs:[ Attr.id "plot-single" ] []
           ]
@@ -294,48 +361,23 @@ let component t graph =
       List.map t.events ~f:(fun event ->
         Node.div
           ~attrs:[ Style.plots_container ]
-          [ Node.div
-              ~attrs:[ Style.outcome_chip_wrapper ]
-              [ Node.span
-                  ~attrs:
-                    [ Attr.class_ "outcome-chip"
-                    ; Style.outcome_chip
-                    ; (match Event.outcome event with
-                       | Yes -> Style.outcome_chip_yes
-                       | No -> Style.outcome_chip_no
-                       | Pending -> Style.outcome_chip_pending)
-                    ]
-                  [ Node.text (event |> Event.outcome |> Outcome.to_string) ]
-              ]
+          [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
           ; Node.div
               ~attrs:[ Style.short_event_description ]
               [ Node.text (Event.short event) ]
           ; Node.div
               ~attrs:
-                [ Attr.id [%string "plot-%{Event.id event#Event_id}"]
-                ; Style.plot_div
-                ]
+                [ Attr.id [%string "plot-%{Event.id event#Event_id}"]; Style.plot_div ]
               []
           ])
   in
+  let%arr plots = plots
+  and select_which_events = select_which_events
+  and select_which_respondents = select_which_respondents in
   Node.div
-    [ create_dropdown
-        ~on_change:set_which_events
-        ~items:(Which_events.All :: List.map t.events ~f:Which_events.one)
-        ~selected:which_events
-        ~item_to_string:(function
-          | All -> "View all events"
-          | One event -> Event.short event)
-        ~equal:[%equal: Which_events.t]
-    ; create_dropdown
-        ~on_change:set_which_respondents
-        ~items:
-          (Which_respondents.None :: List.map (respondents t) ~f:Which_respondents.one)
-        ~selected:which_respondents
-        ~item_to_string:(function
-          | None -> "No respondents highlighted"
-          | One respondent -> respondent)
-        ~equal:[%equal: Which_respondents.t]
+    [ Node.div
+        ~attrs:[ Style.query_box_container ]
+        [ Query_box.view select_which_events; Query_box.view select_which_respondents ]
     ; Node.div plots ~attrs:[ Style.all_plots_wrapper ]
     ]
 ;;
