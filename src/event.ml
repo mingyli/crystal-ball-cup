@@ -7,7 +7,7 @@ type t =
   ; precise : string
   ; outcome : Outcome.t
   }
-[@@deriving equal, fields, sexp, yojson_of]
+[@@deriving compare, equal, fields, sexp, yojson_of]
 
 let create = Fields.create
 let score t ~probability = Outcome.score t.outcome ~probability

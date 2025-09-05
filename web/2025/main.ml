@@ -1,6 +1,7 @@
 open! Core
-open Bonsai_web
+module Bonsai = Bonsai.Cont
 open Bonsai.Let_syntax
+open Bonsai_web.Cont
 open Crystal
 open Crystal_bonsai
 
@@ -10,17 +11,18 @@ let responses_and_scores =
   |> [%of_sexp: Responses_and_scores.t String.Map.t]
 ;;
 
-let all =
+let all graph =
   let plots = Plots.create ~events:Crystal_collections.M2025.all ~responses_and_scores in
-  let%sub standings =
+  let standings =
     let scores = Map.map responses_and_scores ~f:Responses_and_scores.scores in
-    Standings.component scores
+    Standings.component scores graph
   in
-  let%sub plots = Plots.component plots in
-  let%sub explorer =
+  let plots = Plots.component plots graph in
+  let explorer =
     Explorer.component
       ~db_path:"../2025/crystal.db"
       ~initial_query:"SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+      graph
   in
   (* let%sub explorer_winners =
     Explorer.component

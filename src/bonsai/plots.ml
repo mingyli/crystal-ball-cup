@@ -1,55 +1,153 @@
 open! Core
 open Crystal
 open Js_of_ocaml
-open Bonsai_web
+module Bonsai = Bonsai.Cont
+open Bonsai_web.Cont
 open Bonsai.Let_syntax
+module Query_box = Bonsai_web_ui_query_box
+
+module Style =
+  [%css
+    stylesheet
+      {|
+      .selected_item {
+        background-color: rgba(0, 0, 128, 0.2);
+        color: blue;
+      }
+
+      .list_container {
+        background: white;
+        border: solid 1px black;
+        padding: 5px;
+        z-index: 9999;
+      }
+
+      .outcome-chip {
+        display: inline-block;
+        padding: 0.2em 0.6em;
+        border-radius: 1em;
+        font-size: 0.8em;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        line-height: 1;
+      }
+
+      .outcome-chip-yes {
+        background-color: rgba(0, 128, 0, 0.2);
+        color: green;
+      }
+
+      .outcome-chip-no {
+        background-color: rgba(255, 0, 0, 0.2);
+        color: red;
+      }
+
+      .outcome-chip-pending {
+        background-color: rgba(128, 128, 128, 0.2);
+        color: rgba(128, 128, 128, 0.8);
+      }
+
+      .plots-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .outcome-chip-wrapper {
+        width: 80px;
+        font-weight: bold;
+        text-align: center;
+        padding-right: 1rem;
+      }
+
+      .short-event-description {
+        width: 150px;
+        padding-right: 1rem;
+      }
+
+      .plot-div {
+        width: calc(100% - 230px);
+      }
+
+      .all-plots-wrapper {
+        width: 100%;
+      }
+
+      .query-box-container {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+
+      .query-box-item {
+        flex: 1;
+        margin: 0 0.5rem;
+        padding: 0.5rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        min-width: 150px;
+        max-width: 300px;
+      }
+
+      .query-box-input {
+        width: 100%;
+        box-sizing: border-box;
+      }
+    |}]
 
 module Which_events = struct
-  type t =
-    | All
-    | One of Event.t
-  [@@deriving equal, variants]
+  module T = struct
+    type t =
+      | All
+      | One of Event.t
+    [@@deriving compare, equal, sexp_of, variants]
+  end
+
+  include T
+  include Comparable.Make_plain (T)
 end
 
 module Which_respondents = struct
-  type t =
-    | None
-    | One of string
-  [@@deriving equal, variants]
+  module T = struct
+    type t =
+      | None
+      | One of string
+    [@@deriving compare, equal, sexp, variants]
+  end
+
+  include T
+  include Comparable.Make (T)
 end
 
-let create_dropdown
-      (type a)
-      ~(on_change : a -> unit Vdom.Effect.t)
-      ~(items : a list)
-      ~(selected : a)
-      ~(item_to_string : a -> string)
-      ~(equal : a -> a -> bool)
+let create_query_box
+      (type a cmp)
+      (module M : Bonsai.Comparator with type t = a and type comparator_witness = cmp)
+      ~set_state
+      ~placeholder_text
+      ~(default_value : a)
+      ~items
+      graph
   =
-  let open Vdom in
-  Node.select
-    ~attrs:
-      [ Attr.on_change (fun _event value ->
-          let selection =
-            List.find_exn items ~f:(fun o -> String.equal (item_to_string o) value)
-          in
-          on_change selection)
-      ; {%css|
-            padding: 0.5rem;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            flex: 1;
-            min-width: 150px;
-            max-width: 300px;
-            |}
-      ]
-    (List.map items ~f:(fun item ->
-       Node.option
-         ~attrs:
-           [ Attr.value (item_to_string item)
-           ; Attr.bool_property "selected" (equal item selected)
-           ]
-         [ Node.text (item_to_string item) ]))
+  Query_box.stringable
+    ~filter_strategy:Fuzzy_search_and_score
+    ~on_select:set_state
+    ~selected_item_attr:(return Style.selected_item)
+    ~extra_list_container_attr:(return Style.list_container)
+    ~extra_input_attr:
+      (let%arr set_state = set_state in
+       Vdom.Attr.many
+         [ Vdom.Attr.placeholder placeholder_text
+         ; Style.query_box_input
+         ; Vdom.Attr.on_change (fun _event value ->
+             if String.is_empty value then set_state default_value else Effect.Ignore)
+         ])
+    ~extra_attr:(return Style.query_box_item)
+    ~modify_input_on_select:(return `Autocomplete)
+    (module M)
+    items
+    graph
 ;;
 
 let render_plot div_id plotly_data layout =
@@ -188,51 +286,73 @@ let render_plots
   Effect.all_unit effects
 ;;
 
-let component t =
-  let%sub which_events, set_which_events = Bonsai.state Which_events.All in
-  let%sub which_respondents, set_which_respondents =
-    Bonsai.state Which_respondents.None
+let component t graph =
+  let which_events, set_which_events = Bonsai.state Which_events.All graph in
+  let which_respondents, set_which_respondents =
+    Bonsai.state Which_respondents.None graph
   in
-  let%sub () =
+  let select_which_events =
+    create_query_box
+      (module Which_events)
+      ~set_state:set_which_events
+      ~placeholder_text:"View all events"
+      ~default_value:All
+      ~items:
+        (Which_events.All :: List.map (events t) ~f:Which_events.one
+         |> Which_events.Set.of_list
+         |> Which_events.Map.of_key_set ~f:(function
+           | All -> "View all events"
+           | One event -> Event.short event)
+         |> return)
+      graph
+  in
+  let select_which_respondents =
+    create_query_box
+      (module Which_respondents)
+      ~set_state:set_which_respondents
+      ~placeholder_text:"No respondent highlighted"
+      ~default_value:None
+      ~items:
+        (Which_respondents.None :: List.map (respondents t) ~f:Which_respondents.one
+         |> Which_respondents.Set.of_list
+         |> Which_respondents.Map.of_key_set ~f:(function
+           | None -> "No respondent highlighted"
+           | One respondent -> respondent)
+         |> return)
+      graph
+  in
+  let () =
     Bonsai.Edge.on_change
       ~equal:[%equal: Which_events.t * Which_respondents.t]
-      (Value.both which_events which_respondents)
+      (let%arr which_events = which_events
+       and which_respondents = which_respondents in
+       which_events, which_respondents)
       ~callback:
-        (let%map () = Value.return () in
+        (let%arr () = return () in
          fun (which_events, which_respondents) ->
            render_plots t which_events which_respondents)
+      graph
   in
-  let%arr () = Value.return ()
-  and which_events = which_events
-  and set_which_events = set_which_events
-  and which_respondents = which_respondents
-  and set_which_respondents = set_which_respondents in
   let open Vdom in
   let plots =
+    let%arr which_events = which_events in
+    let render_outcome_chip event =
+      let outcome = Event.outcome event in
+      let outcome_style =
+        match outcome with
+        | Yes -> Style.outcome_chip_yes
+        | No -> Style.outcome_chip_no
+        | Pending -> Style.outcome_chip_pending
+      in
+      Node.span
+        ~attrs:[ Attr.class_ "outcome-chip"; Style.outcome_chip; outcome_style ]
+        [ Node.text (outcome |> Outcome.to_string) ]
+    in
     match which_events with
     | One event ->
       [ Node.div
           ~attrs:[]
-          [ Node.span
-              ~attrs:
-                [ Attr.class_ "outcome-chip"
-                ; {%css|
-                          display: inline-block;
-                          padding: 0.2em 0.6em;
-                          border-radius: 1em;
-                          font-size: 0.8em;
-                          text-align: center;
-                          white-space: nowrap;
-                          vertical-align: middle;
-                          line-height: 1;
-                          |}
-                ; (match Event.outcome event with
-                   | Yes -> {%css|background-color: rgba(0, 128, 0, 0.2); color: green;|}
-                   | No -> {%css|background-color: rgba(255, 0, 0, 0.2); color: red;|}
-                   | Pending ->
-                     {%css|background-color: rgba(128, 128, 128, 0.2); color: rgba(128, 128, 128, 0.8);|})
-                ]
-              [ Node.text (event |> Event.outcome |> Outcome.to_string) ]
+          [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
           ; Node.div [ Node.text (Event.precise event) ]
           ; Node.div ~attrs:[ Attr.id "plot-single" ] []
           ]
@@ -240,80 +360,24 @@ let component t =
     | All ->
       List.map t.events ~f:(fun event ->
         Node.div
-          ~attrs:
-            [ {%css|
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-            |}
-            ]
-          [ Node.div
-              ~attrs:
-                [ {%css|
-                width: 80px;
-                font-weight: bold;
-                text-align: center;
-                padding-right: 1rem;
-                |}
-                ]
-              [ Node.span
-                  ~attrs:
-                    [ Attr.class_ "outcome-chip"
-                    ; {%css|
-                    display: inline-block;
-                    padding: 0.2em 0.6em;
-                    border-radius: 1em;
-                    font-size: 0.8em;
-                    text-align: center;
-                    white-space: nowrap;
-                    vertical-align: middle;
-                    line-height: 1;
-                    |}
-                    ; (match Event.outcome event with
-                       | Yes ->
-                         {%css|background-color: rgba(0, 128, 0, 0.2); color: green;|}
-                       | No -> {%css|background-color: rgba(255, 0, 0, 0.2); color: red;|}
-                       | Pending ->
-                         {%css|background-color: rgba(128, 128, 128, 0.2); color: rgba(128, 128, 128, 0.8);|})
-                    ]
-                  [ Node.text (event |> Event.outcome |> Outcome.to_string) ]
-              ]
+          ~attrs:[ Style.plots_container ]
+          [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
           ; Node.div
-              ~attrs:
-                [ {%css|
-                width: 150px;
-                padding-right: 1rem;
-                |}
-                ]
+              ~attrs:[ Style.short_event_description ]
               [ Node.text (Event.short event) ]
           ; Node.div
               ~attrs:
-                [ Attr.id [%string "plot-%{Event.id event#Event_id}"]
-                ; {%css|
-                width: calc(100% - 230px);
-                |}
-                ]
+                [ Attr.id [%string "plot-%{Event.id event#Event_id}"]; Style.plot_div ]
               []
           ])
   in
+  let%arr plots = plots
+  and select_which_events = select_which_events
+  and select_which_respondents = select_which_respondents in
   Node.div
-    [ create_dropdown
-        ~on_change:set_which_events
-        ~items:(Which_events.All :: List.map t.events ~f:Which_events.one)
-        ~selected:which_events
-        ~item_to_string:(function
-          | All -> "View all events"
-          | One event -> Event.short event)
-        ~equal:[%equal: Which_events.t]
-    ; create_dropdown
-        ~on_change:set_which_respondents
-        ~items:
-          (Which_respondents.None :: List.map (respondents t) ~f:Which_respondents.one)
-        ~selected:which_respondents
-        ~item_to_string:(function
-          | None -> "No respondents highlighted"
-          | One respondent -> respondent)
-        ~equal:[%equal: Which_respondents.t]
-    ; Node.div plots ~attrs:[ {%css|width: 100%|} ]
+    [ Node.div
+        ~attrs:[ Style.query_box_container ]
+        [ Query_box.view select_which_events; Query_box.view select_which_respondents ]
+    ; Node.div plots ~attrs:[ Style.all_plots_wrapper ]
     ]
 ;;

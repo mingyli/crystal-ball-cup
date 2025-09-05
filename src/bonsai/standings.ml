@@ -1,12 +1,11 @@
 open! Core
 open Crystal
 open Js_of_ocaml
-open Bonsai_web
+module Bonsai = Bonsai.Cont
+open Bonsai_web.Cont
 open Bonsai.Let_syntax
-(* open Bonsai_web_ui_toggle
-open Bonsai_web_ui_multi_select *)
 
-let component scores =
+let component scores graph =
   let data : Crystal_plotly.Data.t =
     let total_scores =
       Map.map scores ~f:Scores.total
@@ -92,20 +91,21 @@ let component scores =
     ; showlegend = false
     }
   in
-  let%sub () =
+  let () =
     Bonsai.Edge.lifecycle
       ~on_activate:
-        (Bonsai_web.Value.return
-           (Ui_effect.of_sync_fun
-              (fun () ->
-                 let container = Dom_html.getElementById_exn "standings-plot" in
-                 Crystal_plotly.Plotly.create
-                   container
-                   [ data ]
-                   layout
-                   { display_mode_bar = false })
-              ()))
-      ()
+        (let%arr () = return () in
+         Effect.of_sync_fun
+           (fun () ->
+              let container = Dom_html.getElementById_exn "standings-plot" in
+              Crystal_plotly.Plotly.create
+                container
+                [ data ]
+                layout
+                { display_mode_bar = false })
+           ())
+      graph
   in
-  Bonsai.const @@ Vdom.Node.div ~attrs:[ Vdom.Attr.id "standings-plot" ] []
+  let%arr () = return () in
+  Vdom.Node.div ~attrs:[ Vdom.Attr.id "standings-plot" ] []
 ;;

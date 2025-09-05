@@ -1,10 +1,10 @@
 open! Core
-open Bonsai_web
+open Bonsai_web.Cont
 open Bonsai.Let_syntax
 
-let component =
-  let%sub text, set_text = Bonsai.state "default text" in
-  let%sub displayed, set_displayed = Bonsai.state "" in
+let component graph =
+  let text, set_text = Bonsai.state "default text" graph in
+  let displayed, set_displayed = Bonsai.state "" graph in
   let%arr text = text
   and set_text = set_text
   and displayed = displayed
