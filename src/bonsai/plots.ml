@@ -5,6 +5,72 @@ module Bonsai = Bonsai.Cont
 open Bonsai_web.Cont
 open Bonsai.Let_syntax
 
+module Style =
+  [%css
+  stylesheet
+    {|
+      .dropdown {
+        padding: 0.5rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        flex: 1;
+        min-width: 150px;
+        max-width: 300px;
+      }
+
+      .outcome-chip {
+        display: inline-block;
+        padding: 0.2em 0.6em;
+        border-radius: 1em;
+        font-size: 0.8em;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        line-height: 1;
+      }
+
+      .outcome-chip-yes {
+        background-color: rgba(0, 128, 0, 0.2);
+        color: green;
+      }
+
+      .outcome-chip-no {
+        background-color: rgba(255, 0, 0, 0.2);
+        color: red;
+      }
+
+      .outcome-chip-pending {
+        background-color: rgba(128, 128, 128, 0.2);
+        color: rgba(128, 128, 128, 0.8);
+      }
+
+      .plots-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .outcome-chip-wrapper {
+        width: 80px;
+        font-weight: bold;
+        text-align: center;
+        padding-right: 1rem;
+      }
+
+      .short-event-description {
+        width: 150px;
+        padding-right: 1rem;
+      }
+
+      .plot-div {
+        width: calc(100% - 230px);
+      }
+
+      .all-plots-wrapper {
+        width: 100%;
+      }
+    |}]
+
 module Which_events = struct
   type t =
     | All
@@ -35,14 +101,7 @@ let create_dropdown
             List.find_exn items ~f:(fun o -> String.equal (item_to_string o) value)
           in
           on_change selection)
-      ; {%css|
-            padding: 0.5rem;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            flex: 1;
-            min-width: 150px;
-            max-width: 300px;
-            |}
+      ; Style.dropdown
       ]
     (List.map items ~f:(fun item ->
        Node.option
@@ -220,21 +279,11 @@ let component t graph =
           [ Node.span
               ~attrs:
                 [ Attr.class_ "outcome-chip"
-                ; {%css|
-                          display: inline-block;
-                          padding: 0.2em 0.6em;
-                          border-radius: 1em;
-                          font-size: 0.8em;
-                          text-align: center;
-                          white-space: nowrap;
-                          vertical-align: middle;
-                          line-height: 1;
-                          |}
+                ; Style.outcome_chip
                 ; (match Event.outcome event with
-                   | Yes -> {%css|background-color: rgba(0, 128, 0, 0.2); color: green;|}
-                   | No -> {%css|background-color: rgba(255, 0, 0, 0.2); color: red;|}
-                   | Pending ->
-                     {%css|background-color: rgba(128, 128, 128, 0.2); color: rgba(128, 128, 128, 0.8);|})
+                   | Yes -> Style.outcome_chip_yes
+                   | No -> Style.outcome_chip_no
+                   | Pending -> Style.outcome_chip_pending)
                 ]
               [ Node.text (event |> Event.outcome |> Outcome.to_string) ]
           ; Node.div [ Node.text (Event.precise event) ]
@@ -244,58 +293,27 @@ let component t graph =
     | All ->
       List.map t.events ~f:(fun event ->
         Node.div
-          ~attrs:
-            [ {%css|
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-            |}
-            ]
+          ~attrs:[ Style.plots_container ]
           [ Node.div
-              ~attrs:
-                [ {%css|
-                width: 80px;
-                font-weight: bold;
-                text-align: center;
-                padding-right: 1rem;
-                |}
-                ]
+              ~attrs:[ Style.outcome_chip_wrapper ]
               [ Node.span
                   ~attrs:
                     [ Attr.class_ "outcome-chip"
-                    ; {%css|
-                    display: inline-block;
-                    padding: 0.2em 0.6em;
-                    border-radius: 1em;
-                    font-size: 0.8em;
-                    text-align: center;
-                    white-space: nowrap;
-                    vertical-align: middle;
-                    line-height: 1;
-                    |}
+                    ; Style.outcome_chip
                     ; (match Event.outcome event with
-                       | Yes ->
-                         {%css|background-color: rgba(0, 128, 0, 0.2); color: green;|}
-                       | No -> {%css|background-color: rgba(255, 0, 0, 0.2); color: red;|}
-                       | Pending ->
-                         {%css|background-color: rgba(128, 128, 128, 0.2); color: rgba(128, 128, 128, 0.8);|})
+                       | Yes -> Style.outcome_chip_yes
+                       | No -> Style.outcome_chip_no
+                       | Pending -> Style.outcome_chip_pending)
                     ]
                   [ Node.text (event |> Event.outcome |> Outcome.to_string) ]
               ]
           ; Node.div
-              ~attrs:
-                [ {%css|
-                width: 150px;
-                padding-right: 1rem;
-                |}
-                ]
+              ~attrs:[ Style.short_event_description ]
               [ Node.text (Event.short event) ]
           ; Node.div
               ~attrs:
                 [ Attr.id [%string "plot-%{Event.id event#Event_id}"]
-                ; {%css|
-                width: calc(100% - 230px);
-                |}
+                ; Style.plot_div
                 ]
               []
           ])
@@ -318,6 +336,6 @@ let component t graph =
           | None -> "No respondents highlighted"
           | One respondent -> respondent)
         ~equal:[%equal: Which_respondents.t]
-    ; Node.div plots ~attrs:[ {%css|width: 100%|} ]
+    ; Node.div plots ~attrs:[ Style.all_plots_wrapper ]
     ]
 ;;
