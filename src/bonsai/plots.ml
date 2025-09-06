@@ -55,7 +55,7 @@ module Style =
       }
 
       .outcome-chip-wrapper {
-        width: 80px;
+        max-width: 80px;
         font-weight: bold;
         text-align: center;
         padding-right: 1rem;
