@@ -55,7 +55,7 @@ module Style =
       }
 
       .outcome-chip-wrapper {
-        width: 80px;
+        max-width: 80px;
         font-weight: bold;
         text-align: center;
         padding-right: 1rem;
@@ -64,6 +64,7 @@ module Style =
       .short-event-description {
         width: calc(100% - 680px);
         padding-right: 1rem;
+        font-size: 0.8em;
       }
 
       .plot-div {
