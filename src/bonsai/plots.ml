@@ -62,12 +62,13 @@ module Style =
       }
 
       .short-event-description {
-        width: 150px;
+        width: calc(100% - 680px);
         padding-right: 1rem;
       }
 
       .plot-div {
-        width: calc(100% - 230px);
+        width: 600px;
+        min-width: 600px;
       }
 
       .all-plots-wrapper {
