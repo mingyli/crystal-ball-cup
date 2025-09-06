@@ -64,6 +64,7 @@ module Style =
       .short-event-description {
         width: calc(100% - 680px);
         padding-right: 1rem;
+        fontsize: 0.8em;
       }
 
       .plot-div {
