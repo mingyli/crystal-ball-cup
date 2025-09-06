@@ -12,7 +12,15 @@ let component scores graph =
       |> Map.to_alist
       |> List.sort ~compare:[%compare: _ * float]
     in
-    let respondents = List.map total_scores ~f:fst in
+    let respondents =
+      List.map total_scores ~f:(fun (r, _) ->
+        let name =
+          match String.split r ~on:'@' with
+          | name :: _ -> name
+          | _ -> r
+        in
+        String.prefix name 10)
+    in
     let scores = List.map total_scores ~f:snd in
     let max_abs_score =
       scores
@@ -86,7 +94,7 @@ let component scores graph =
           ; line = { color = "black"; width = 1 }
           }
         ]
-    ; margin = { l = 200; r = 20; t = 60; b = 40 }
+    ; margin = { l = 20; r = 20; t = 60; b = 40 }
     ; height = (20 * respondents_length) + 80
     ; showlegend = false
     }
