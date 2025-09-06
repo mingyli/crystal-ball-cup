@@ -30,6 +30,6 @@
    (run
     %{project_root}/bin/main.exe
     2025
-    responses-and-scores-sexp
+    responses-and-scores
     -responses
     responses.csv))))

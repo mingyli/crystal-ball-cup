@@ -1,6 +1,6 @@
 open! Core
 
-type t [@@deriving sexp, yojson_of]
+type t [@@deriving sexp]
 
 val create : Collection.t -> Responses.t -> t
 val event_scores : t -> float Event_id.Map.t
