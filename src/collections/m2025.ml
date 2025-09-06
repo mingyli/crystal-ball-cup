@@ -32,7 +32,7 @@ let all =
         ~precise:
           "The winner of the 2025 US Open Men's Singles Final is under 25 years old on \
            the day of the final match, as determined by official ATP birthdate records."
-        ~outcome:Pending
+        ~outcome:Yes
     ; Event.create
         ~short:"Sam Bankman-Fried is pardoned"
         ~precise:
