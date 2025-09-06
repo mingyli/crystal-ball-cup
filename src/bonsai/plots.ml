@@ -96,6 +96,33 @@ module Style =
         width: 100%;
         box-sizing: border-box;
       }
+
+      @media (max-width: 768px) {
+        .plots-container {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .short-event-description {
+          width: 100%;
+          padding-right: 0;
+          margin-bottom: 0.5rem;
+        }
+
+        .plot-div {
+          width: 100%;
+          min-width: 0;
+        }
+
+        .query-box-container {
+          flex-direction: column;
+        }
+
+        .query-box-item {
+          margin: 0.5rem 0;
+          max-width: none;
+        }
+      }
     |}]
 
 module Which_events = struct
