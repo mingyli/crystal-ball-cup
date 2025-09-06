@@ -24,6 +24,7 @@ let all graph =
       ~initial_query:"SELECT name, sql FROM sqlite_master WHERE type = 'table'"
       graph
   in
+  let table = Table.component graph in
   (* let%sub explorer_winners =
     Explorer.component
       ~db_path:"../2025/crystal.db"
@@ -36,14 +37,16 @@ LIMIT 3|}
   in *)
   let%arr standings = standings
   and plots = plots
-  and explorer =
-    explorer
+  and explorer = explorer
+  and table =
+    table
     (* and explorer_winners = explorer_winners  *)
   in
   let open Vdom in
   Node.div
     [ Node.h2 [ Node.text "Standings" ]
     ; standings
+    ; table
     ; Node.h2 [ Node.text "Events" ]
     ; plots
     ; Node.h2 [ Node.text "Explorer" ]
