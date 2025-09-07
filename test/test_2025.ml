@@ -40,7 +40,7 @@ let%expect_test _ =
     │    │                                  │ nch of the Academy of Motion Picture │         │
     │    │                                  │  Arts and Sciences).                 │         │
     ├────┼──────────────────────────────────┼──────────────────────────────────────┼─────────┤
-    │ 4  │ A young man wins the 2025 US Ope │ The winner of the 2025 US Open Men's │ Pending │
+    │ 4  │ A young man wins the 2025 US Ope │ The winner of the 2025 US Open Men's │ Yes     │
     │    │ n Men's Singles tournament       │  Singles Final is under 25 years old │         │
     │    │                                  │  on the day of the final match, as d │         │
     │    │                                  │ etermined by official ATP birthdate  │         │
@@ -143,5 +143,6 @@ let%expect_test _ =
     │    │ mas                              │ ground in Central Park on December 2 │         │
     │    │                                  │ 5, as measured by the National Weath │         │
     │    │                                  │ er Service.                          │         │
-    └────┴──────────────────────────────────┴──────────────────────────────────────┴─────────┘ |}]
+    └────┴──────────────────────────────────┴──────────────────────────────────────┴─────────┘
+    |}]
 ;;
