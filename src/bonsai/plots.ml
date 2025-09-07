@@ -51,24 +51,24 @@ module Style =
       .plots-container {
         display: grid;
         align-items: center;
-        grid-template-columns: 1fr 1fr 3fr;
+        grid-template-columns: 1fr 1fr 4fr;
         margin-bottom: 1rem;
       }
 
       .outcome-chip-wrapper {
         font-weight: bold;
         text-align: center;
-        padding-right: 1rem;
       }
 
       .short-event-description {
-        padding-right: 1rem;
         font-size: 0.8em;
       }
 
       .plot-div {
-        width: 600px;
-        min-width: 600px;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        width: 550px;
+        max-width: 550px;
       }
 
       .all-plots-wrapper {
