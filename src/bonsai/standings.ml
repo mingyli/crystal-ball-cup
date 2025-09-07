@@ -14,12 +14,9 @@ let component scores graph =
     in
     let respondents =
       List.map total_scores ~f:(fun (r, _) ->
-        let name =
-          match String.split r ~on:'@' with
-          | name :: _ -> name
-          | _ -> r
-        in
-        String.prefix name 10)
+        match String.split r ~on:'@' with
+        | name :: _ -> name
+        | _ -> r)
     in
     let scores = List.map total_scores ~f:snd in
     let max_abs_score =

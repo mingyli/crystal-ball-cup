@@ -49,26 +49,26 @@ module Style =
       }
 
       .plots-container {
-        display: flex;
+        display: grid;
         align-items: center;
-        margin-bottom: 1rem;
+        grid-template-columns: 1fr 1fr 4fr;
+        margin-bottom: 10px;
       }
 
       .outcome-chip-wrapper {
-        width: 80px;
         font-weight: bold;
         text-align: center;
-        padding-right: 1rem;
       }
 
       .short-event-description {
-        width: calc(100% - 680px);
-        padding-right: 1rem;
+        font-size: 0.8em;
       }
 
       .plot-div {
-        width: 600px;
-        min-width: 600px;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        width: 550px;
+        max-width: 550px;
       }
 
       .all-plots-wrapper {
@@ -99,6 +99,7 @@ module Style =
 
       @media (max-width: 768px) {
         .plots-container {
+          display: flex;
           flex-direction: column;
           align-items: flex-start;
         }
