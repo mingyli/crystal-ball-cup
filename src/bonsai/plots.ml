@@ -49,20 +49,19 @@ module Style =
       }
 
       .plots-container {
-        display: flex;
+        display: grid;
         align-items: center;
+        grid-template-columns: 1fr 1fr 3fr;
         margin-bottom: 1rem;
       }
 
       .outcome-chip-wrapper {
-        max-width: 80px;
         font-weight: bold;
         text-align: center;
         padding-right: 1rem;
       }
 
       .short-event-description {
-        width: calc(100% - 680px);
         padding-right: 1rem;
         font-size: 0.8em;
       }
@@ -100,6 +99,7 @@ module Style =
 
       @media (max-width: 768px) {
         .plots-container {
+          display: flex;
           flex-direction: column;
           align-items: flex-start;
         }
