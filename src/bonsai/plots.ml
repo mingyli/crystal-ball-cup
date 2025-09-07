@@ -52,7 +52,7 @@ module Style =
         display: grid;
         align-items: center;
         grid-template-columns: 1fr 1fr 4fr;
-        margin-bottom: 1rem;
+        margin-bottom: 10px;
       }
 
       .outcome-chip-wrapper {
