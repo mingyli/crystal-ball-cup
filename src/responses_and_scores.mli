@@ -1,6 +1,6 @@
 open! Core
 
-type t [@@deriving sexp, yojson_of]
+type t [@@deriving sexp]
 
 val create : Responses.t -> Scores.t -> t
 val of_responses : Collection.t -> Responses.t -> t

@@ -19,8 +19,6 @@ let of_string = function
   | s -> Error [%string "unknown outcome %{s}"]
 ;;
 
-let yojson_of_t t = `String (to_string t)
-
 let score t ~probability =
   let ln = Float.log in
   match t with

@@ -1,5 +1,5 @@
 (library
  (name crystal)
- (libraries core caqti yojson csv ppx_yojson_conv_lib)
+ (libraries core caqti csv)
  (preprocess
-  (pps ppx_jane ppx_yojson_conv)))
+  (pps ppx_jane)))

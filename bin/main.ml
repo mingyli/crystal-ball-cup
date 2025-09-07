@@ -22,37 +22,7 @@ module Make (Collection : Collection.S) = struct
         print_s ~mach:() [%sexp (event : Event.t)])
   ;;
 
-  let json_command =
-    Command.basic ~summary:"Print events in json format"
-    @@
-    let%map_open.Command () = return () in
-    fun () ->
-      let yojson = `List (List.map Collection.all ~f:[%yojson_of: Event.t]) in
-      print_endline (Yojson.Safe.pretty_to_string yojson)
-  ;;
-
   let responses_and_scores_command =
-    Command.basic ~summary:"Print responses and scores"
-    @@
-    let%map_open.Command () = return ()
-    and responses_file =
-      flag "responses" (required Filename_unix.arg_type) ~doc:"FILE responses csv file"
-    in
-    fun () ->
-      let responses = Responses.of_csv (In_channel.read_all responses_file) in
-      let responses_and_scores =
-        Map.map responses ~f:(Responses_and_scores.of_responses (module Collection))
-      in
-      let json_output =
-        `Assoc
-          (Map.to_alist responses_and_scores
-           |> List.map ~f:(fun (respondent, responses_and_scores) ->
-             respondent, [%yojson_of: Responses_and_scores.t] responses_and_scores))
-      in
-      print_endline (Yojson.Safe.pretty_to_string json_output)
-  ;;
-
-  let responses_and_scores_sexp_command =
     Command.basic ~summary:"Print responses and scores"
     @@
     let%map_open.Command () = return ()
@@ -101,9 +71,7 @@ module Make (Collection : Collection.S) = struct
       ~summary:[%string "Crystal Ball Cup %{Collection.name}"]
       [ "markdown", markdown_command
       ; "sexp", sexp_command
-      ; "json", json_command
       ; "responses-and-scores", responses_and_scores_command
-      ; "responses-and-scores-sexp", responses_and_scores_sexp_command
       ; "create-db", create_db_command
       ]
   ;;

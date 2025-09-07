@@ -4,7 +4,7 @@ type t =
   { responses : Responses.t
   ; scores : Scores.t
   }
-[@@deriving fields, sexp, yojson_of]
+[@@deriving fields, sexp]
 
 let create responses scores = { responses; scores }
 

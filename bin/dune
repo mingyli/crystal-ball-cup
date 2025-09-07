@@ -6,7 +6,6 @@
   core_unix.filename_unix
   crystal
   crystal_collections
-  crystal_sqlite
-  yojson)
+  crystal_sqlite)
  (preprocess
-  (pps ppx_jane ppx_yojson_conv)))
+  (pps ppx_jane)))

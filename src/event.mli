@@ -1,6 +1,6 @@
 open! Core
 
-type t [@@deriving compare, equal, sexp, yojson_of]
+type t [@@deriving compare, equal, sexp]
 
 val create : id:Event_id.t -> short:string -> precise:string -> outcome:Outcome.t -> t
 val id : t -> Event_id.t
