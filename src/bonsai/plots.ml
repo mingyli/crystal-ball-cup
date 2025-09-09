@@ -62,6 +62,11 @@ module Style =
 
       .short-event-description {
         font-size: 0.8em;
+        cursor: pointer;
+      }
+
+      .short-event-description:hover {
+        text-decoration: underline;
       }
 
       .plot-div {
@@ -352,6 +357,36 @@ let component t graph =
   in
   let () =
     Bonsai.Edge.on_change
+      ~equal:[%equal: Which_events.t]
+      which_events
+      ~callback:
+        (let%map select_which_events = select_which_events in
+         fun which_events ->
+           let query_string =
+             match which_events with
+             | Which_events.All -> "View all events"
+             | Which_events.One event -> Event.short event
+           in
+           select_which_events.set_query query_string)
+      graph
+  in
+  let () =
+    Bonsai.Edge.on_change
+      ~equal:[%equal: Which_respondents.t]
+      which_respondents
+      ~callback:
+        (let%map select_which_respondents = select_which_respondents in
+         fun which_respondents ->
+           let query_string =
+             match which_respondents with
+             | Which_respondents.None -> "No respondent highlighted"
+             | Which_respondents.One respondent -> respondent
+           in
+           select_which_respondents.set_query query_string)
+      graph
+  in
+  let () =
+    Bonsai.Edge.on_change
       ~equal:[%equal: Which_events.t * Which_respondents.t]
       (let%arr which_events = which_events
        and which_respondents = which_respondents in
@@ -364,7 +399,8 @@ let component t graph =
   in
   let open Vdom in
   let plots =
-    let%arr which_events = which_events in
+    let%arr which_events = which_events
+    and set_which_events = set_which_events in
     let render_outcome_chip event =
       let outcome = Event.outcome event in
       let outcome_style =
@@ -392,7 +428,10 @@ let component t graph =
           ~attrs:[ Style.plots_container ]
           [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
           ; Node.div
-              ~attrs:[ Style.short_event_description ]
+              ~attrs:
+                [ Style.short_event_description
+                ; Attr.on_click (fun _ -> set_which_events (One event))
+                ]
               [ Node.text (Event.short event) ]
           ; Node.div
               ~attrs:
