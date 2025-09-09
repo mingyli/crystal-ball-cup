@@ -62,11 +62,6 @@ module Style =
 
       .short-event-description {
         font-size: 0.8em;
-        cursor: pointer;
-      }
-
-      .short-event-description:hover {
-        text-decoration: underline;
       }
 
       .plot-div {
@@ -427,10 +422,13 @@ let component t graph =
         Node.div
           ~attrs:[ Style.plots_container ]
           [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
-          ; Node.div
+          ; Node.a
               ~attrs:
                 [ Style.short_event_description
-                ; Attr.on_click (fun _ -> set_which_events (One event))
+                ; Attr.href "#"
+                ; Attr.on_click (fun dom_event ->
+                    Dom.preventDefault dom_event;
+                    set_which_events (One event))
                 ]
               [ Node.text (Event.short event) ]
           ; Node.div
