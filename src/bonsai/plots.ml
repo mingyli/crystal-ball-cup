@@ -68,9 +68,25 @@ module Style =
         padding: 0.2em;
       }
 
-      .short-event-description:hover {
-        color: white;
-        background-color: black;
+      .short-event-description-yes:hover {
+        background-color: rgba(0, 128, 0, 0.2);
+        color: green;
+      }
+
+      .short-event-description-no:hover {
+        background-color: rgba(255, 0, 0, 0.2);
+        color: red;
+      }
+
+      .short-event-description-pending:hover {
+        background-color: rgba(128, 128, 128, 0.2);
+        color: black;
+      }
+
+      .short-event-description:active {
+        color: black;
+        background-color: transparent;
+        text-decoration: none;
       }
 
       .plot-div {
@@ -399,12 +415,19 @@ let component t graph =
       ]
     | All ->
       List.map t.events ~f:(fun event ->
+        let outcome_hover_style =
+          match Event.outcome event with
+          | Yes -> Style.short_event_description_yes
+          | No -> Style.short_event_description_no
+          | Pending -> Style.short_event_description_pending
+        in
         Node.div
           ~attrs:[ Style.plots_container ]
           [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
           ; Node.a
               ~attrs:
                 [ Style.short_event_description
+                ; outcome_hover_style
                 ; Attr.href "#"
                 ; Attr.on_click (fun dom_event ->
                     Dom.preventDefault dom_event;
