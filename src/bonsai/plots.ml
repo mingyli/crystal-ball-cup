@@ -62,6 +62,15 @@ module Style =
 
       .short-event-description {
         font-size: 0.8em;
+        color: black;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0.2em;
+      }
+
+      .short-event-description:hover {
+        color: white;
+        background-color: black;
       }
 
       .plot-div {
