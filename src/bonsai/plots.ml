@@ -83,10 +83,19 @@ module Style =
         color: black;
       }
 
-      .short-event-description:active {
-        color: black;
-        background-color: transparent;
-        text-decoration: none;
+      .short-event-description-yes:active {
+        background-color: green;
+        color: white;
+      }
+
+      .short-event-description-no:active {
+        background-color: red;
+        color: white;
+      }
+
+      .short-event-description-pending:active {
+        background-color: black;
+        color: white;
       }
 
       .plot-div {
