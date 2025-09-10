@@ -62,6 +62,40 @@ module Style =
 
       .short-event-description {
         font-size: 0.8em;
+        color: black;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0.2em;
+      }
+
+      .short-event-description-yes:hover {
+        background-color: rgba(0, 128, 0, 0.2);
+        color: green;
+      }
+
+      .short-event-description-no:hover {
+        background-color: rgba(255, 0, 0, 0.2);
+        color: red;
+      }
+
+      .short-event-description-pending:hover {
+        background-color: rgba(128, 128, 128, 0.2);
+        color: black;
+      }
+
+      .short-event-description-yes:active {
+        background-color: green;
+        color: white;
+      }
+
+      .short-event-description-no:active {
+        background-color: red;
+        color: white;
+      }
+
+      .short-event-description-pending:active {
+        background-color: black;
+        color: white;
       }
 
       .plot-div {
@@ -364,7 +398,9 @@ let component t graph =
   in
   let open Vdom in
   let plots =
-    let%arr which_events = which_events in
+    let%arr which_events = which_events
+    and set_which_events = set_which_events
+    and select_which_events = select_which_events in
     let render_outcome_chip event =
       let outcome = Event.outcome event in
       let outcome_style =
@@ -388,11 +424,27 @@ let component t graph =
       ]
     | All ->
       List.map t.events ~f:(fun event ->
+        let outcome_hover_style =
+          match Event.outcome event with
+          | Yes -> Style.short_event_description_yes
+          | No -> Style.short_event_description_no
+          | Pending -> Style.short_event_description_pending
+        in
         Node.div
           ~attrs:[ Style.plots_container ]
           [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
-          ; Node.div
-              ~attrs:[ Style.short_event_description ]
+          ; Node.a
+              ~attrs:
+                [ Style.short_event_description
+                ; outcome_hover_style
+                ; Attr.href "#"
+                ; Attr.on_click (fun dom_event ->
+                    Dom.preventDefault dom_event;
+                    Effect.all_unit
+                      [ set_which_events (One event)
+                      ; Query_box.set_query select_which_events (Event.short event)
+                      ])
+                ]
               [ Node.text (Event.short event) ]
           ; Node.div
               ~attrs:
