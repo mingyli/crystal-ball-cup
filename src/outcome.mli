@@ -9,3 +9,4 @@ type t =
 val caqti_type : t Caqti_type.t
 val to_string : t -> string
 val score : t -> probability:float -> float
+val to_float : t -> float

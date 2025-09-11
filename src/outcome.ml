@@ -27,4 +27,10 @@ let score t ~probability =
   | No -> ln (1.0 -. probability) -. ln 0.5
 ;;
 
+let to_float = function
+  | Pending -> Float.nan
+  | Yes -> 1.0
+  | No -> 0.0
+;;
+
 let caqti_type = Caqti_type.enum "Outcome.t" ~encode:to_string ~decode:of_string
