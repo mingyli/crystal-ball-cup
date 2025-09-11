@@ -205,6 +205,13 @@ let create_query_box
          ; Style.query_box_input
          ; Vdom.Attr.on_change (fun _event value ->
              if String.is_empty value then set_state default_value else Effect.Ignore)
+         ; Vdom.Attr.on_focus (fun event ->
+             Effect.of_sync_fun
+               (fun event ->
+                  Js.Opt.iter event##.target (fun target ->
+                    Js.Opt.iter (Dom_html.CoerceTo.input target) (fun input ->
+                      input##select)))
+               event)
          ])
     ~extra_attr:(return Style.query_box_item)
     ~modify_input_on_select:(return `Autocomplete)
