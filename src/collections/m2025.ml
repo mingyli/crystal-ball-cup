@@ -10,7 +10,7 @@ let all =
         ~short:"Nintendo announces a new Super Smash Bros. game"
         ~precise:
           "Nintendo announces a new Super Smash Bros. game on or before 2025-12-31."
-        ~outcome:Pending
+        ~outcome:No
     ; Event.create
         ~short:"Zohran Mamdani wins the NYC mayoral election"
         ~precise:

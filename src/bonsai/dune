@@ -6,6 +6,7 @@
   bonsai.web
   bonsai.web_ui_multi_select
   bonsai.web_ui_form
+  bonsai.web_ui_typeahead
   crystal
   crystal_plotly
   crystal_sqljs

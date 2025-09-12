@@ -5,6 +5,7 @@ module Bonsai = Bonsai.Cont
 open Bonsai_web.Cont
 open Bonsai.Let_syntax
 module Query_box = Bonsai_web_ui_query_box
+module Typeahead = Bonsai_web_ui_typeahead.Typeahead
 
 module Style =
   [%css
@@ -255,11 +256,17 @@ let render_plots
       t
       (which_events : Which_events.t)
       (which_respondents : Which_respondents.t)
+      (selected_outcomes : Outcome.Set.t)
   =
   let events_to_plot =
+    let all_events =
+      List.filter t.events ~f:(fun event ->
+        Set.mem selected_outcomes (Event.outcome event))
+    in
     match which_events with
-    | All -> t.events
-    | One event -> [ event ]
+    | All -> all_events
+    | One event ->
+      if Set.mem selected_outcomes (Event.outcome event) then [ event ] else []
   in
   let effects =
     List.map events_to_plot ~f:(fun event ->
@@ -377,9 +384,29 @@ let render_plots
 ;;
 
 let component t graph =
+  let t = Bonsai.return t in
   let which_events, set_which_events = Bonsai.state Which_events.All graph in
   let which_respondents, set_which_respondents =
     Bonsai.state Which_respondents.None graph
+  in
+  let selected_outcomes, set_selected_outcomes =
+    Bonsai.state (Outcome.Set.of_list Outcome.all) graph
+  in
+  let%sub { view = outcomes_typeahead_vdom; set_selected; _ } =
+    Typeahead.create_multi
+      (module Outcome)
+      ~to_string:(Bonsai.return Outcome.to_string)
+      ~on_set_change:set_selected_outcomes
+      ~placeholder:"Filter by outcome"
+      ~all_options:(Bonsai.return Outcome.all)
+      graph
+  in
+  let () =
+    Bonsai.Edge.lifecycle
+      ~on_activate:
+        (let%map set_selected = set_selected in
+         set_selected (Outcome.Set.of_list Outcome.all))
+      graph
   in
   let select_which_events =
     create_query_box
@@ -388,12 +415,12 @@ let component t graph =
       ~placeholder_text:"View all events"
       ~default_value:All
       ~items:
-        (Which_events.All :: List.map (events t) ~f:Which_events.one
+        (let%map t = t in
+         Which_events.All :: List.map (events t) ~f:Which_events.one
          |> Which_events.Set.of_list
          |> Which_events.Map.of_key_set ~f:(function
            | All -> "View all events"
-           | One event -> Event.short event)
-         |> return)
+           | One event -> Event.short event))
       graph
   in
   let select_which_respondents =
@@ -403,31 +430,38 @@ let component t graph =
       ~placeholder_text:"No respondent highlighted"
       ~default_value:None
       ~items:
-        (Which_respondents.None :: List.map (respondents t) ~f:Which_respondents.one
+        (let%map t = t in
+         Which_respondents.None :: List.map (respondents t) ~f:Which_respondents.one
          |> Which_respondents.Set.of_list
          |> Which_respondents.Map.of_key_set ~f:(function
            | None -> "No respondent highlighted"
-           | One respondent -> respondent)
-         |> return)
+           | One respondent -> respondent))
       graph
   in
   let () =
     Bonsai.Edge.on_change
-      ~equal:[%equal: Which_events.t * Which_respondents.t]
+      ~equal:[%equal: Which_events.t * Which_respondents.t * Outcome.Set.t]
       (let%arr which_events = which_events
-       and which_respondents = which_respondents in
-       which_events, which_respondents)
+       and which_respondents = which_respondents
+       and selected_outcomes = selected_outcomes in
+       which_events, which_respondents, selected_outcomes)
       ~callback:
-        (let%arr () = return () in
-         fun (which_events, which_respondents) ->
-           render_plots t which_events which_respondents)
+        (let%arr t = t in
+         fun (which_events, which_respondents, selected_outcomes) ->
+           render_plots t which_events which_respondents selected_outcomes)
       graph
   in
   let open Vdom in
   let plots =
     let%arr which_events = which_events
     and set_which_events = set_which_events
-    and select_which_events = select_which_events in
+    and select_which_events = select_which_events
+    and selected_outcomes = selected_outcomes
+    and t = t in
+    let events_in_view =
+      List.filter (events t) ~f:(fun event ->
+        Set.mem selected_outcomes (Event.outcome event))
+    in
     let render_outcome_chip event =
       let outcome = Event.outcome event in
       let outcome_style =
@@ -442,15 +476,18 @@ let component t graph =
     in
     match which_events with
     | One event ->
-      [ Node.div
-          ~attrs:[]
-          [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
-          ; Node.div [ Node.text (Event.precise event) ]
-          ; Node.div ~attrs:[ Attr.id "plot-single" ] []
-          ]
-      ]
+      if Set.mem selected_outcomes (Event.outcome event)
+      then
+        [ Node.div
+            ~attrs:[]
+            [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
+            ; Node.div [ Node.text (Event.precise event) ]
+            ; Node.div ~attrs:[ Attr.id "plot-single" ] []
+            ]
+        ]
+      else []
     | All ->
-      List.map t.events ~f:(fun event ->
+      List.map events_in_view ~f:(fun event ->
         let outcome_hover_style =
           match Event.outcome event with
           | Yes -> Style.short_event_description_yes
@@ -481,11 +518,15 @@ let component t graph =
   in
   let%arr plots = plots
   and select_which_events = select_which_events
-  and select_which_respondents = select_which_respondents in
+  and select_which_respondents = select_which_respondents
+  and outcomes_typeahead_vdom = outcomes_typeahead_vdom in
   Node.div
     [ Node.div
         ~attrs:[ Style.query_box_container ]
-        [ Query_box.view select_which_events; Query_box.view select_which_respondents ]
+        [ Node.div ~attrs:[ Style.query_box_item ] [ outcomes_typeahead_vdom ]
+        ; Query_box.view select_which_events
+        ; Query_box.view select_which_respondents
+        ]
     ; Node.div plots ~attrs:[ Style.all_plots_wrapper ]
     ]
 ;;
