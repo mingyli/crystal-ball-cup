@@ -20,6 +20,8 @@ let create collection responses =
   { event_scores }
 ;;
 
+let event_score t event_id = Map.find_exn t.event_scores event_id
+
 let total t =
   t.event_scores
   |> Map.data
