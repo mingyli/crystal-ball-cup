@@ -5,7 +5,8 @@ module Bonsai = Bonsai.Cont
 open Bonsai_web.Cont
 open Bonsai.Let_syntax
 module Query_box = Bonsai_web_ui_query_box
-module Typeahead = Bonsai_web_ui_typeahead.Typeahead
+module Form = Bonsai_web_ui_form.With_manual_view
+module E = Form.Elements
 
 module Style =
   [%css
@@ -112,8 +113,10 @@ module Style =
       .query-box-container {
         display: flex;
         justify-content: space-around;
+        align-items: center;
         width: 100%;
         margin-bottom: 1rem;
+        padding: 0;
       }
 
       .query-box-item {
@@ -124,6 +127,9 @@ module Style =
         border-radius: 0.25rem;
         min-width: 150px;
         max-width: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
       .query-box-input {
@@ -324,7 +330,7 @@ let render_plots
                 else None)
               |> Array.unzip
             in
-            let colors = Array.map responses ~f:(Fn.const "#5C504F") in
+            let colors = Array.map responses ~f:(Fn.const Colors.burgundy) in
             Scatter
               { x = responses
               ; y = Array.map responses ~f:(fun _ -> "")
@@ -389,24 +395,50 @@ let component t graph =
   let which_respondents, set_which_respondents =
     Bonsai.state Which_respondents.None graph
   in
-  let selected_outcomes, set_selected_outcomes =
-    Bonsai.state (Outcome.Set.of_list Outcome.all) graph
-  in
-  let%sub { view = outcomes_typeahead_vdom; set_selected; _ } =
-    Typeahead.create_multi
+  let outcomes_checkboxes_form =
+    E.Checkbox.set
       (module Outcome)
-      ~to_string:(Bonsai.return Outcome.to_string)
-      ~on_set_change:set_selected_outcomes
-      ~placeholder:"Filter by outcome"
-      ~all_options:(Bonsai.return Outcome.all)
+      ~layout:`Horizontal
+      ~to_string:Outcome.to_string
+      ~style:(Bonsai.return E.Selectable_style.Button_like)
+      ~extra_checkbox_attrs:
+        (Bonsai.return (fun ~checked ->
+           [ {%css|
+             font-size: 0.8em;
+             padding: 0.2em 0.4em;
+             margin: 0.4em;
+           |}
+           ; (if checked
+              then
+                {%css|
+              background-color: %{Colors.burgundy};
+              color: %{Colors.white};
+              border: solid 1px %{Colors.transparent};
+              |}
+              else
+                {%css|
+              background-color: %{Colors.transparent};
+              color: %{Colors.black};
+              border: solid 1px %{Colors.burgundy};
+              |})
+           ]))
+      ~extra_container_attrs:(Bonsai.return [ Style.query_box_item ])
+      (Bonsai.return Outcome.all)
       graph
   in
-  let () =
-    Bonsai.Edge.lifecycle
-      ~on_activate:
-        (let%map set_selected = set_selected in
-         set_selected (Outcome.Set.of_list Outcome.all))
+  let outcomes_checkboxes_form_with_default =
+    Form.Dynamic.with_default
+      (Bonsai.return (Outcome.Set.of_list Outcome.all))
+      outcomes_checkboxes_form
       graph
+  in
+  let selected_outcomes =
+    let%arr form = outcomes_checkboxes_form_with_default in
+    Form.value_or_default form ~default:Outcome.Set.empty
+  in
+  let outcomes_checkboxes_vdom =
+    let%arr form = outcomes_checkboxes_form_with_default in
+    form.view
   in
   let select_which_events =
     create_query_box
@@ -519,11 +551,11 @@ let component t graph =
   let%arr plots = plots
   and select_which_events = select_which_events
   and select_which_respondents = select_which_respondents
-  and outcomes_typeahead_vdom = outcomes_typeahead_vdom in
+  and outcomes_checkboxes_vdom = outcomes_checkboxes_vdom in
   Node.div
     [ Node.div
         ~attrs:[ Style.query_box_container ]
-        [ Node.div ~attrs:[ Style.query_box_item ] [ outcomes_typeahead_vdom ]
+        [ outcomes_checkboxes_vdom
         ; Query_box.view select_which_events
         ; Query_box.view select_which_respondents
         ]
