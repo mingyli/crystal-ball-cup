@@ -68,12 +68,12 @@ module Style =
       }
 
       .short-event-description-yes:hover {
-        background-color: %{Colors.blue_light};
+        background-color: %{Colors.light_blue};
         color: %{Colors.blue};
       }
 
       .short-event-description-no:hover {
-        background-color: %{Colors.orange_light};
+        background-color: %{Colors.light_orange};
         color: %{Colors.orange};
       }
 
