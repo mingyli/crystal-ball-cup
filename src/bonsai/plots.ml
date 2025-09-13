@@ -6,48 +6,26 @@ open Bonsai_web.Cont
 open Bonsai.Let_syntax
 module Query_box = Bonsai_web_ui_query_box
 
+module Outcome = struct
+  include Outcome
+
+  let color = function
+    | Yes -> Colors.blue
+    | No -> Colors.orange
+    | Pending -> Colors.gray
+  ;;
+
+  let accent_color = function
+    | Yes -> Colors.light_blue
+    | No -> Colors.light_orange
+    | Pending -> Colors.light_gray
+  ;;
+end
+
 module Style =
   [%css
     stylesheet
       {|
-      .selected_item {
-        background-color: rgba(0, 0, 128, 0.2);
-        color: blue;
-      }
-
-      .list_container {
-        background: white;
-        border: solid 1px black;
-        padding: 5px;
-        z-index: 9999;
-      }
-
-      .outcome-chip {
-        display: inline-block;
-        padding: 0.2em 0.6em;
-        border-radius: 1em;
-        font-size: 0.8em;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: middle;
-        line-height: 1;
-      }
-
-      .outcome-chip-yes {
-        background-color: rgba(0, 128, 0, 0.2);
-        color: green;
-      }
-
-      .outcome-chip-no {
-        background-color: rgba(255, 0, 0, 0.2);
-        color: red;
-      }
-
-      .outcome-chip-pending {
-        background-color: rgba(128, 128, 128, 0.2);
-        color: rgba(128, 128, 128, 0.8);
-      }
-
       .plots-container {
         display: grid;
         align-items: center;
@@ -60,53 +38,11 @@ module Style =
         text-align: center;
       }
 
-      .short-event-description {
-        font-size: 0.8em;
-        color: black;
-        text-decoration: underline;
-        cursor: pointer;
-        padding: 0.2em;
-      }
-
-      .short-event-description-yes:hover {
-        background-color: rgba(0, 128, 0, 0.2);
-        color: green;
-      }
-
-      .short-event-description-no:hover {
-        background-color: rgba(255, 0, 0, 0.2);
-        color: red;
-      }
-
-      .short-event-description-pending:hover {
-        background-color: rgba(128, 128, 128, 0.2);
-        color: black;
-      }
-
-      .short-event-description-yes:active {
-        background-color: green;
-        color: white;
-      }
-
-      .short-event-description-no:active {
-        background-color: red;
-        color: white;
-      }
-
-      .short-event-description-pending:active {
-        background-color: black;
-        color: white;
-      }
-
       .plot-div {
         padding-left: 1rem;
         padding-right: 1rem;
         width: 550px;
         max-width: 550px;
-      }
-
-      .all-plots-wrapper {
-        width: 100%;
       }
 
       .query-box-container {
@@ -126,27 +62,19 @@ module Style =
         max-width: 300px;
       }
 
-      .query-box-input {
-        width: 100%;
-        box-sizing: border-box;
-      }
-
       @media (max-width: 768px) {
         .plots-container {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
-        }
-
-        .short-event-description {
-          width: 100%;
-          padding-right: 0;
-          margin-bottom: 0.5rem;
+          margin-bottom: 1rem;
         }
 
         .plot-div {
           width: 100%;
           min-width: 0;
+          padding-left: 0.5rem;
+          padding-right: 0.5rem;
         }
 
         .query-box-container {
@@ -154,35 +82,11 @@ module Style =
         }
 
         .query-box-item {
-          margin: 0.5rem 0;
+          margin: 0.25rem 0;
           max-width: none;
         }
       }
     |}]
-
-module Which_events = struct
-  module T = struct
-    type t =
-      | All
-      | One of Event.t
-    [@@deriving compare, equal, sexp_of, variants]
-  end
-
-  include T
-  include Comparable.Make_plain (T)
-end
-
-module Which_respondents = struct
-  module T = struct
-    type t =
-      | None
-      | One of string
-    [@@deriving compare, equal, sexp, variants]
-  end
-
-  include T
-  include Comparable.Make (T)
-end
 
 let create_query_box
       (type a cmp)
@@ -196,13 +100,20 @@ let create_query_box
   Query_box.stringable
     ~filter_strategy:Fuzzy_search_and_score
     ~on_select:set_state
-    ~selected_item_attr:(return Style.selected_item)
-    ~extra_list_container_attr:(return Style.list_container)
+    ~selected_item_attr:(return {%css| background-color: %{Colors.light_gray}; |})
+    ~extra_list_container_attr:
+      (return
+         {%css|
+        background: %{Colors.white};
+        border: solid 1px %{Colors.black};
+        padding: 5px;
+        z-index: 9999;
+      |})
     ~extra_input_attr:
       (let%arr set_state = set_state in
        Vdom.Attr.many
          [ Vdom.Attr.placeholder placeholder_text
-         ; Style.query_box_input
+         ; {%css| width: 100%; box-sizing: border-box; |}
          ; Vdom.Attr.on_change (fun _event value ->
              if String.is_empty value then set_state default_value else Effect.Ignore)
          ; Vdom.Attr.on_focus (fun event ->
@@ -267,9 +178,9 @@ let render_plots
       let responses = get_responses t (Event.id event) in
       let fill_color, line_color =
         match Event.outcome event with
-        | Yes -> "rgba(0, 128, 0, 0.1)", "green"
-        | No -> "rgba(255, 0, 0, 0.1)", "red"
-        | Pending -> "rgba(128, 128, 128, 0.1)", "gray"
+        | Yes -> Colors.very_light_blue, Colors.blue
+        | No -> Colors.very_light_orange, Colors.orange
+        | Pending -> Colors.very_light_gray, Colors.gray
       in
       let plotly_data =
         let violin : Crystal_plotly.Data.t =
@@ -288,32 +199,53 @@ let render_plots
             }
         in
         let scatter : Crystal_plotly.Data.t =
-          let colors =
-            List.map (respondents t) ~f:(fun respondent ->
-              if
-                match which_respondents with
-                | None -> false
-                | One selected_respondent -> String.equal respondent selected_respondent
-              then "blue"
-              else "rgba(128, 128, 128, 0.2)")
-            |> Array.of_list
-          in
-          Scatter
-            { x = responses
-            ; y = Array.map responses ~f:(fun _ -> "")
-            ; type_ = "scatter"
-            ; mode = "markers"
-            ; text = Array.of_list (respondents t)
-            ; customdata =
-                Array.map responses ~f:(fun p ->
-                  let prediction = sprintf "%.2f" p in
-                  Crystal_plotly.Data.Scatter.{ prediction })
-            ; hovertemplate = "<b>%{customdata.prediction}</b> %{text}<extra></extra>"
-            ; marker = { size = 10; color = colors }
-            ; fill = None
-            ; fillcolor = None
-            ; line = None
-            }
+          match which_respondents with
+          | None ->
+            Scatter
+              { x = responses
+              ; y = Array.map responses ~f:(fun _ -> "")
+              ; type_ = "scatter"
+              ; mode = "markers"
+              ; text = Array.of_list (respondents t)
+              ; customdata =
+                  Array.map responses ~f:(fun p ->
+                    let prediction = sprintf "%.2f" p in
+                    Crystal_plotly.Data.Scatter.{ prediction })
+              ; hovertemplate = "<b>%{customdata.prediction}</b> %{text}<extra></extra>"
+              ; marker =
+                  { size = 10
+                  ; color = Array.map responses ~f:(Fn.const Colors.very_light_gray)
+                  }
+              ; fill = None
+              ; fillcolor = None
+              ; line = None
+              }
+          | One selected_respondent ->
+            let respondents, responses =
+              Array.zip_exn (respondents t |> Array.of_list) responses
+              |> Array.filter_map ~f:(fun (respondent, response) ->
+                if String.equal respondent selected_respondent
+                then Some (respondent, response)
+                else None)
+              |> Array.unzip
+            in
+            let colors = Array.map responses ~f:(Fn.const "#5C504F") in
+            Scatter
+              { x = responses
+              ; y = Array.map responses ~f:(fun _ -> "")
+              ; type_ = "scatter"
+              ; mode = "markers"
+              ; text = respondents
+              ; customdata =
+                  Array.map responses ~f:(fun p ->
+                    let prediction = sprintf "%.2f" p in
+                    Crystal_plotly.Data.Scatter.{ prediction })
+              ; hovertemplate = "<b>%{customdata.prediction}</b> %{text}<extra></extra>"
+              ; marker = { size = 10; color = colors }
+              ; fill = None
+              ; fillcolor = None
+              ; line = None
+              }
         in
         [ violin; scatter ]
       in
@@ -413,13 +345,22 @@ let component t graph =
     let render_outcome_chip event =
       let outcome = Event.outcome event in
       let outcome_style =
-        match outcome with
-        | Yes -> Style.outcome_chip_yes
-        | No -> Style.outcome_chip_no
-        | Pending -> Style.outcome_chip_pending
+        {%css| background-color: %{Outcome.accent_color outcome}; color: %{Outcome.color outcome}; |}
       in
       Node.span
-        ~attrs:[ Attr.class_ "outcome-chip"; Style.outcome_chip; outcome_style ]
+        ~attrs:
+          [ {%css|
+            display: inline-block;
+            padding: 0.2em 0.6em;
+            border-radius: 1em;
+            font-size: 0.8em;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            line-height: 1;
+          |}
+          ; outcome_style
+          ]
         [ Node.text (outcome |> Outcome.to_string) ]
     in
     match which_events with
@@ -433,18 +374,32 @@ let component t graph =
       ]
     | All ->
       List.map t.events ~f:(fun event ->
+        let outcome = Event.outcome event in
         let outcome_hover_style =
-          match Event.outcome event with
-          | Yes -> Style.short_event_description_yes
-          | No -> Style.short_event_description_no
-          | Pending -> Style.short_event_description_pending
+          {%css|
+            &:hover {
+              background-color: %{Outcome.accent_color outcome};
+              color: %{Outcome.color outcome};
+            }
+
+            &:active {
+              background-color: %{Outcome.color outcome};
+              color: %{Colors.white};
+            }
+            |}
         in
         Node.div
           ~attrs:[ Style.plots_container ]
           [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
           ; Node.a
               ~attrs:
-                [ Style.short_event_description
+                [ {%css|
+                    font-size: 0.8em;
+                    color: %{Colors.black};
+                    text-decoration: underline;
+                    cursor: pointer;
+                    padding: 0.2em;
+                  |}
                 ; outcome_hover_style
                 ; Attr.href "#"
                 ; Attr.on_click (fun dom_event ->
@@ -468,6 +423,6 @@ let component t graph =
     [ Node.div
         ~attrs:[ Style.query_box_container ]
         [ Query_box.view select_which_events; Query_box.view select_which_respondents ]
-    ; Node.div plots ~attrs:[ Style.all_plots_wrapper ]
+    ; Node.div plots ~attrs:[ {%css| width: 100%; |} ]
     ]
 ;;
