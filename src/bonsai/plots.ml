@@ -67,11 +67,14 @@ module Style =
           display: flex;
           flex-direction: column;
           align-items: flex-start;
+          margin-bottom: 1rem;
         }
 
         .plot-div {
           width: 100%;
           min-width: 0;
+          padding-left: 0.5rem;
+          padding-right: 0.5rem;
         }
 
         .query-box-container {
@@ -79,7 +82,7 @@ module Style =
         }
 
         .query-box-item {
-          margin: 0.5rem 0;
+          margin: 0.25rem 0;
           max-width: none;
         }
       }
