@@ -127,7 +127,6 @@ module Style =
         border-radius: 0.25rem;
         min-width: 150px;
         max-width: 300px;
-        display: flex;
         justify-content: center;
         align-items: center;
       }
