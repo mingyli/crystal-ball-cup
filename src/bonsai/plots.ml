@@ -300,8 +300,7 @@ let render_plots
   Effect.all_unit effects
 ;;
 
-let component t graph =
-  let t = Bonsai.return t in
+let component (t : t) graph =
   let which_events, set_which_events = Bonsai.state Which_events.All graph in
   let which_respondents, set_which_respondents =
     Bonsai.state Which_respondents.None graph
@@ -358,7 +357,7 @@ let component t graph =
       ~placeholder_text:"View all events"
       ~default_value:All
       ~items:
-        (let%map t = t in
+        (let%arr () = return () in
          Which_events.All :: List.map (events t) ~f:Which_events.one
          |> Which_events.Set.of_list
          |> Which_events.Map.of_key_set ~f:(function
@@ -373,7 +372,7 @@ let component t graph =
       ~placeholder_text:"No respondent highlighted"
       ~default_value:None
       ~items:
-        (let%map t = t in
+        (let%arr () = return () in
          Which_respondents.None :: List.map (respondents t) ~f:Which_respondents.one
          |> Which_respondents.Set.of_list
          |> Which_respondents.Map.of_key_set ~f:(function
@@ -389,7 +388,7 @@ let component t graph =
        and selected_outcomes = selected_outcomes in
        which_events, which_respondents, selected_outcomes)
       ~callback:
-        (let%arr t = t in
+        (let%arr () = return () in
          fun (which_events, which_respondents, selected_outcomes) ->
            render_plots t which_events which_respondents selected_outcomes)
       graph
@@ -399,8 +398,7 @@ let component t graph =
     let%arr which_events = which_events
     and set_which_events = set_which_events
     and select_which_events = select_which_events
-    and selected_outcomes = selected_outcomes
-    and t = t in
+    and selected_outcomes = selected_outcomes in
     let events_in_view =
       List.filter (events t) ~f:(fun event ->
         Set.mem selected_outcomes (Event.outcome event))
