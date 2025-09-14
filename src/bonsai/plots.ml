@@ -236,19 +236,15 @@ let get_responses t event_id =
 
 let render_plots
       t
+      (which_outcomes : Outcome.Set.t)
       (which_events : Which_events.t)
       (which_respondents : Which_respondents.t)
-      (selected_outcomes : Outcome.Set.t)
   =
   let events_to_plot =
-    let all_events =
-      List.filter t.events ~f:(fun event ->
-        Set.mem selected_outcomes (Event.outcome event))
-    in
     match which_events with
-    | All -> all_events
-    | One event ->
-      if Set.mem selected_outcomes (Event.outcome event) then [ event ] else []
+    | All ->
+      List.filter t.events ~f:(fun event -> Set.mem which_outcomes (Event.outcome event))
+    | One event -> [ event ]
   in
   let effects =
     List.map events_to_plot ~f:(fun event ->
@@ -406,15 +402,15 @@ let component (t : t) graph =
   in
   let () =
     Bonsai.Edge.on_change
-      ~equal:[%equal: Which_events.t * Which_respondents.t * Outcome.Set.t]
-      (let%arr which_events = which_events
-       and which_respondents = which_respondents
-       and which_outcomes = which_outcomes in
-       which_events, which_respondents, which_outcomes)
+      ~equal:[%equal: Outcome.Set.t * Which_events.t * Which_respondents.t]
+      (let%arr which_outcomes = which_outcomes
+       and which_events = which_events
+       and which_respondents = which_respondents in
+       which_outcomes, which_events, which_respondents)
       ~callback:
         (let%arr () = return () in
-         fun (which_events, which_respondents, selected_outcomes) ->
-           render_plots t which_events which_respondents selected_outcomes)
+         fun (which_outcomes, which_events, which_respondents) ->
+           render_plots t which_outcomes which_events which_respondents)
       graph
   in
   let open Vdom in
