@@ -94,6 +94,52 @@ module Style =
       }
     |}]
 
+let create_outcomes_checkboxes which_outcomes set_which_outcomes graph =
+  let checkboxes =
+    E.Checkbox.set
+      (module Outcome)
+      ~layout:`Horizontal
+      ~to_string:Outcome.to_string
+      ~style:(Bonsai.return E.Selectable_style.Button_like)
+      ~extra_checkbox_attrs:
+        (Bonsai.return (fun ~checked ->
+           [ {%css|
+           font-size: 0.8em;
+           padding: 0.2em 0.4em;
+           margin: 0.4em;
+         |}
+           ; (if checked
+              then
+                {%css|
+            background-color: %{Colors.burgundy};
+            color: %{Colors.white};
+            border: solid 1px %{Colors.transparent};
+            |}
+              else
+                {%css|
+            background-color: %{Colors.transparent};
+            color: %{Colors.black};
+            border: solid 1px %{Colors.burgundy};
+            |})
+           ]))
+      ~extra_container_attrs:(Bonsai.return [ Style.query_box_item ])
+      (Bonsai.return Outcome.all)
+      graph
+  in
+  let sync_with =
+    Form.Dynamic.sync_with
+      ~equal:Outcome.Set.equal
+      ~store_value:
+        (let%arr which_outcomes = which_outcomes in
+         Some which_outcomes)
+      ~store_set:set_which_outcomes
+      checkboxes
+      graph
+  in
+  (* TODO: When we upgrade bonsai, [sync_with] should return unit and we can delete this line. *)
+  Bonsai.( *> ) sync_with checkboxes
+;;
+
 let create_query_box
       (type a cmp)
       (module M : Bonsai.Comparator with type t = a and type comparator_witness = cmp)
@@ -301,56 +347,15 @@ let render_plots
 ;;
 
 let component (t : t) graph =
+  let which_outcomes, set_which_outcomes = Bonsai.state Outcome.(Set.of_list all) graph in
   let which_events, set_which_events = Bonsai.state Which_events.All graph in
   let which_respondents, set_which_respondents =
     Bonsai.state Which_respondents.None graph
   in
-  let outcomes_checkboxes_form =
-    E.Checkbox.set
-      (module Outcome)
-      ~layout:`Horizontal
-      ~to_string:Outcome.to_string
-      ~style:(Bonsai.return E.Selectable_style.Button_like)
-      ~extra_checkbox_attrs:
-        (Bonsai.return (fun ~checked ->
-           [ {%css|
-             font-size: 0.8em;
-             padding: 0.2em 0.4em;
-             margin: 0.4em;
-           |}
-           ; (if checked
-              then
-                {%css|
-              background-color: %{Colors.burgundy};
-              color: %{Colors.white};
-              border: solid 1px %{Colors.transparent};
-              |}
-              else
-                {%css|
-              background-color: %{Colors.transparent};
-              color: %{Colors.black};
-              border: solid 1px %{Colors.burgundy};
-              |})
-           ]))
-      ~extra_container_attrs:(Bonsai.return [ Style.query_box_item ])
-      (Bonsai.return Outcome.all)
-      graph
+  let checkboxes_which_outcomes =
+    create_outcomes_checkboxes which_outcomes set_which_outcomes graph
   in
-  let outcomes_checkboxes_form_with_default =
-    Form.Dynamic.with_default
-      (Bonsai.return (Outcome.Set.of_list Outcome.all))
-      outcomes_checkboxes_form
-      graph
-  in
-  let selected_outcomes =
-    let%arr form = outcomes_checkboxes_form_with_default in
-    Form.value_or_default form ~default:Outcome.Set.empty
-  in
-  let outcomes_checkboxes_vdom =
-    let%arr form = outcomes_checkboxes_form_with_default in
-    form.view
-  in
-  let select_which_events =
+  let query_box_which_events =
     create_query_box
       (module Which_events)
       ~set_state:set_which_events
@@ -365,7 +370,7 @@ let component (t : t) graph =
            | One event -> Event.short event))
       graph
   in
-  let select_which_respondents =
+  let query_box_which_respondents =
     create_query_box
       (module Which_respondents)
       ~set_state:set_which_respondents
@@ -385,8 +390,8 @@ let component (t : t) graph =
       ~equal:[%equal: Which_events.t * Which_respondents.t * Outcome.Set.t]
       (let%arr which_events = which_events
        and which_respondents = which_respondents
-       and selected_outcomes = selected_outcomes in
-       which_events, which_respondents, selected_outcomes)
+       and which_outcomes = which_outcomes in
+       which_events, which_respondents, which_outcomes)
       ~callback:
         (let%arr () = return () in
          fun (which_events, which_respondents, selected_outcomes) ->
@@ -397,12 +402,8 @@ let component (t : t) graph =
   let plots =
     let%arr which_events = which_events
     and set_which_events = set_which_events
-    and select_which_events = select_which_events
-    and selected_outcomes = selected_outcomes in
-    let events_in_view =
-      List.filter (events t) ~f:(fun event ->
-        Set.mem selected_outcomes (Event.outcome event))
-    in
+    and query_box_which_events = query_box_which_events
+    and which_outcomes = which_outcomes in
     let render_outcome_chip event =
       let outcome = Event.outcome event in
       let outcome_style =
@@ -426,17 +427,18 @@ let component (t : t) graph =
     in
     match which_events with
     | One event ->
-      if Set.mem selected_outcomes (Event.outcome event)
-      then
-        [ Node.div
-            ~attrs:[]
-            [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
-            ; Node.div [ Node.text (Event.precise event) ]
-            ; Node.div ~attrs:[ Attr.id "plot-single" ] []
-            ]
-        ]
-      else []
+      [ Node.div
+          ~attrs:[]
+          [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
+          ; Node.div [ Node.text (Event.precise event) ]
+          ; Node.div ~attrs:[ Attr.id "plot-single" ] []
+          ]
+      ]
     | All ->
+      let events_in_view =
+        List.filter (events t) ~f:(fun event ->
+          Set.mem which_outcomes (Event.outcome event))
+      in
       List.map events_in_view ~f:(fun event ->
         let outcome = Event.outcome event in
         let outcome_hover_style =
@@ -470,7 +472,7 @@ let component (t : t) graph =
                     Dom.preventDefault dom_event;
                     Effect.all_unit
                       [ set_which_events (One event)
-                      ; Query_box.set_query select_which_events (Event.short event)
+                      ; Query_box.set_query query_box_which_events (Event.short event)
                       ])
                 ]
               [ Node.text (Event.short event) ]
@@ -481,15 +483,15 @@ let component (t : t) graph =
           ])
   in
   let%arr plots = plots
-  and select_which_events = select_which_events
-  and select_which_respondents = select_which_respondents
-  and outcomes_checkboxes_vdom = outcomes_checkboxes_vdom in
+  and query_box_which_events = query_box_which_events
+  and query_box_which_respondents = query_box_which_respondents
+  and checkboxes_which_outcomes = checkboxes_which_outcomes in
   Node.div
     [ Node.div
         ~attrs:[ Style.query_box_container ]
-        [ outcomes_checkboxes_vdom
-        ; Query_box.view select_which_events
-        ; Query_box.view select_which_respondents
+        [ Form.view checkboxes_which_outcomes
+        ; Query_box.view query_box_which_events
+        ; Query_box.view query_box_which_respondents
         ]
     ; Node.div plots ~attrs:[ {%css| width: 100%; |} ]
     ]
