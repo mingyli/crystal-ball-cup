@@ -62,10 +62,9 @@ module Style =
         padding: 0.5rem;
         border: 1px solid #ced4da;
         border-radius: 0.25rem;
-        min-width: 150px;
-        max-width: 300px;
         justify-content: center;
-        align-items: center;
+        align-items: stretch;
+        height: 100%;
       }
 
       @media (max-width: 768px) {
@@ -107,22 +106,42 @@ let create_outcomes_checkboxes which_outcomes set_which_outcomes graph =
            font-size: 0.8em;
            padding: 0.2em 0.4em;
            margin: 0.4em;
+           cursor: pointer;
          |}
-           ; (if checked
-              then
-                {%css|
+           ]
+           @
+           if checked
+           then
+             [ {%css|
             background-color: %{Colors.burgundy};
             color: %{Colors.white};
-            border: solid 1px %{Colors.transparent};
+            border: 3px solid %{Colors.light_gray}
             |}
-              else
-                {%css|
-            background-color: %{Colors.transparent};
-            color: %{Colors.black};
-            border: solid 1px %{Colors.burgundy};
-            |})
-           ]))
-      ~extra_container_attrs:(Bonsai.return [ Style.query_box_item ])
+             ; {%css| &:active {
+                        background-color: %{Colors.transparent};
+                        color: %{Colors.black};
+                        border: 3px solid %{Colors.dark_gray}
+                        }
+                        |}
+             ]
+           else
+             [ {%css|
+               background-color: %{Colors.transparent};
+               color: %{Colors.black};
+               transform: translate(3px, 3px);
+               border: 3px solid %{Colors.light_gray}
+            |}
+             ; {%css|
+              &:active {
+              background-color: %{Colors.burgundy};
+              color: %{Colors.white};
+              border: 3px solid %{Colors.dark_gray}
+              }
+            |}
+             ]))
+      ~extra_container_attrs:
+        (Bonsai.return
+           [ Style.query_box_item; {%css| display: flex; flex-direction: row; |} ])
       (Bonsai.return Outcome.all)
       graph
   in
