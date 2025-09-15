@@ -117,7 +117,7 @@ let%expect_test _ =
     │    │ al season of Stranger Things     │ in the fifth season of Stranger Thin │         │
     │    │                                  │ gs.                                  │         │
     ├────┼──────────────────────────────────┼──────────────────────────────────────┼─────────┤
-    │ 17 │ A record is broken at the 2025 W │ At least one world record is broken  │ Pending │
+    │ 17 │ A record is broken at the 2025 W │ At least one world record is broken  │ Yes     │
     │    │ orld Athletics Championships     │ at the 2025 World Athletics Champion │         │
     │    │                                  │ ships in Tokyo, confirmed by World A │         │
     │    │                                  │ thletics.                            │         │
