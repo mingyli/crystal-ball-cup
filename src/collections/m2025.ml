@@ -115,7 +115,7 @@ let all =
         ~precise:
           "At least one world record is broken at the 2025 World Athletics Championships \
            in Tokyo, confirmed by World Athletics."
-        ~outcome:Pending
+        ~outcome:Yes
     ; Event.create
         ~short:"More than three participants change employment status"
         ~precise:
