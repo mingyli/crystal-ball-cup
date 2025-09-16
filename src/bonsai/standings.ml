@@ -81,6 +81,8 @@ let component scores graph =
         ; range = None
         ; tickvals = None
         ; ticktext = None
+        ; type_ = None
+        ; autorange = None
         }
     ; shapes =
         [ { type_ = "line"
