@@ -12,14 +12,22 @@
  (action
   (with-stdout-to
    slides.md
-   (run cat rules.md events.md))))
+   (run bash -c "(cat rules.md; echo; cat events.md)"))))
 
 (rule
  (targets slides.pdf)
- (deps slides.md score.png form.png)
+ (deps slides.md form.png header.tex)
  (mode promote)
  (action
-  (run pandoc -t beamer slides.md -o slides.pdf --pdf-engine=xelatex)))
+  (run
+   pandoc
+   -t
+   beamer
+   slides.md
+   -o
+   slides.pdf
+   --pdf-engine=xelatex
+   --include-in-header=header.tex)))
 
 (rule
  (target responses_and_scores.sexp)
