@@ -25,7 +25,7 @@ let all graph =
   let explorer =
     Explorer.component
       ~db_path:"../2025/crystal.db"
-      ~initial_query:"SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+      ~initial_query:"SELECT name, sql FROM sqlite_master WHERE type IN ('table', 'view')"
       graph
   in
   (* let%sub explorer_winners =

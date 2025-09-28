@@ -40,9 +40,9 @@ module Queries = struct
       "INSERT INTO scores (respondent, event_id, score) VALUES (?, ?, ?)"
   ;;
 
-  let create_responses_and_scores_table =
+  let create_responses_and_scores_view =
     (Caqti_type.unit ->. Caqti_type.unit)
-      {| CREATE TABLE responses_and_scores AS
+      {| CREATE VIEW responses_and_scores AS
            SELECT
              r.respondent,
              r.event_id,
@@ -52,12 +52,6 @@ module Queries = struct
            JOIN scores AS s
              ON r.respondent = s.respondent AND r.event_id = s.event_id
         |}
-  ;;
-
-  let create_responses_and_scores_index =
-    (Caqti_type.unit ->. Caqti_type.unit)
-      "CREATE INDEX idx_responses_and_scores ON responses_and_scores (respondent, \
-       event_id)"
   ;;
 end
 
@@ -113,10 +107,7 @@ module Connection = struct
   let make_scores t scores = make_scores t scores |> caqti_or_error
 
   let make_responses_and_scores ((module Conn) : t) =
-    let work () =
-      let%bind () = Conn.exec Queries.create_responses_and_scores_table () in
-      Conn.exec Queries.create_responses_and_scores_index ()
-    in
+    let work () = Conn.exec Queries.create_responses_and_scores_view () in
     Conn.with_transaction work |> caqti_or_error
   ;;
 end
