@@ -13,15 +13,35 @@
    %{target})))
 
 (rule
- (target main.bc.js)
- (mode promote)
- (deps %{project_root}/web/2025/main.bc.js)
- (action
-  (copy %{deps} %{target})))
-
-(rule
  (target index.html)
  (deps index.md ../style.css)
  (mode promote)
  (action
   (run pandoc -s -t html5 --css ../style.css index.md -o %{target})))
+
+(executable
+ (name main)
+ (modes js)
+ (promote)
+ (libraries
+  core
+  crystal
+  crystal_collections
+  crystal_plotly
+  crystal_sqljs
+  crystal_bonsai
+  bonsai
+  bonsai.web
+  bonsai.web_ui_multi_select
+  bonsai.web_ui_form
+  promise_jsoo
+  js_of_ocaml)
+ (preprocessor_deps %{project_root}/etc/2025/responses_and_scores.sexp)
+ (preprocess
+  (pps
+   ppx_jane
+   ppx_css
+   ppx_typed_fields
+   ppx_blob
+   bonsai.ppx_bonsai
+   js_of_ocaml-ppx)))
