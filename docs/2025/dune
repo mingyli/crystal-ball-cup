@@ -26,7 +26,7 @@
  (libraries
   core
   crystal
-  crystal_collections
+  crystal_2025
   crystal_plotly
   crystal_sqljs
   crystal_bonsai

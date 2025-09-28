@@ -14,7 +14,7 @@ let%expect_test _ =
     (Ascii_table.to_string
        ~display:Ascii_table.Display.tall_box
        columns
-       Crystal_collections.M2025.all
+       Crystal_2025.all
        ~bars:`Unicode);
   [%expect
     {|
