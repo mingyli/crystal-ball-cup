@@ -31,7 +31,7 @@ module Queries = struct
   ;;
 
   let insert_response =
-    (Caqti_type.(t3 string Event_id.caqti_type float) ->. Caqti_type.unit)
+    (Caqti_type.(t3 string Event_id.caqti_type Probability.caqti_type) ->. Caqti_type.unit)
       "INSERT INTO responses (respondent, event_id, probability) VALUES (?, ?, ?)"
   ;;
 
@@ -87,7 +87,9 @@ module Connection = struct
         ~init:(Ok ())
         ~f:(fun ~key:event_id ~data:probability acc ->
           let%bind () = acc in
-          Conn.exec Queries.insert_response (respondent, event_id, probability)))
+          Conn.exec
+            Queries.insert_response
+            (respondent, event_id, probability)))
   ;;
 
   let make_responses t responses = make_responses t responses |> caqti_or_error

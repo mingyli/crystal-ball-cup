@@ -248,7 +248,7 @@ let render_plots
   in
   let effects =
     List.map events_to_plot ~f:(fun event ->
-      let responses = get_responses t (Event.id event) in
+      let responses = get_responses t (Event.id event) |> Array.map ~f:Probability.to_float in
       let fill_color, line_color =
         match Event.outcome event with
         | Yes -> Colors.very_light_blue, Colors.blue
