@@ -180,11 +180,13 @@ let component ~collection ~responses graph =
             [ Node.td [ Node.text (Event.short event) ]
             ; Node.td
                 [ Node.text
-                    (Option.value_map original_pred ~default:"-" ~f:(sprintf "%.3f"))
+                    (Option.value_map original_pred ~default:"-" ~f:(fun p ->
+                       sprintf "%.3f" (Probability.to_float p)))
                 ]
             ; Node.td
                 [ Node.text
-                    (Option.value_map adjusted_pred ~default:"-" ~f:(sprintf "%.3f"))
+                    (Option.value_map adjusted_pred ~default:"-" ~f:(fun p ->
+                       sprintf "%.3f" (Probability.to_float p)))
                 ]
             ])
       in

@@ -10,7 +10,9 @@ let create collection responses =
       | `Left probability ->
         raise_s
           [%message
-            "No event found for probability" (event_id : Event_id.t) (probability : float)]
+            "No event found for probability"
+              (event_id : Event_id.t)
+              (probability : Probability.t)]
       | `Right event ->
         raise_s
           [%message

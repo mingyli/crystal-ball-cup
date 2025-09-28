@@ -31,7 +31,7 @@ module Queries = struct
   ;;
 
   let insert_response =
-    (Caqti_type.(t3 string Event_id.caqti_type float) ->. Caqti_type.unit)
+    (Caqti_type.(t3 string Event_id.caqti_type Probability.caqti_type) ->. Caqti_type.unit)
       "INSERT INTO responses (respondent, event_id, probability) VALUES (?, ?, ?)"
   ;;
 

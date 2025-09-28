@@ -10,5 +10,5 @@ include Comparable.S with type t := t
 
 val caqti_type : t Caqti_type.t
 val to_string : t -> string
-val score : t -> probability:float -> float
+val score : t -> probability:Probability.t -> float
 val to_float : t -> float
