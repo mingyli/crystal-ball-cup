@@ -5,6 +5,8 @@ module Bonsai = Bonsai.Cont
 open Bonsai_web.Cont
 open Bonsai.Let_syntax
 module Query_box = Bonsai_web_ui_query_box
+module Form = Bonsai_web_ui_form.With_manual_view
+module E = Form.Elements
 
 module Outcome = struct
   include Outcome
@@ -48,8 +50,10 @@ module Style =
       .query-box-container {
         display: flex;
         justify-content: space-around;
+        align-items: center;
         width: 100%;
         margin-bottom: 1rem;
+        padding: 0;
       }
 
       .query-box-item {
@@ -58,8 +62,9 @@ module Style =
         padding: 0.5rem;
         border: 1px solid #ced4da;
         border-radius: 0.25rem;
-        min-width: 150px;
-        max-width: 300px;
+        justify-content: center;
+        align-items: stretch;
+        height: 100%;
       }
 
       @media (max-width: 768px) {
@@ -87,6 +92,72 @@ module Style =
         }
       }
     |}]
+
+let create_outcomes_checkboxes which_outcomes set_which_outcomes graph =
+  let checkboxes =
+    E.Checkbox.set
+      (module Outcome)
+      ~layout:`Horizontal
+      ~to_string:Outcome.to_string
+      ~style:(Bonsai.return E.Selectable_style.Button_like)
+      ~extra_checkbox_attrs:
+        (Bonsai.return (fun ~checked ->
+           [ {%css|
+           font-size: 0.8em;
+           padding: 0.2em 0.4em;
+           margin: 0.4em;
+           cursor: pointer;
+         |}
+           ]
+           @
+           if checked
+           then
+             [ {%css|
+            background-color: %{Colors.burgundy};
+            color: %{Colors.white};
+            border: 3px solid %{Colors.light_gray}
+            |}
+             ; {%css| &:active {
+                        background-color: %{Colors.transparent};
+                        color: %{Colors.black};
+                        border: 3px solid %{Colors.dark_gray}
+                        }
+                        |}
+             ]
+           else
+             [ {%css|
+               background-color: %{Colors.transparent};
+               color: %{Colors.black};
+               transform: translate(3px, 3px);
+               border: 3px solid %{Colors.light_gray}
+            |}
+             ; {%css|
+              &:active {
+              background-color: %{Colors.burgundy};
+              color: %{Colors.white};
+              border: 3px solid %{Colors.dark_gray}
+              }
+            |}
+             ]))
+      ~extra_container_attrs:
+        (Bonsai.return
+           [ Style.query_box_item; {%css| display: flex; flex-direction: row; |} ])
+      (Bonsai.return Outcome.all)
+      graph
+  in
+  let sync_with =
+    Form.Dynamic.sync_with
+      ~equal:Outcome.Set.equal
+      ~store_value:
+        (let%arr which_outcomes = which_outcomes in
+         Some which_outcomes)
+      ~store_set:set_which_outcomes
+      checkboxes
+      graph
+  in
+  (* TODO: When we upgrade bonsai, [sync_with] should return unit and we can delete this line. *)
+  Bonsai.( *> ) sync_with checkboxes
+;;
 
 let create_query_box
       (type a cmp)
@@ -165,12 +236,14 @@ let get_responses t event_id =
 
 let render_plots
       t
+      (which_outcomes : Outcome.Set.t)
       (which_events : Which_events.t)
       (which_respondents : Which_respondents.t)
   =
   let events_to_plot =
     match which_events with
-    | All -> t.events
+    | All ->
+      List.filter t.events ~f:(fun event -> Set.mem which_outcomes (Event.outcome event))
     | One event -> [ event ]
   in
   let effects =
@@ -229,7 +302,7 @@ let render_plots
                 else None)
               |> Array.unzip
             in
-            let colors = Array.map responses ~f:(Fn.const "#5C504F") in
+            let colors = Array.map responses ~f:(Fn.const Colors.burgundy) in
             Scatter
               { x = responses
               ; y = Array.map responses ~f:(fun _ -> "")
@@ -290,58 +363,64 @@ let render_plots
   Effect.all_unit effects
 ;;
 
-let component t graph =
+let component (t : t) graph =
+  let which_outcomes, set_which_outcomes = Bonsai.state Outcome.(Set.of_list all) graph in
   let which_events, set_which_events = Bonsai.state Which_events.All graph in
   let which_respondents, set_which_respondents =
     Bonsai.state Which_respondents.None graph
   in
-  let select_which_events =
+  let checkboxes_which_outcomes =
+    create_outcomes_checkboxes which_outcomes set_which_outcomes graph
+  in
+  let query_box_which_events =
     create_query_box
       (module Which_events)
       ~set_state:set_which_events
       ~placeholder_text:"View all events"
       ~default_value:All
       ~items:
-        (Which_events.All :: List.map (events t) ~f:Which_events.one
+        (let%arr () = return () in
+         Which_events.All :: List.map (events t) ~f:Which_events.one
          |> Which_events.Set.of_list
          |> Which_events.Map.of_key_set ~f:(function
            | All -> "View all events"
-           | One event -> Event.short event)
-         |> return)
+           | One event -> Event.short event))
       graph
   in
-  let select_which_respondents =
+  let query_box_which_respondents =
     create_query_box
       (module Which_respondents)
       ~set_state:set_which_respondents
       ~placeholder_text:"No respondent highlighted"
       ~default_value:None
       ~items:
-        (Which_respondents.None :: List.map (respondents t) ~f:Which_respondents.one
+        (let%arr () = return () in
+         Which_respondents.None :: List.map (respondents t) ~f:Which_respondents.one
          |> Which_respondents.Set.of_list
          |> Which_respondents.Map.of_key_set ~f:(function
            | None -> "No respondent highlighted"
-           | One respondent -> respondent)
-         |> return)
+           | One respondent -> respondent))
       graph
   in
   let () =
     Bonsai.Edge.on_change
-      ~equal:[%equal: Which_events.t * Which_respondents.t]
-      (let%arr which_events = which_events
+      ~equal:[%equal: Outcome.Set.t * Which_events.t * Which_respondents.t]
+      (let%arr which_outcomes = which_outcomes
+       and which_events = which_events
        and which_respondents = which_respondents in
-       which_events, which_respondents)
+       which_outcomes, which_events, which_respondents)
       ~callback:
         (let%arr () = return () in
-         fun (which_events, which_respondents) ->
-           render_plots t which_events which_respondents)
+         fun (which_outcomes, which_events, which_respondents) ->
+           render_plots t which_outcomes which_events which_respondents)
       graph
   in
   let open Vdom in
   let plots =
     let%arr which_events = which_events
     and set_which_events = set_which_events
-    and select_which_events = select_which_events in
+    and query_box_which_events = query_box_which_events
+    and which_outcomes = which_outcomes in
     let render_outcome_chip event =
       let outcome = Event.outcome event in
       let outcome_style =
@@ -373,7 +452,11 @@ let component t graph =
           ]
       ]
     | All ->
-      List.map t.events ~f:(fun event ->
+      let events_in_view =
+        List.filter (events t) ~f:(fun event ->
+          Set.mem which_outcomes (Event.outcome event))
+      in
+      List.map events_in_view ~f:(fun event ->
         let outcome = Event.outcome event in
         let outcome_hover_style =
           {%css|
@@ -406,7 +489,7 @@ let component t graph =
                     Dom.preventDefault dom_event;
                     Effect.all_unit
                       [ set_which_events (One event)
-                      ; Query_box.set_query select_which_events (Event.short event)
+                      ; Query_box.set_query query_box_which_events (Event.short event)
                       ])
                 ]
               [ Node.text (Event.short event) ]
@@ -417,12 +500,16 @@ let component t graph =
           ])
   in
   let%arr plots = plots
-  and select_which_events = select_which_events
-  and select_which_respondents = select_which_respondents in
+  and query_box_which_events = query_box_which_events
+  and query_box_which_respondents = query_box_which_respondents
+  and checkboxes_which_outcomes = checkboxes_which_outcomes in
   Node.div
     [ Node.div
         ~attrs:[ Style.query_box_container ]
-        [ Query_box.view select_which_events; Query_box.view select_which_respondents ]
+        [ Form.view checkboxes_which_outcomes
+        ; Query_box.view query_box_which_events
+        ; Query_box.view query_box_which_respondents
+        ]
     ; Node.div plots ~attrs:[ {%css| width: 100%; |} ]
     ]
 ;;
