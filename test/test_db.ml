@@ -4,7 +4,11 @@ open Crystal_sqlite
 
 let dummy_responses =
   let event = Event_id.of_int in
-  let responses l = Responses.create @@ Event_id.Map.of_alist_exn (List.map l ~f:(fun (id, p) -> id, Probability.of_float p)) in
+  let responses l =
+    Responses.create
+    @@ Event_id.Map.of_alist_exn
+         (List.map l ~f:(fun (id, p) -> id, Probability.of_float p))
+  in
   String.Map.of_alist_exn
     [ "respondent1", responses [ event 1, 0.5; event 2, 0.5; event 3, 0.8 ]
     ; "respondent2", responses [ event 1, 0.2; event 2, 0.9; event 3, 0.5 ]

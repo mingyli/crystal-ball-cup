@@ -7,7 +7,6 @@ val to_float : t -> float
 val of_float : float -> t
 val to_string : t -> string
 val of_string : string -> t
-
 val odds : t -> float
 val logit : t -> float
 val of_odds : float -> t
