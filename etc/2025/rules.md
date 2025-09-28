@@ -18,7 +18,7 @@ Your score on one event with submitted probability $p$ is the logarithmic scorin
 defined as:
 
 $$
-\text{score}(p) =
+\mathsf{score}(p) =
 \begin{cases}
 \ln p - \ln 0.5 & \text{if the event occurred} \\
 \ln (1 - p) - \ln 0.5 & \text{otherwise}
