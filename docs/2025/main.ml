@@ -12,10 +12,10 @@ let responses_and_scores =
 ;;
 
 let all graph =
-  let plots = Plots.create ~events:Crystal_collections.M2025.all ~responses_and_scores in
+  let plots = Plots.create ~events:Crystal_2025.all ~responses_and_scores in
   let responses = Map.map responses_and_scores ~f:Responses_and_scores.responses in
   let confidence =
-    Confidence.component ~collection:(module Crystal_collections.M2025) ~responses graph
+    Confidence.component ~collection:(module Crystal_2025) ~responses graph
   in
   let standings =
     let scores = Map.map responses_and_scores ~f:Responses_and_scores.scores in
@@ -24,7 +24,7 @@ let all graph =
   let plots = Plots.component plots graph in
   let explorer =
     Explorer.component
-      ~db_path:"../2025/crystal.db"
+      ~db_path:"./crystal.db"
       ~initial_query:"SELECT name, sql FROM sqlite_master WHERE type IN ('table', 'view')"
       graph
   in
