@@ -1,5 +1,5 @@
 (library
- (name crystal_collections)
+ (name crystal_2025)
  (libraries core crystal)
  (inline_tests (deps))
  (preprocess

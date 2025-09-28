@@ -4,7 +4,6 @@
   core
   crystal
   crystal_sqlite
-  crystal_collections
   caqti.blocking
   caqti-driver-sqlite3
   textutils.ascii_table)
