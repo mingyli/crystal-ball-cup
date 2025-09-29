@@ -9,7 +9,6 @@ type t =
 [@@deriving compare, equal, fields, sexp]
 
 let create = Fields.create
-let score t ~probability = Outcome.score t.outcome ~probability
 
 let compare_by_outcome_date t1 t2 =
   (* For equality, compare event id *)
@@ -25,3 +24,4 @@ let compare_by_outcome_date t1 t2 =
     (* If both are resolved, sort by outcome date *)
     | (Yes exp1 | No exp1), (Yes exp2 | No exp2) ->
       Date.compare (Explanation.date exp1) (Explanation.date exp2)
+let score t ~(probability : Probability.t) = Outcome.score t.outcome ~probability

@@ -12,6 +12,7 @@ include T
 include Comparable.Make (T)
 
 let score t ~probability =
+  let probability = Probability.to_float probability in
   let ln = Float.log in
   match t with
   | Pending -> Float.nan
