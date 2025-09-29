@@ -96,9 +96,9 @@ module Style =
 let create_outcomes_checkboxes which_outcomes set_which_outcomes graph =
   let checkboxes =
     E.Checkbox.set
-      (module Outcome_kind)
+      (module Outcome.Kind)
       ~layout:`Horizontal
-      ~to_string:Outcome_kind.to_string
+      ~to_string:Outcome.Kind.to_string
       ~style:(Bonsai.return E.Selectable_style.Button_like)
       ~extra_checkbox_attrs:
         (Bonsai.return (fun ~checked ->
@@ -142,12 +142,12 @@ let create_outcomes_checkboxes which_outcomes set_which_outcomes graph =
       ~extra_container_attrs:
         (Bonsai.return
            [ Style.query_box_item; {%css| display: flex; flex-direction: row; |} ])
-      (Bonsai.return Outcome_kind.all)
+      (Bonsai.return Outcome.Kind.all)
       graph
   in
   let sync_with =
     Form.Dynamic.sync_with
-      ~equal:Outcome_kind.Set.equal
+      ~equal:Outcome.Kind.Set.equal
       ~store_value:
         (let%arr which_outcomes = which_outcomes in
          Some which_outcomes)
@@ -236,7 +236,7 @@ let get_responses t event_id =
 
 let render_plots
       t
-      (which_outcomes : Outcome_kind.Set.t)
+      (which_outcomes : Outcome.Kind.Set.t)
       (which_events : Which_events.t)
       (which_respondents : Which_respondents.t)
       (sort_by_resolved_first : bool)
@@ -368,7 +368,7 @@ let render_plots
 ;;
 
 let component (t : t) graph =
-  let which_outcomes, set_which_outcomes = Bonsai.state Outcome_kind.(Set.of_list all) graph in
+  let which_outcomes, set_which_outcomes = Bonsai.state Outcome.Kind.(Set.of_list all) graph in
   let which_events, set_which_events = Bonsai.state Which_events.All graph in
   let which_respondents, set_which_respondents =
     Bonsai.state Which_respondents.None graph
@@ -409,7 +409,7 @@ let component (t : t) graph =
   in
   let () =
     Bonsai.Edge.on_change
-      ~equal:[%equal: Outcome_kind.Set.t * Which_events.t * Which_respondents.t * bool]
+      ~equal:[%equal: Outcome.Kind.Set.t * Which_events.t * Which_respondents.t * bool]
       (let%arr which_outcomes = which_outcomes
        and which_events = which_events
        and which_respondents = which_respondents

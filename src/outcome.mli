@@ -1,5 +1,17 @@
 open! Core
 
+module Kind : sig
+  type t =
+    | Pending
+    | Yes
+    | No
+  [@@deriving compare, equal, sexp, enumerate]
+
+  include Comparable.S with type t := t
+
+  val to_string : t -> string
+end
+
 type t =
   | Pending
   | Yes of Explanation.t
@@ -10,6 +22,6 @@ include Comparable.S with type t := t
 
 val caqti_type : t Caqti_type.t
 
-val to_kind : t -> Outcome_kind.t
+val to_kind : t -> Kind.t
 val to_string : t -> string
 val score : t -> probability:Probability.t -> float

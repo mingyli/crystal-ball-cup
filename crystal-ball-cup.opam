@@ -26,8 +26,6 @@ depends: [
   "js_of_ocaml-compiler"
   "promise_jsoo"
   "metaquot"
-  "yojson"
-  "ppx_deriving_yojson"
 ]
 build: [
   ["dune" "build" "-p" name "-j" jobs]

@@ -1,5 +1,23 @@
 open! Core
 
+module Kind = struct
+  module T = struct
+    type t =
+      | Pending
+      | Yes
+      | No
+    [@@deriving compare, equal, sexp, enumerate]
+  end
+
+  include T
+  include Comparable.Make (T)
+  let to_string = function
+    | Pending -> "Pending"
+    | Yes -> "Yes"
+    | No -> "No"
+  ;;
+end
+
 module T = struct
   type t =
     | Pending
@@ -21,12 +39,12 @@ let score t ~probability =
 ;;
 
 let to_kind = function
-  | Pending -> Outcome_kind.Pending
-  | Yes _ -> Outcome_kind.Yes
-  | No _ -> Outcome_kind.No
+  | Pending -> Kind.Pending
+  | Yes _ -> Kind.Yes
+  | No _ -> Kind.No
 ;;
 
-let to_string t = Outcome_kind.to_string (to_kind t)
+let to_string t = Kind.to_string (to_kind t)
 
 let caqti_type =
   let encode t =
