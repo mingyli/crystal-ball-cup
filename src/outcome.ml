@@ -11,6 +11,7 @@ module Kind = struct
 
   include T
   include Comparable.Make (T)
+
   let to_string = function
     | Pending -> "Pending"
     | Yes -> "Yes"
@@ -51,13 +52,16 @@ let caqti_type =
     try
       let sexp = sexp_of_t t in
       Ok (Sexp.to_string sexp)
-    with exn -> Error ("Failed to encode outcome: " ^ Exn.to_string exn)
+    with
+    | exn -> Error ("Failed to encode outcome: " ^ Exn.to_string exn)
   in
   let decode sexp_str =
     try
       let sexp = Sexp.of_string sexp_str in
       let outcome = t_of_sexp sexp in
       Ok outcome
-    with exn -> Error ("Failed to parse outcome: " ^ Exn.to_string exn)
+    with
+    | exn -> Error ("Failed to parse outcome: " ^ Exn.to_string exn)
   in
   Caqti_type.custom ~encode ~decode Caqti_type.string
+;;

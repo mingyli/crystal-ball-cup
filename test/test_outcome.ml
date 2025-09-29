@@ -2,7 +2,21 @@ open! Core
 open Crystal
 
 let%expect_test "score" =
-  let outcomes : Outcome.t list = [ Pending; Yes (Explanation.create ~link:"https://www.link.why/yes" ~date:(Date.of_string "2025-01-01") ~description:"Description of why yes" ()); No (Explanation.create ~date:(Date.of_string "2025-12-31") ~description:"Description that describes why not" ()) ] in
+  let outcomes : Outcome.t list =
+    [ Pending
+    ; Yes
+        (Explanation.create
+           ~link:"https://www.link.why/yes"
+           ~date:(Date.of_string "2025-01-01")
+           ~description:"Description of why yes"
+           ())
+    ; No
+        (Explanation.create
+           ~date:(Date.of_string "2025-12-31")
+           ~description:"Description that describes why not"
+           ())
+    ]
+  in
   let probabilities = [ 0.0; 0.1; 0.5; 0.9; 1.0 ] |> List.map ~f:Probability.of_float in
   let rows =
     List.cartesian_product outcomes probabilities
