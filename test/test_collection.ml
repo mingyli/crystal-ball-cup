@@ -13,12 +13,12 @@ let all =
       ~id:(Event_id.of_int 2)
       ~short:"Event2"
       ~precise:"Precise description for event 2"
-      ~outcome:Yes
+      ~outcome:(Yes (Explanation.create ~date:(Date.of_string "2025-01-01") ~description:"Description proving event 2" ~link:"https://www.link.that/proves/event/2" ()))
   ; Event.create
       ~id:(Event_id.of_int 3)
       ~short:"Event3"
       ~precise:"Precise description for event 3"
-      ~outcome:No
+      ~outcome:(No (Explanation.create ~date:(Date.of_string "2025-12-31") ~description:"Description that describes why event 3 didnt happen" ()))
   ]
 ;;
 

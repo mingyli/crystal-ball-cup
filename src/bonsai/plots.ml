@@ -12,14 +12,14 @@ module Outcome = struct
   include Outcome
 
   let color = function
-    | Yes -> Colors.blue
-    | No -> Colors.orange
+    | Yes _ -> Colors.blue
+    | No _ -> Colors.orange
     | Pending -> Colors.gray
   ;;
 
   let accent_color = function
-    | Yes -> Colors.light_blue
-    | No -> Colors.light_orange
+    | Yes _ -> Colors.light_blue
+    | No _ -> Colors.light_orange
     | Pending -> Colors.light_gray
   ;;
 end
@@ -96,9 +96,9 @@ module Style =
 let create_outcomes_checkboxes which_outcomes set_which_outcomes graph =
   let checkboxes =
     E.Checkbox.set
-      (module Outcome)
+      (module Outcome_kind)
       ~layout:`Horizontal
-      ~to_string:Outcome.to_string
+      ~to_string:Outcome_kind.to_string
       ~style:(Bonsai.return E.Selectable_style.Button_like)
       ~extra_checkbox_attrs:
         (Bonsai.return (fun ~checked ->
@@ -142,12 +142,12 @@ let create_outcomes_checkboxes which_outcomes set_which_outcomes graph =
       ~extra_container_attrs:
         (Bonsai.return
            [ Style.query_box_item; {%css| display: flex; flex-direction: row; |} ])
-      (Bonsai.return Outcome.all)
+      (Bonsai.return Outcome_kind.all)
       graph
   in
   let sync_with =
     Form.Dynamic.sync_with
-      ~equal:Outcome.Set.equal
+      ~equal:Outcome_kind.Set.equal
       ~store_value:
         (let%arr which_outcomes = which_outcomes in
          Some which_outcomes)
@@ -236,14 +236,14 @@ let get_responses t event_id =
 
 let render_plots
       t
-      (which_outcomes : Outcome.Set.t)
+      (which_outcomes : Outcome_kind.Set.t)
       (which_events : Which_events.t)
       (which_respondents : Which_respondents.t)
   =
   let events_to_plot =
     match which_events with
     | All ->
-      List.filter t.events ~f:(fun event -> Set.mem which_outcomes (Event.outcome event))
+      List.filter t.events ~f:(fun event -> Set.mem which_outcomes (Event.outcome event |> Outcome.to_kind))
     | One event -> [ event ]
   in
   let effects =
@@ -251,8 +251,8 @@ let render_plots
       let responses = get_responses t (Event.id event) in
       let fill_color, line_color =
         match Event.outcome event with
-        | Yes -> Colors.very_light_blue, Colors.blue
-        | No -> Colors.very_light_orange, Colors.orange
+        | Yes _ -> Colors.very_light_blue, Colors.blue
+        | No _ -> Colors.very_light_orange, Colors.orange
         | Pending -> Colors.very_light_gray, Colors.gray
       in
       let plotly_data =
@@ -362,7 +362,7 @@ let render_plots
 ;;
 
 let component (t : t) graph =
-  let which_outcomes, set_which_outcomes = Bonsai.state Outcome.(Set.of_list all) graph in
+  let which_outcomes, set_which_outcomes = Bonsai.state Outcome_kind.(Set.of_list all) graph in
   let which_events, set_which_events = Bonsai.state Which_events.All graph in
   let which_respondents, set_which_respondents =
     Bonsai.state Which_respondents.None graph
@@ -402,7 +402,7 @@ let component (t : t) graph =
   in
   let () =
     Bonsai.Edge.on_change
-      ~equal:[%equal: Outcome.Set.t * Which_events.t * Which_respondents.t]
+      ~equal:[%equal: Outcome_kind.Set.t * Which_events.t * Which_respondents.t]
       (let%arr which_outcomes = which_outcomes
        and which_events = which_events
        and which_respondents = which_respondents in
@@ -452,7 +452,7 @@ let component (t : t) graph =
     | All ->
       let events_in_view =
         List.filter (events t) ~f:(fun event ->
-          Set.mem which_outcomes (Event.outcome event))
+          Set.mem which_outcomes (Event.outcome event |> Outcome.to_kind))
       in
       List.map events_in_view ~f:(fun event ->
         let outcome = Event.outcome event in
