@@ -1,6 +1,6 @@
 open! Core
 
-type t = { probabilities : float Event_id.Map.t } [@@deriving sexp, fields]
+type t = { probabilities : Probability.t Event_id.Map.t } [@@deriving sexp, fields]
 
 let create probabilities = { probabilities }
 
@@ -26,7 +26,7 @@ let of_csv csv =
       let respondent = List.nth_exn row email_idx in
       let probabilities =
         List.map event_ids ~f:(fun (e, i) ->
-          let p = Float.of_string (List.nth_exn row i) in
+          let p = Probability.of_string (List.nth_exn row i) in
           e, p)
         |> Map.of_alist_exn (module Event_id)
       in

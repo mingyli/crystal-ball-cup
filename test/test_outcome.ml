@@ -3,7 +3,7 @@ open Crystal
 
 let%expect_test "score" =
   let outcomes : Outcome.t list = [ Pending; Yes; No ] in
-  let probabilities = [ 0.0; 0.1; 0.5; 0.9; 1.0 ] in
+  let probabilities = [ 0.0; 0.1; 0.5; 0.9; 1.0 ] |> List.map ~f:Probability.of_float in
   let rows =
     List.cartesian_product outcomes probabilities
     |> List.map ~f:(fun (outcome, probability) ->
@@ -12,7 +12,7 @@ let%expect_test "score" =
   let columns =
     let c = Ascii_table.Column.create in
     [ c "Outcome" (fun (outcome, _, _) -> Outcome.to_string outcome)
-    ; c "Probability" (fun (_, prob, _) -> Float.to_string prob)
+    ; c "Probability" (fun (_, prob, _) -> Probability.to_string prob)
     ; c "Score" (fun (_, _, score_val) ->
         if Float.is_nan score_val then "nan" else Float.to_string score_val)
     ]
