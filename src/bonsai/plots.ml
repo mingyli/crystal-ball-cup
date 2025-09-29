@@ -239,16 +239,11 @@ let render_plots
       (which_outcomes : Outcome.Kind.Set.t)
       (which_events : Which_events.t)
       (which_respondents : Which_respondents.t)
-      (sort_by_resolved_first : bool)
   =
   let events_to_plot =
     match which_events with
     | All ->
-      List.filter t.events ~f:(fun event ->
-        Set.mem which_outcomes (Event.outcome event |> Outcome.to_kind))
-      |> List.sort ~compare:(fun e1 e2 ->
-        let cmp = Event.compare_by_outcome_date e1 e2 in
-        if sort_by_resolved_first then cmp else -cmp)
+      List.filter t.events ~f:(fun event -> Set.mem which_outcomes (Event.outcome event |> Outcome.to_kind))
     | One event -> [ event ]
   in
   let effects =
@@ -369,14 +364,11 @@ let render_plots
 ;;
 
 let component (t : t) graph =
-  let which_outcomes, set_which_outcomes =
-    Bonsai.state Outcome.Kind.(Set.of_list all) graph
-  in
+  let which_outcomes, set_which_outcomes = Bonsai.state Outcome.Kind.(Set.of_list all) graph in
   let which_events, set_which_events = Bonsai.state Which_events.All graph in
   let which_respondents, set_which_respondents =
     Bonsai.state Which_respondents.None graph
   in
-  let sort_by_resolved_first, set_sort_by_resolved_first = Bonsai.state true graph in
   let checkboxes_which_outcomes =
     create_outcomes_checkboxes which_outcomes set_which_outcomes graph
   in
@@ -412,21 +404,15 @@ let component (t : t) graph =
   in
   let () =
     Bonsai.Edge.on_change
-      ~equal:[%equal: Outcome.Kind.Set.t * Which_events.t * Which_respondents.t * bool]
+      ~equal:[%equal: Outcome.Kind.Set.t * Which_events.t * Which_respondents.t]
       (let%arr which_outcomes = which_outcomes
        and which_events = which_events
-       and which_respondents = which_respondents
-       and sort_by_resolved_first = sort_by_resolved_first in
-       which_outcomes, which_events, which_respondents, sort_by_resolved_first)
+       and which_respondents = which_respondents in
+       which_outcomes, which_events, which_respondents)
       ~callback:
         (let%arr () = return () in
-         fun (which_outcomes, which_events, which_respondents, sort_by_resolved_first) ->
-           render_plots
-             t
-             which_outcomes
-             which_events
-             which_respondents
-             sort_by_resolved_first)
+         fun (which_outcomes, which_events, which_respondents) ->
+           render_plots t which_outcomes which_events which_respondents)
       graph
   in
   let open Vdom in
@@ -434,8 +420,7 @@ let component (t : t) graph =
     let%arr which_events = which_events
     and set_which_events = set_which_events
     and query_box_which_events = query_box_which_events
-    and which_outcomes = which_outcomes
-    and sort_by_resolved_first = sort_by_resolved_first in
+    and which_outcomes = which_outcomes in
     let render_outcome_chip event =
       let outcome = Event.outcome event in
       let outcome_style =
@@ -460,28 +445,17 @@ let component (t : t) graph =
     let render_detailed_explanation event =
       match Event.outcome event with
       | Pending ->
-        Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
+        Node.div ~attrs:[ Style.outcome_chip_wrapper ]
+           [ render_outcome_chip event ]
       | Yes explanation | No explanation ->
-        let chip =
-          match Explanation.link explanation with
+        let chip = match Explanation.link explanation with
           | None -> render_outcome_chip event
-          | Some link ->
-            Node.a
-              ~attrs:[ Attr.href link; Attr.target "_blank" ]
-              [ render_outcome_chip event
-              ; Node.span
-                  ~attrs:[ {%css| font-size: 0.8em; color: %{Colors.blue}; |} ]
-                  [ Node.text "(Source)" ]
-              ]
+          | Some link -> Node.a ~attrs:[ Attr.href link; Attr.target "_blank"; ]
+            [ render_outcome_chip event; Node.span ~attrs:[ {%css| font-size: 0.8em; color: %{Colors.blue}; |} ] [ Node.text "(Source)" ] ]
         in
-        Node.div
-          ~attrs:
-            [ {%css| width: 100%; border: 1px solid %{Colors.black}; display: flex; flex-direction: column; padding: 5px; |}
-            ]
+        Node.div ~attrs:[ {%css| width: 100%; border: 1px solid %{Colors.black}; display: flex; flex-direction: column; padding: 5px; |} ]
           [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ chip ]
-          ; Node.div
-              ~attrs:[ {%css| color: %{Colors.black}; line-height: 1.4; |} ]
-              [ Node.text (Explanation.description explanation) ]
+          ; Node.div ~attrs:[ {%css| color: %{Colors.black}; line-height: 1.4; |} ] [ Node.text (Explanation.description explanation) ]
           ]
     in
     match which_events with
@@ -497,9 +471,6 @@ let component (t : t) graph =
       let events_in_view =
         List.filter (events t) ~f:(fun event ->
           Set.mem which_outcomes (Event.outcome event |> Outcome.to_kind))
-        |> List.sort ~compare:(fun e1 e2 ->
-          let cmp = Event.compare_by_outcome_date e1 e2 in
-          if sort_by_resolved_first then cmp else -cmp)
       in
       List.map events_in_view ~f:(fun event ->
         let outcome = Event.outcome event in
@@ -526,17 +497,14 @@ let component (t : t) graph =
                     align-items: center;
                   |}
                 ]
-              [ Node.div
-                  ~attrs:[ Style.outcome_chip_wrapper ]
-                  [ render_outcome_chip event ]
+              [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
               ; (match Event.outcome event with
                  | Pending -> Node.div []
                  | Yes explanation | No explanation ->
                    Node.div
-                     ~attrs:
-                       [ {%css| margin-top: 0.2em; color: %{Colors.gray}; font-size: 0.8em; |}
-                       ]
-                     [ Node.span [ Node.text "On: " ]
+                     ~attrs:[ {%css| margin-top: 0.2em; color: %{Colors.gray}; font-size: 0.8em; |} ]
+                     [ Node.span
+                         [ Node.text "On: " ]
                      ; (match Explanation.link explanation with
                         | None ->
                           Node.span
@@ -580,38 +548,13 @@ let component (t : t) graph =
   let%arr plots = plots
   and query_box_which_events = query_box_which_events
   and query_box_which_respondents = query_box_which_respondents
-  and checkboxes_which_outcomes = checkboxes_which_outcomes
-  and sort_by_resolved_first = sort_by_resolved_first
-  and set_sort_by_resolved_first = set_sort_by_resolved_first in
+  and checkboxes_which_outcomes = checkboxes_which_outcomes in
   Node.div
     [ Node.div
         ~attrs:[ Style.query_box_container ]
         [ Form.view checkboxes_which_outcomes
         ; Query_box.view query_box_which_events
         ; Query_box.view query_box_which_respondents
-        ]
-    ; Node.div
-        ~attrs:
-          [ {%css|
-              text-align: left;
-              margin: 1rem 0;
-              font-size: 0.9em;
-              cursor: pointer;
-              user-select: none;
-            |}
-          ; Attr.on_click (fun _ ->
-              set_sort_by_resolved_first (not sort_by_resolved_first))
-          ]
-        [ Node.span ~attrs:[ {%css| color: %{Colors.gray}; |} ] [ Node.text "Sorted by " ]
-        ; Node.span
-            ~attrs:
-              [ {%css| font-weight: bold; font-style: italic; color: %{Colors.black}; |} ]
-            [ Node.text
-                (if sort_by_resolved_first then "resolved first" else "pending first")
-            ]
-        ; Node.span
-            ~attrs:[ {%css| margin-left: 0.5em; color: %{Colors.gray}; |} ]
-            [ Node.text (if sort_by_resolved_first then "▼▲" else "▲▼") ]
         ]
     ; Node.div plots ~attrs:[ {%css| width: 100%; |} ]
     ]

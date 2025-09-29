@@ -7,5 +7,4 @@ val id : t -> Event_id.t
 val short : t -> string
 val precise : t -> string
 val outcome : t -> Outcome.t
-val compare_by_outcome_date : t -> t -> int
 val score : t -> probability:Probability.t -> float
