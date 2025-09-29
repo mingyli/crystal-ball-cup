@@ -239,11 +239,15 @@ let render_plots
       (which_outcomes : Outcome_kind.Set.t)
       (which_events : Which_events.t)
       (which_respondents : Which_respondents.t)
+      (sort_by_resolved_first : bool)
   =
   let events_to_plot =
     match which_events with
     | All ->
       List.filter t.events ~f:(fun event -> Set.mem which_outcomes (Event.outcome event |> Outcome.to_kind))
+      |> List.sort ~compare:(fun e1 e2 ->
+          let cmp = Event.compare_by_outcome_date e1 e2 in
+          if sort_by_resolved_first then cmp else -cmp)
     | One event -> [ event ]
   in
   let effects =
@@ -403,15 +407,16 @@ let component (t : t) graph =
   in
   let () =
     Bonsai.Edge.on_change
-      ~equal:[%equal: Outcome_kind.Set.t * Which_events.t * Which_respondents.t]
+      ~equal:[%equal: Outcome_kind.Set.t * Which_events.t * Which_respondents.t * bool]
       (let%arr which_outcomes = which_outcomes
        and which_events = which_events
-       and which_respondents = which_respondents in
-       which_outcomes, which_events, which_respondents)
+       and which_respondents = which_respondents
+       and sort_by_resolved_first = sort_by_resolved_first in
+       which_outcomes, which_events, which_respondents, sort_by_resolved_first)
       ~callback:
         (let%arr () = return () in
-         fun (which_outcomes, which_events, which_respondents) ->
-           render_plots t which_outcomes which_events which_respondents)
+         fun (which_outcomes, which_events, which_respondents, sort_by_resolved_first) ->
+           render_plots t which_outcomes which_events which_respondents sort_by_resolved_first)
       graph
   in
   let open Vdom in
