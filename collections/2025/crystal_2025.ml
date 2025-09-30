@@ -38,8 +38,8 @@ let all =
                 ~link:"https://www.instagram.com/p/DOUPJaRiXFD/"
                 ~date:(Date.of_string "2025-09-07")
                 ~description:
-                  "Carlos Alcaraz (Born May 5, 2003, Age 22) defeated Jannik Sinner 6-2 \
-                   3-6 6-1 6-4 to win the 2025 US Open Men's Singles tournament"
+                  "Carlos Alcaraz (born 2003-05-05, age 22 years) defeated Jannik Sinner \
+                   to win the 2025 US Open Men's Singles tournament."
                 ()))
     ; Event.create
         ~short:"Sam Bankman-Fried is pardoned"
@@ -72,8 +72,8 @@ let all =
                 ~link:"https://www.instagram.com/p/DN02niAXMM-/"
                 ~date:(Date.of_string "2025-08-26")
                 ~description:
-                  "Travis Kelce and Taylor Swift were engaged on August 26th, 2025 as \
-                   confirmed on instgram."
+                  "Travis Kelce and Taylor Swift were engaged on 2025-08-26, as \
+                   confirmed on Instagram."
                 ()))
     ; Event.create
         ~short:"Life is discovered beyond Earth"
@@ -138,8 +138,9 @@ let all =
                   "https://www.espn.com/olympics/trackandfield/story/_/id/46269417/armand-duplantis-breaks-pole-vault-world-record-14th"
                 ~date:(Date.of_string "2025-09-15")
                 ~description:
-                  "Armand \"Mondo\" Duplantis broke the men's pole vault record by \
-                   clearing a height of 20 ft, 8 inches"
+                  "Armand \"Mondo\" Duplantis broke the pole vault world record for the \
+                   14th time, clearing 6.30 meters to capture his third world \
+                   championship."
                 ()))
     ; Event.create
         ~short:"More than three participants change employment status"

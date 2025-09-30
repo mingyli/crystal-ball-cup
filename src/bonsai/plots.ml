@@ -243,7 +243,8 @@ let render_plots
   let events_to_plot =
     match which_events with
     | All ->
-      List.filter t.events ~f:(fun event -> Set.mem which_outcomes (Event.outcome event |> Outcome.to_kind))
+      List.filter t.events ~f:(fun event ->
+        Set.mem which_outcomes (Event.outcome event |> Outcome.kind))
     | One event -> [ event ]
   in
   let effects =
@@ -364,7 +365,9 @@ let render_plots
 ;;
 
 let component (t : t) graph =
-  let which_outcomes, set_which_outcomes = Bonsai.state Outcome.Kind.(Set.of_list all) graph in
+  let which_outcomes, set_which_outcomes =
+    Bonsai.state Outcome.Kind.(Set.of_list all) graph
+  in
   let which_events, set_which_events = Bonsai.state Which_events.All graph in
   let which_respondents, set_which_respondents =
     Bonsai.state Which_respondents.None graph
@@ -445,17 +448,28 @@ let component (t : t) graph =
     let render_detailed_explanation event =
       match Event.outcome event with
       | Pending ->
-        Node.div ~attrs:[ Style.outcome_chip_wrapper ]
-           [ render_outcome_chip event ]
+        Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
       | Yes explanation | No explanation ->
-        let chip = match Explanation.link explanation with
+        let chip =
+          match Explanation.link explanation with
           | None -> render_outcome_chip event
-          | Some link -> Node.a ~attrs:[ Attr.href link; Attr.target "_blank"; ]
-            [ render_outcome_chip event; Node.span ~attrs:[ {%css| font-size: 0.8em; color: %{Colors.blue}; |} ] [ Node.text "(Source)" ] ]
+          | Some link ->
+            Node.a
+              ~attrs:[ Attr.href link; Attr.target "_blank" ]
+              [ render_outcome_chip event
+              ; Node.span
+                  ~attrs:[ {%css| font-size: 0.8em; color: %{Colors.blue}; |} ]
+                  [ Node.text "(Source)" ]
+              ]
         in
-        Node.div ~attrs:[ {%css| width: 100%; border: 1px solid %{Colors.black}; display: flex; flex-direction: column; padding: 5px; |} ]
+        Node.div
+          ~attrs:
+            [ {%css| width: 100%; border: 1px solid %{Colors.black}; display: flex; flex-direction: column; padding: 5px; |}
+            ]
           [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ chip ]
-          ; Node.div ~attrs:[ {%css| color: %{Colors.black}; line-height: 1.4; |} ] [ Node.text (Explanation.description explanation) ]
+          ; Node.div
+              ~attrs:[ {%css| color: %{Colors.black}; line-height: 1.4; |} ]
+              [ Node.text (Explanation.description explanation) ]
           ]
     in
     match which_events with
@@ -470,7 +484,7 @@ let component (t : t) graph =
     | All ->
       let events_in_view =
         List.filter (events t) ~f:(fun event ->
-          Set.mem which_outcomes (Event.outcome event |> Outcome.to_kind))
+          Set.mem which_outcomes (Event.outcome event |> Outcome.kind))
       in
       List.map events_in_view ~f:(fun event ->
         let outcome = Event.outcome event in
@@ -497,14 +511,17 @@ let component (t : t) graph =
                     align-items: center;
                   |}
                 ]
-              [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
+              [ Node.div
+                  ~attrs:[ Style.outcome_chip_wrapper ]
+                  [ render_outcome_chip event ]
               ; (match Event.outcome event with
                  | Pending -> Node.div []
                  | Yes explanation | No explanation ->
                    Node.div
-                     ~attrs:[ {%css| margin-top: 0.2em; color: %{Colors.gray}; font-size: 0.8em; |} ]
-                     [ Node.span
-                         [ Node.text "On: " ]
+                     ~attrs:
+                       [ {%css| margin-top: 0.2em; color: %{Colors.gray}; font-size: 0.8em; |}
+                       ]
+                     [ Node.span [ Node.text "On: " ]
                      ; (match Explanation.link explanation with
                         | None ->
                           Node.span

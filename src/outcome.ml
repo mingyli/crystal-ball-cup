@@ -17,6 +17,15 @@ module Kind = struct
     | Yes -> "Yes"
     | No -> "No"
   ;;
+
+  let score t ~probability =
+    let probability = Probability.to_float probability in
+    let ln = Float.log in
+    match t with
+    | Pending -> Float.nan
+    | Yes -> ln probability -. ln 0.5
+    | No -> ln (1.0 -. probability) -. ln 0.5
+  ;;
 end
 
 module T = struct
@@ -30,22 +39,14 @@ end
 include T
 include Comparable.Make (T)
 
-let score t ~probability =
-  let probability = Probability.to_float probability in
-  let ln = Float.log in
-  match t with
-  | Pending -> Float.nan
-  | Yes _ -> ln probability -. ln 0.5
-  | No _ -> ln (1.0 -. probability) -. ln 0.5
+let kind : t -> Kind.t = function
+  | Pending -> Pending
+  | Yes _ -> Yes
+  | No _ -> No
 ;;
 
-let to_kind = function
-  | Pending -> Kind.Pending
-  | Yes _ -> Kind.Yes
-  | No _ -> Kind.No
-;;
-
-let to_string t = Kind.to_string (to_kind t)
+let score t ~probability = Kind.score (kind t) ~probability
+let to_string t = Kind.to_string (kind t)
 
 let caqti_type =
   let encode t =
