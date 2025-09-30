@@ -3,7 +3,7 @@ open Crystal
 
 let%expect_test "odds and logit" =
   let probabilities =
-    [ 0.01; 0.1; 0.25; 0.5; 0.75; 0.9; 0.99 ] |> List.map ~f:Probability.of_float
+    [ 0.; 0.01; 0.1; 0.25; 0.5; 0.75; 0.9; 0.99; 1. ] |> List.map ~f:Probability.of_float
   in
   let rows =
     List.map probabilities ~f:(fun p -> p, Probability.odds p, Probability.logit p)
@@ -21,6 +21,7 @@ let%expect_test "odds and logit" =
     ┌─────────────┬────────┬────────┐
     │ Probability │ Odds   │ Logit  │
     ├─────────────┼────────┼────────┤
+    │ 0.          │ 0.000  │ -inf   │
     │ 0.01        │ 0.010  │ -4.595 │
     │ 0.1         │ 0.111  │ -2.197 │
     │ 0.25        │ 0.333  │ -1.099 │
@@ -28,6 +29,7 @@ let%expect_test "odds and logit" =
     │ 0.75        │ 3.000  │ 1.099  │
     │ 0.9         │ 9.000  │ 2.197  │
     │ 0.99        │ 99.000 │ 4.595  │
+    │ 1.          │ inf    │ inf    │
     └─────────────┴────────┴────────┘
     |}]
 ;;
@@ -99,9 +101,9 @@ let%expect_test "scale_by_confidence" =
     │ Probability │ Scaled │
     ├─────────────┼────────┤
     │ 0.          │ 0.000  │
-    │ 0.1         │ 0.500  │
+    │ 0.1         │ 0.000  │
     │ 0.5         │ 0.500  │
-    │ 0.9         │ 0.500  │
+    │ 0.9         │ 1.000  │
     │ 1.          │ 1.000  │
     └─────────────┴────────┘
     |}]
