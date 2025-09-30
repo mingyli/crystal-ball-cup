@@ -1,11 +1,12 @@
+@import url("https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,200..800;1,200..800&display=swap");
+
 html {
     background-color: #f8f9fa;
 }
 
 body {
     margin: 0 auto;
-    font-family: "Inter", sans-serif;
-    font-variation-settings: "wdth" 55;
+    font-family: "Karla", sans-serif;
     background-color: #f8f9fa;
     color: #212529;
     max-width: 50em;
