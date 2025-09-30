@@ -32,7 +32,15 @@ let all =
         ~precise:
           "The winner of the 2025 US Open Men's Singles Final is under 25 years old on \
            the day of the final match, as determined by official ATP birthdate records."
-        ~outcome:Yes
+        ~outcome:
+          (Yes
+             (Explanation.create
+                ~link:"https://www.instagram.com/p/DOUPJaRiXFD/"
+                ~date:(Date.of_string "2025-09-07")
+                ~description:
+                  "Carlos Alcaraz (born 2003-05-05, age 22 years) defeated Jannik Sinner \
+                   to win the 2025 US Open Men's Singles tournament."
+                ()))
     ; Event.create
         ~short:"Sam Bankman-Fried is pardoned"
         ~precise:
@@ -58,7 +66,15 @@ let all =
         ~precise:
           "Travis Kelce and Taylor Swift are reported to be engaged on or before \
            2025-12-31, via a consensus of credible media reporting or primary sources."
-        ~outcome:Yes
+        ~outcome:
+          (Yes
+             (Explanation.create
+                ~link:"https://www.instagram.com/p/DN02niAXMM-/"
+                ~date:(Date.of_string "2025-08-26")
+                ~description:
+                  "Travis Kelce and Taylor Swift were engaged on 2025-08-26, as \
+                   confirmed on Instagram."
+                ()))
     ; Event.create
         ~short:"Life is discovered beyond Earth"
         ~precise:
@@ -115,7 +131,17 @@ let all =
         ~precise:
           "At least one world record is broken at the 2025 World Athletics Championships \
            in Tokyo, confirmed by World Athletics."
-        ~outcome:Yes
+        ~outcome:
+          (Yes
+             (Explanation.create
+                ~link:
+                  "https://www.espn.com/olympics/trackandfield/story/_/id/46269417/armand-duplantis-breaks-pole-vault-world-record-14th"
+                ~date:(Date.of_string "2025-09-15")
+                ~description:
+                  "Armand \"Mondo\" Duplantis broke the pole vault world record for the \
+                   14th time, clearing 6.30 meters to capture his third world \
+                   championship."
+                ()))
     ; Event.create
         ~short:"More than three participants change employment status"
         ~precise:
