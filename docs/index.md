@@ -41,7 +41,7 @@ is defined according to an adjusted logarithmic scoring rule.
 $$
 \mathsf{score}(p) =
 \begin{cases}
-  \ln p - \ln 0.5 & \text{if the event occurs} \\
+  \ln p - \ln 0.5 & \text{if event occurs} \\
   \ln (1 - p) - \ln 0.5 & \text{otherwise}
 \end{cases}
 $$
