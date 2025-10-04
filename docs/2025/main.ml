@@ -13,6 +13,10 @@ let responses_and_scores =
 
 let all graph =
   let plots = Plots.create ~events:Crystal_2025.all ~responses_and_scores in
+  let responses = Map.map responses_and_scores ~f:Responses_and_scores.responses in
+  let confidence =
+    Confidence.component ~collection:(module Crystal_2025) ~responses graph
+  in
   let standings =
     let scores = Map.map responses_and_scores ~f:Responses_and_scores.scores in
     Standings.component scores graph
@@ -35,6 +39,7 @@ ORDER BY total_score DESC
 LIMIT 3|}
   in *)
   let%arr standings = standings
+  and confidence = confidence
   and plots = plots
   and explorer =
     explorer
@@ -44,6 +49,8 @@ LIMIT 3|}
   Node.div
     [ Node.h2 [ Node.text "Standings" ]
     ; standings
+    ; Node.h2 [ Node.text "Confidence" ]
+    ; confidence
     ; Node.h2 [ Node.text "Events" ]
     ; plots
     ; Node.h2 [ Node.text "Explorer" ]
