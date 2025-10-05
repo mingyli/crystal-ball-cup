@@ -24,6 +24,7 @@ let all graph =
       ~initial_query:"SELECT name, sql FROM sqlite_master WHERE type IN ('table', 'view')"
       graph
   in
+  let dygraph_example = Dygraph_example.component graph in
   (* let%sub explorer_winners =
     Explorer.component
       ~db_path:"../2025/crystal.db"
@@ -36,8 +37,9 @@ LIMIT 3|}
   in *)
   let%arr standings = standings
   and plots = plots
-  and explorer =
-    explorer
+  and explorer = explorer
+  and dygraph_example =
+    dygraph_example
     (* and explorer_winners = explorer_winners  *)
   in
   let open Vdom in
@@ -48,6 +50,8 @@ LIMIT 3|}
     ; plots
     ; Node.h2 [ Node.text "Explorer" ]
     ; explorer
+    ; Node.h2 [ Node.text "Dygraph Simple Example" ]
+    ; dygraph_example
     ]
 ;;
 
