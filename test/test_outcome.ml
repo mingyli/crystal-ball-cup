@@ -2,16 +2,16 @@ open! Core
 open Crystal
 
 let%expect_test "score" =
-  let outcomes : Outcome.t list = [ Pending; Yes; No ] in
+  let outcomes = Outcome.Kind.all in
   let probabilities = [ 0.0; 0.1; 0.5; 0.9; 1.0 ] |> List.map ~f:Probability.of_float in
   let rows =
     List.cartesian_product outcomes probabilities
     |> List.map ~f:(fun (outcome, probability) ->
-      outcome, probability, Outcome.score outcome ~probability)
+      outcome, probability, Outcome.Kind.score outcome ~probability)
   in
   let columns =
     let c = Ascii_table.Column.create in
-    [ c "Outcome" (fun (outcome, _, _) -> Outcome.to_string outcome)
+    [ c "Outcome" (fun (outcome, _, _) -> Outcome.Kind.to_string outcome)
     ; c "Probability" (fun (_, prob, _) -> Probability.to_string prob)
     ; c "Score" (fun (_, _, score_val) ->
         if Float.is_nan score_val then "nan" else Float.to_string score_val)

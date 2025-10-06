@@ -12,14 +12,14 @@ module Outcome = struct
   include Outcome
 
   let color = function
-    | Yes -> Colors.blue
-    | No -> Colors.orange
+    | Yes _ -> Colors.blue
+    | No _ -> Colors.orange
     | Pending -> Colors.gray
   ;;
 
   let accent_color = function
-    | Yes -> Colors.light_blue
-    | No -> Colors.light_orange
+    | Yes _ -> Colors.light_blue
+    | No _ -> Colors.light_orange
     | Pending -> Colors.light_gray
   ;;
 end
@@ -96,9 +96,9 @@ module Style =
 let create_outcomes_checkboxes which_outcomes set_which_outcomes graph =
   let checkboxes =
     E.Checkbox.set
-      (module Outcome)
+      (module Outcome.Kind)
       ~layout:`Horizontal
-      ~to_string:Outcome.to_string
+      ~to_string:Outcome.Kind.to_string
       ~style:(Bonsai.return E.Selectable_style.Button_like)
       ~extra_checkbox_attrs:
         (Bonsai.return (fun ~checked ->
@@ -142,12 +142,12 @@ let create_outcomes_checkboxes which_outcomes set_which_outcomes graph =
       ~extra_container_attrs:
         (Bonsai.return
            [ Style.query_box_item; {%css| display: flex; flex-direction: row; |} ])
-      (Bonsai.return Outcome.all)
+      (Bonsai.return Outcome.Kind.all)
       graph
   in
   let sync_with =
     Form.Dynamic.sync_with
-      ~equal:Outcome.Set.equal
+      ~equal:Outcome.Kind.Set.equal
       ~store_value:
         (let%arr which_outcomes = which_outcomes in
          Some which_outcomes)
@@ -236,14 +236,15 @@ let get_responses t event_id =
 
 let render_plots
       t
-      (which_outcomes : Outcome.Set.t)
+      (which_outcomes : Outcome.Kind.Set.t)
       (which_events : Which_events.t)
       (which_respondents : Which_respondents.t)
   =
   let events_to_plot =
     match which_events with
     | All ->
-      List.filter t.events ~f:(fun event -> Set.mem which_outcomes (Event.outcome event))
+      List.filter t.events ~f:(fun event ->
+        Set.mem which_outcomes (Event.outcome event |> Outcome.kind))
     | One event -> [ event ]
   in
   let effects =
@@ -253,8 +254,8 @@ let render_plots
       in
       let fill_color, line_color =
         match Event.outcome event with
-        | Yes -> Colors.very_light_blue, Colors.blue
-        | No -> Colors.very_light_orange, Colors.orange
+        | Yes _ -> Colors.very_light_blue, Colors.blue
+        | No _ -> Colors.very_light_orange, Colors.orange
         | Pending -> Colors.very_light_gray, Colors.gray
       in
       let plotly_data =
@@ -364,7 +365,9 @@ let render_plots
 ;;
 
 let component (t : t) graph =
-  let which_outcomes, set_which_outcomes = Bonsai.state Outcome.(Set.of_list all) graph in
+  let which_outcomes, set_which_outcomes =
+    Bonsai.state Outcome.Kind.(Set.of_list all) graph
+  in
   let which_events, set_which_events = Bonsai.state Which_events.All graph in
   let which_respondents, set_which_respondents =
     Bonsai.state Which_respondents.None graph
@@ -404,7 +407,7 @@ let component (t : t) graph =
   in
   let () =
     Bonsai.Edge.on_change
-      ~equal:[%equal: Outcome.Set.t * Which_events.t * Which_respondents.t]
+      ~equal:[%equal: Outcome.Kind.Set.t * Which_events.t * Which_respondents.t]
       (let%arr which_outcomes = which_outcomes
        and which_events = which_events
        and which_respondents = which_respondents in
@@ -442,19 +445,46 @@ let component (t : t) graph =
           ]
         [ Node.text (outcome |> Outcome.to_string) ]
     in
+    let render_detailed_explanation event =
+      match Event.outcome event with
+      | Pending ->
+        Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
+      | Yes explanation | No explanation ->
+        let chip =
+          match Explanation.link explanation with
+          | None -> render_outcome_chip event
+          | Some link ->
+            Node.a
+              ~attrs:[ Attr.href link; Attr.target "_blank" ]
+              [ render_outcome_chip event
+              ; Node.span
+                  ~attrs:[ {%css| font-size: 0.8em; color: %{Colors.blue}; |} ]
+                  [ Node.text "(Source)" ]
+              ]
+        in
+        Node.div
+          ~attrs:
+            [ {%css| width: 100%; border: 1px solid %{Colors.black}; display: flex; flex-direction: column; padding: 5px; |}
+            ]
+          [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ chip ]
+          ; Node.div
+              ~attrs:[ {%css| color: %{Colors.black}; line-height: 1.4; |} ]
+              [ Node.text (Explanation.description explanation) ]
+          ]
+    in
     match which_events with
     | One event ->
       [ Node.div
           ~attrs:[]
-          [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
-          ; Node.div [ Node.text (Event.precise event) ]
+          [ Node.div [ Node.text (Event.precise event) ]
+          ; render_detailed_explanation event
           ; Node.div ~attrs:[ Attr.id "plot-single" ] []
           ]
       ]
     | All ->
       let events_in_view =
         List.filter (events t) ~f:(fun event ->
-          Set.mem which_outcomes (Event.outcome event))
+          Set.mem which_outcomes (Event.outcome event |> Outcome.kind))
       in
       List.map events_in_view ~f:(fun event ->
         let outcome = Event.outcome event in
@@ -473,7 +503,40 @@ let component (t : t) graph =
         in
         Node.div
           ~attrs:[ Style.plots_container ]
-          [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
+          [ Node.div
+              ~attrs:
+                [ {%css|
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                  |}
+                ]
+              [ Node.div
+                  ~attrs:[ Style.outcome_chip_wrapper ]
+                  [ render_outcome_chip event ]
+              ; (match Event.outcome event with
+                 | Pending -> Node.div []
+                 | Yes explanation | No explanation ->
+                   Node.div
+                     ~attrs:
+                       [ {%css| margin-top: 0.2em; color: %{Colors.gray}; font-size: 0.8em; |}
+                       ]
+                     [ Node.span [ Node.text "On: " ]
+                     ; (match Explanation.link explanation with
+                        | None ->
+                          Node.span
+                            ~attrs:[ {%css| font-style: italic; |} ]
+                            [ Node.text (Date.to_string (Explanation.date explanation)) ]
+                        | Some link ->
+                          Node.a
+                            ~attrs:
+                              [ Attr.href link
+                              ; Attr.target "_blank"
+                              ; {%css| font-style: italic; text-decoration: underline; cursor: pointer; color: %{Colors.gray}; |}
+                              ]
+                            [ Node.text (Date.to_string (Explanation.date explanation)) ])
+                     ])
+              ]
           ; Node.a
               ~attrs:
                 [ {%css|
