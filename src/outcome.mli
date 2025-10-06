@@ -1,13 +1,9 @@
 open! Core
 
-type t =
-  | Pending
-  | Yes
-  | No
-[@@deriving compare, equal, sexp, enumerate]
+type t [@@deriving compare, equal, sexp]
 
-include Comparable.S with type t := t
-
-val caqti_type : t Caqti_type.t
-val to_string : t -> string
+val create : Resolution.t -> Date.t -> string -> t
+val resolution : t -> Resolution.t
+val date : t -> Date.t
+val explanation : t -> string
 val score : t -> probability:Probability.t -> float

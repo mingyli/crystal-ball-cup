@@ -4,9 +4,19 @@ type t =
   { id : Event_id.t
   ; short : string
   ; precise : string
-  ; outcome : Outcome.t
+  ; outcome : Outcome.t option
   }
 [@@deriving compare, equal, fields, sexp]
 
 let create = Fields.create
-let score t ~(probability : Probability.t) = Outcome.score t.outcome ~probability
+
+let resolution t =
+  let%map.Option outcome = t.outcome in
+  Outcome.resolution outcome
+;;
+
+let score t ~(probability : Probability.t) =
+  match t.outcome with
+  | None -> Float.nan
+  | Some outcome -> Outcome.score outcome ~probability
+;;

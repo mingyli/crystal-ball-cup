@@ -8,20 +8,35 @@ module Query_box = Bonsai_web_ui_query_box
 module Form = Bonsai_web_ui_form.With_manual_view
 module E = Form.Elements
 
-module Outcome = struct
-  include Outcome
+module Resolution = struct
+  include Resolution
 
-  let color = function
-    | Yes -> Colors.blue
-    | No -> Colors.orange
-    | Pending -> Colors.gray
-  ;;
+  module Option = struct
+    module T = struct
+      type nonrec t = t option [@@deriving compare, equal, sexp, enumerate]
+    end
 
-  let accent_color = function
-    | Yes -> Colors.light_blue
-    | No -> Colors.light_orange
-    | Pending -> Colors.light_gray
-  ;;
+    include T
+    include Comparable.Make (T)
+
+    let to_string = function
+      | Some Yes -> "Yes"
+      | Some No -> "No"
+      | None -> "Pending"
+    ;;
+
+    let color = function
+      | Some Yes -> Colors.blue
+      | Some No -> Colors.orange
+      | None -> Colors.gray
+    ;;
+
+    let accent_color = function
+      | Some Yes -> Colors.light_blue
+      | Some No -> Colors.light_orange
+      | None -> Colors.light_gray
+    ;;
+  end
 end
 
 module Style =
@@ -35,7 +50,7 @@ module Style =
         margin-bottom: 10px;
       }
 
-      .outcome-chip-wrapper {
+      .resolution-chip-wrapper {
         font-weight: bold;
         text-align: center;
       }
@@ -93,12 +108,12 @@ module Style =
       }
     |}]
 
-let create_outcomes_checkboxes which_outcomes set_which_outcomes graph =
+let create_resolutions_checkboxes which_resolutions set_which_resolutions graph =
   let checkboxes =
     E.Checkbox.set
-      (module Outcome)
+      (module Resolution.Option)
       ~layout:`Horizontal
-      ~to_string:Outcome.to_string
+      ~to_string:Resolution.Option.to_string
       ~style:(Bonsai.return E.Selectable_style.Button_like)
       ~extra_checkbox_attrs:
         (Bonsai.return (fun ~checked ->
@@ -142,16 +157,16 @@ let create_outcomes_checkboxes which_outcomes set_which_outcomes graph =
       ~extra_container_attrs:
         (Bonsai.return
            [ Style.query_box_item; {%css| display: flex; flex-direction: row; |} ])
-      (Bonsai.return Outcome.all)
+      (Bonsai.return Resolution.Option.all)
       graph
   in
   let sync_with =
     Form.Dynamic.sync_with
-      ~equal:Outcome.Set.equal
+      ~equal:Resolution.Option.Set.equal
       ~store_value:
-        (let%arr which_outcomes = which_outcomes in
-         Some which_outcomes)
-      ~store_set:set_which_outcomes
+        (let%arr which_resolutions = which_resolutions in
+         Some which_resolutions)
+      ~store_set:set_which_resolutions
       checkboxes
       graph
   in
@@ -236,14 +251,15 @@ let get_responses t event_id =
 
 let render_plots
       t
-      (which_outcomes : Outcome.Set.t)
+      (which_resolutions : Resolution.Option.Set.t)
       (which_events : Which_events.t)
       (which_respondents : Which_respondents.t)
   =
   let events_to_plot =
     match which_events with
     | All ->
-      List.filter t.events ~f:(fun event -> Set.mem which_outcomes (Event.outcome event))
+      List.filter t.events ~f:(fun event ->
+        Set.mem which_resolutions (Event.resolution event))
     | One event -> [ event ]
   in
   let effects =
@@ -252,10 +268,10 @@ let render_plots
         get_responses t (Event.id event) |> Array.map ~f:Probability.to_float
       in
       let fill_color, line_color =
-        match Event.outcome event with
-        | Yes -> Colors.very_light_blue, Colors.blue
-        | No -> Colors.very_light_orange, Colors.orange
-        | Pending -> Colors.very_light_gray, Colors.gray
+        match Event.resolution event with
+        | Some Yes -> Colors.very_light_blue, Colors.blue
+        | Some No -> Colors.very_light_orange, Colors.orange
+        | None -> Colors.very_light_gray, Colors.gray
       in
       let plotly_data =
         let violin : Crystal_plotly.Data.t =
@@ -364,13 +380,15 @@ let render_plots
 ;;
 
 let component (t : t) graph =
-  let which_outcomes, set_which_outcomes = Bonsai.state Outcome.(Set.of_list all) graph in
+  let which_resolutions, set_which_resolutions =
+    Bonsai.state Resolution.Option.(Set.of_list all) graph
+  in
   let which_events, set_which_events = Bonsai.state Which_events.All graph in
   let which_respondents, set_which_respondents =
     Bonsai.state Which_respondents.None graph
   in
-  let checkboxes_which_outcomes =
-    create_outcomes_checkboxes which_outcomes set_which_outcomes graph
+  let checkboxes_which_resolutions =
+    create_resolutions_checkboxes which_resolutions set_which_resolutions graph
   in
   let query_box_which_events =
     create_query_box
@@ -404,15 +422,15 @@ let component (t : t) graph =
   in
   let () =
     Bonsai.Edge.on_change
-      ~equal:[%equal: Outcome.Set.t * Which_events.t * Which_respondents.t]
-      (let%arr which_outcomes = which_outcomes
+      ~equal:[%equal: Resolution.Option.Set.t * Which_events.t * Which_respondents.t]
+      (let%arr which_resolutions = which_resolutions
        and which_events = which_events
        and which_respondents = which_respondents in
-       which_outcomes, which_events, which_respondents)
+       which_resolutions, which_events, which_respondents)
       ~callback:
         (let%arr () = return () in
-         fun (which_outcomes, which_events, which_respondents) ->
-           render_plots t which_outcomes which_events which_respondents)
+         fun (which_resolutions, which_events, which_respondents) ->
+           render_plots t which_resolutions which_events which_respondents)
       graph
   in
   let open Vdom in
@@ -420,11 +438,11 @@ let component (t : t) graph =
     let%arr which_events = which_events
     and set_which_events = set_which_events
     and query_box_which_events = query_box_which_events
-    and which_outcomes = which_outcomes in
-    let render_outcome_chip event =
-      let outcome = Event.outcome event in
-      let outcome_style =
-        {%css| background-color: %{Outcome.accent_color outcome}; color: %{Outcome.color outcome}; |}
+    and which_resolutions = which_resolutions in
+    let render_resolution_chip event =
+      let resolution = Event.resolution event in
+      let resolution_style =
+        {%css| background-color: %{Resolution.Option.accent_color resolution}; color: %{Resolution.Option.color resolution}; |}
       in
       Node.span
         ~attrs:
@@ -438,15 +456,17 @@ let component (t : t) graph =
             vertical-align: middle;
             line-height: 1;
           |}
-          ; outcome_style
+          ; resolution_style
           ]
-        [ Node.text (outcome |> Outcome.to_string) ]
+        [ Node.text (Resolution.Option.to_string resolution) ]
     in
     match which_events with
     | One event ->
       [ Node.div
           ~attrs:[]
-          [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
+          [ Node.div
+              ~attrs:[ Style.resolution_chip_wrapper ]
+              [ render_resolution_chip event ]
           ; Node.div [ Node.text (Event.precise event) ]
           ; Node.div ~attrs:[ Attr.id "plot-single" ] []
           ]
@@ -454,26 +474,28 @@ let component (t : t) graph =
     | All ->
       let events_in_view =
         List.filter (events t) ~f:(fun event ->
-          Set.mem which_outcomes (Event.outcome event))
+          Set.mem which_resolutions (Event.resolution event))
       in
       List.map events_in_view ~f:(fun event ->
-        let outcome = Event.outcome event in
-        let outcome_hover_style =
+        let resolution = Event.resolution event in
+        let resolution_hover_style =
           {%css|
             &:hover {
-              background-color: %{Outcome.accent_color outcome};
-              color: %{Outcome.color outcome};
+              background-color: %{Resolution.Option.accent_color resolution};
+              color: %{Resolution.Option.color resolution};
             }
 
             &:active {
-              background-color: %{Outcome.color outcome};
+              background-color: %{Resolution.Option.color resolution};
               color: %{Colors.white};
             }
             |}
         in
         Node.div
           ~attrs:[ Style.plots_container ]
-          [ Node.div ~attrs:[ Style.outcome_chip_wrapper ] [ render_outcome_chip event ]
+          [ Node.div
+              ~attrs:[ Style.resolution_chip_wrapper ]
+              [ render_resolution_chip event ]
           ; Node.a
               ~attrs:
                 [ {%css|
@@ -483,7 +505,7 @@ let component (t : t) graph =
                     cursor: pointer;
                     padding: 0.2em;
                   |}
-                ; outcome_hover_style
+                ; resolution_hover_style
                 ; Attr.href "#"
                 ; Attr.on_click (fun dom_event ->
                     Dom.preventDefault dom_event;
@@ -502,11 +524,11 @@ let component (t : t) graph =
   let%arr plots = plots
   and query_box_which_events = query_box_which_events
   and query_box_which_respondents = query_box_which_respondents
-  and checkboxes_which_outcomes = checkboxes_which_outcomes in
+  and checkboxes_which_resolutions = checkboxes_which_resolutions in
   Node.div
     [ Node.div
         ~attrs:[ Style.query_box_container ]
-        [ Form.view checkboxes_which_outcomes
+        [ Form.view checkboxes_which_resolutions
         ; Query_box.view query_box_which_events
         ; Query_box.view query_box_which_respondents
         ]
