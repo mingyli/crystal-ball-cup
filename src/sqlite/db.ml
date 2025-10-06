@@ -10,6 +10,12 @@ module Queries = struct
        outcome TEXT )"
   ;;
 
+  let create_outcomes =
+    (Caqti_type.unit ->. Caqti_type.unit)
+      "CREATE TABLE outcomes ( event_id INTEGER PRIMARY KEY, resolution TEXT, date TEXT, \
+       explanation TEXT, FOREIGN KEY (event_id) REFERENCES events(event_id) )"
+  ;;
+
   let create_responses =
     (Caqti_type.unit ->. Caqti_type.unit)
       "CREATE TABLE responses ( respondent TEXT NOT NULL, event_id INTEGER NOT NULL, \
@@ -24,10 +30,15 @@ module Queries = struct
        events(event_id) )"
   ;;
 
-  let insert_event =
-    (Caqti_type.(t4 Event_id.caqti_type string string Outcome.caqti_type)
+  let insert_outcome =
+    (Caqti_type.(t4 Event_id.caqti_type Resolution.caqti_type pdate string)
      ->. Caqti_type.unit)
-      "INSERT INTO events (event_id, short, precise, outcome) VALUES (?, ?, ?, ?)"
+      "INSERT INTO outcomes (event_id, resolution, date, explanation) VALUES (?, ?, ?, ?)"
+  ;;
+
+  let insert_event =
+    (Caqti_type.(t3 Event_id.caqti_type string string) ->. Caqti_type.unit)
+      "INSERT INTO events (event_id, short, precise) VALUES (?, ?, ?)"
   ;;
 
   let insert_response =
@@ -38,6 +49,22 @@ module Queries = struct
   let insert_score =
     (Caqti_type.(t3 string Event_id.caqti_type float) ->. Caqti_type.unit)
       "INSERT INTO scores (respondent, event_id, score) VALUES (?, ?, ?)"
+  ;;
+
+  let create_events_and_outcomes_view =
+    (Caqti_type.unit ->. Caqti_type.unit)
+      {|CREATE VIEW events_and_outcomes AS
+           SELECT
+             e.event_id,
+             e.short,
+             e.precise,
+             o.resolution,
+             o.date,
+             o.explanation
+           FROM events AS e
+           LEFT JOIN outcomes AS o
+             ON e.event_id = o.event_id
+        |}
   ;;
 
   let create_responses_and_scores_view =
@@ -65,15 +92,30 @@ module Connection = struct
   ;;
 
   let make_events ((module Conn) : t) collection =
-    let%bind () = Conn.exec Queries.create_events () in
+    let%bind () = Conn.exec Queries.create_events ()
+    and () = Conn.exec Queries.create_outcomes () in
     let events = Collection.all collection in
     List.fold events ~init:(Ok ()) ~f:(fun acc event ->
       let%bind () = acc in
       let event_id = Event.id event in
       let short = Event.short event in
       let precise = Event.precise event in
-      let outcome = Event.outcome event in
-      Conn.exec Queries.insert_event (event_id, short, precise, outcome))
+      let%bind () =
+        match Event.outcome event with
+        | None -> Ok ()
+        | Some outcome ->
+          let resolution = Outcome.resolution outcome in
+          let date =
+            let date = Outcome.date outcome in
+            let year = Date.year date in
+            let month = Date.month date |> Month.to_int in
+            let day = Date.day date in
+            Ptime.of_date (year, month, day) |> Option.value_exn
+          in
+          let explanation = Outcome.explanation outcome in
+          Conn.exec Queries.insert_outcome (event_id, resolution, date, explanation)
+      in
+      Conn.exec Queries.insert_event (event_id, short, precise))
   ;;
 
   let make_events t collection = make_events t collection |> caqti_or_error
@@ -105,6 +147,11 @@ module Connection = struct
   ;;
 
   let make_scores t scores = make_scores t scores |> caqti_or_error
+
+  let make_events_and_outcomes ((module Conn) : t) =
+    let work () = Conn.exec Queries.create_events_and_outcomes_view () in
+    Conn.with_transaction work |> caqti_or_error
+  ;;
 
   let make_responses_and_scores ((module Conn) : t) =
     let work () = Conn.exec Queries.create_responses_and_scores_view () in

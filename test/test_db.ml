@@ -52,6 +52,7 @@ let%expect_test _ =
       let%bind.Or_error () = Db.Connection.make_events conn (module Test_collection) in
       let%bind.Or_error () = Db.Connection.make_responses conn dummy_responses in
       let%bind.Or_error () = Db.Connection.make_scores conn dummy_scores in
+      let%bind.Or_error () = Db.Connection.make_events_and_outcomes conn in
       let%bind.Or_error () = Db.Connection.make_responses_and_scores conn in
       Ok ())
     |> Or_error.ok_exn
