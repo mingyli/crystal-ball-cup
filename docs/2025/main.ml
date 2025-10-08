@@ -13,9 +13,11 @@ let responses_and_scores =
 
 let all graph =
   let plots = Plots.create ~events:Crystal_2025.all ~responses_and_scores in
-  let standings =
-    let scores = Map.map responses_and_scores ~f:Responses_and_scores.scores in
-    Standings.component scores graph
+  let scores = Map.map responses_and_scores ~f:Responses_and_scores.scores in
+  (* let standings = Standings.component scores graph in *)
+  let standings2 =
+    let standings = Standings2.create Crystal_2025.all scores in
+    Standings2.component standings graph
   in
   let plots = Plots.component plots graph in
   let explorer =
@@ -24,7 +26,6 @@ let all graph =
       ~initial_query:"SELECT name, sql FROM sqlite_master WHERE type IN ('table', 'view')"
       graph
   in
-  let dygraph_example = Dygraph_example.component graph in
   (* let%sub explorer_winners =
     Explorer.component
       ~db_path:"../2025/crystal.db"
@@ -35,23 +36,25 @@ GROUP BY respondent
 ORDER BY total_score DESC
 LIMIT 3|}
   in *)
-  let%arr standings = standings
+  let%arr
+      (* standings = standings
+  and *)
+        standings2
+    =
+    standings2
   and plots = plots
-  and explorer = explorer
-  and dygraph_example =
-    dygraph_example
+  and explorer =
+    explorer
     (* and explorer_winners = explorer_winners  *)
   in
   let open Vdom in
   Node.div
-    [ Node.h2 [ Node.text "Standings" ]
-    ; standings
+    [ Node.h2 [ Node.text "Standings" ] (* ; standings *)
+    ; standings2
     ; Node.h2 [ Node.text "Events" ]
     ; plots
     ; Node.h2 [ Node.text "Explorer" ]
     ; explorer
-    ; Node.h2 [ Node.text "Dygraph Simple Example" ]
-    ; dygraph_example
     ]
 ;;
 

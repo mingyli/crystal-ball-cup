@@ -514,7 +514,7 @@ let component (t : t) graph =
                       ; Query_box.set_query query_box_which_events (Event.short event)
                       ])
                 ]
-              [ Node.text (Event.short event) ]
+              [ Node.text [%string "%{Event.id event#Event_id}. %{Event.short event}"] ]
           ; Node.div
               ~attrs:
                 [ Attr.id [%string "plot-%{Event.id event#Event_id}"]; Style.plot_div ]
