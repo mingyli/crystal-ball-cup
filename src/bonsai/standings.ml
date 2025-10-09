@@ -230,11 +230,7 @@ let component events scores graph =
           in
           `Hex hex_color
         in
-        ( respondent
-        , Dygraph.Options.Series_options.create
-            () (* ~strokeWidth:0.8 *)
-            ~drawPoints:false
-            ~color ))
+        respondent, Dygraph.Options.Series_options.create () ~drawPoints:false ~color)
     in
     let series = Dygraph.Options.Series.create series_options in
     let axes =
@@ -266,11 +262,28 @@ let component events scores graph =
       ~height:600
       ~labelsSeparateLines:false
       ~labelsDiv_string:"my-custom-legend"
-      ~legend:`never (* TODO ming *)
+      ~legend:`never
       ?dateWindow:
         (match sort_by with
          | Event_id -> Some Dygraph.Range.{ low = 0.5; high = 20.5 }
-         | Date -> Some Dygraph.Range.{ low = 1755648000000.; high = 1767139200000. })
+         | Date ->
+           let low =
+             Time_ns.of_date_ofday
+               ~zone:(Timezone.of_string "America/New_York")
+               (Date.of_string "2025-08-20")
+               Time_ns.Ofday.start_of_day
+           in
+           let high =
+             Time_ns.of_date_ofday
+               ~zone:(Timezone.of_string "America/New_York")
+               (Date.of_string "2025-12-31")
+               Time_ns.Ofday.approximate_end_of_day
+           in
+           Some
+             Dygraph.Range.
+               { low = low |> Time_ns.to_span_since_epoch |> Time_ns.Span.to_ms
+               ; high = high |> Time_ns.to_span_since_epoch |> Time_ns.Span.to_ms
+               })
       ?legendFormatter:None
       ~drawPoints:false
       ~strokeWidth:1.0
