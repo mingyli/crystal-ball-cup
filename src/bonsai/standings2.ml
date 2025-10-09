@@ -163,7 +163,11 @@ let component t graph =
           let r_pos, g_pos, b_pos = 0., 192., 64. in
           let r_neg, g_neg, b_neg = 192., 0., 64. in
           let red_val, green_val, blue_val =
-            if Float.(score > 0.0)
+            if Float.equal score Float.neg_infinity
+            then r_neg, g_neg, b_neg
+            else if Float.equal score Float.infinity
+            then r_pos, g_pos, b_pos
+            else if Float.(score > 0.0)
             then (
               let ratio = score /. max_total_score in
               let r = r_zero +. ((r_pos -. r_zero) *. ratio) in
