@@ -84,8 +84,10 @@ let component ~collection ~responses graph =
   let outcomes =
     collection
     |> Collection.all
-    |> List.map ~f:Event.outcome
-    |> List.map ~f:Outcome.to_float
+    |> List.map ~f:Event.resolution
+    |> List.map ~f:(function
+      | None -> Float.nan
+      | Some resolution -> Resolution.to_float resolution)
     |> List.to_array
   in
   let plots = go collection responses in

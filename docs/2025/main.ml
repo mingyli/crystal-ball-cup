@@ -19,7 +19,7 @@ let all graph =
   in
   let standings =
     let scores = Map.map responses_and_scores ~f:Responses_and_scores.scores in
-    Standings.component scores graph
+    Standings.component Crystal_2025.all scores graph
   in
   let plots = Plots.component plots graph in
   let explorer =

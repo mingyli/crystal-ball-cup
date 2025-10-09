@@ -61,6 +61,7 @@ module Make (Collection : Collection.S) = struct
         let%bind.Or_error () = Db.Connection.make_events conn (module Collection) in
         let%bind.Or_error () = Db.Connection.make_responses conn responses in
         let%bind.Or_error () = Db.Connection.make_scores conn scores in
+        let%bind.Or_error () = Db.Connection.make_events_and_outcomes conn in
         let%bind.Or_error () = Db.Connection.make_responses_and_scores conn in
         Ok ())
       |> Or_error.ok_exn
