@@ -3,16 +3,28 @@ open Crystal
 module Bonsai = Bonsai.Cont
 open Bonsai_web.Cont
 open Bonsai.Let_syntax
-open Dygraph.With_bonsai
+module Form = Bonsai_web_ui_form.With_manual_view
+
+module Sort_by = struct
+  type t =
+    | Date
+    | Event_id
+  [@@deriving compare, enumerate, equal, sexp_of]
+
+  let to_string = function
+    | Date -> "Date"
+    | Event_id -> "Event ID"
+  ;;
+end
 
 type t =
   { events : Event.t list
   ; scores : (string, Scores.t) List.Assoc.t
-  ; which : [ `Date | `Id ] Bonsai.t
+  ; sort_by : Sort_by.t Bonsai.t
   }
 [@@deriving fields]
 
-let create events scores which =
+let create events scores sort_by =
   let scores =
     String.Map.map_keys_exn scores ~f:(fun respondent ->
       let respondent =
@@ -27,7 +39,7 @@ let create events scores which =
       let b = Scores.total b in
       Comparable.reverse [%compare: float] a b)
   in
-  { events; scores; which }
+  { events; scores; sort_by }
 ;;
 
 let respondents t = List.map t.scores ~f:fst
@@ -66,9 +78,9 @@ let cumulative_scores_by_date t =
 ;;
 
 let cumulative_scores t =
-  match%arr t.which with
-  | `Date -> cumulative_scores_by_date t
-  | `Id -> cumulative_scores_by_id t
+  match%arr t.sort_by with
+  | Date -> cumulative_scores_by_date t
+  | Event_id -> cumulative_scores_by_id t
 ;;
 
 let min_finite_score t =
@@ -115,7 +127,31 @@ let max_total_score t =
   |> Option.value_exn
 ;;
 
-let component t graph =
+let component events scores graph =
+  let sort_by, set_sort_by = Bonsai.state Sort_by.Date graph in
+  let radio =
+    let radio =
+      Form.Elements.Radio_buttons.enumerable
+        (module Sort_by)
+        ~style:(return Vdom_input_widgets.Selectable_style.Native)
+        ~to_string:Sort_by.to_string
+        ~layout:`Horizontal
+        graph
+    in
+    let sync_with =
+      Form.Dynamic.sync_with
+        ~equal:[%equal: Sort_by.t]
+        ~store_value:
+          (let%arr sort_by = sort_by in
+           Some sort_by)
+        ~store_set:set_sort_by
+        radio
+        graph
+    in
+    (* TODO: When we upgrade bonsai, [sync_with] should return unit and we can delete this line. *)
+    Bonsai.( *> ) sync_with radio
+  in
+  let t = create events scores sort_by in
   let respondents = respondents t in
   let min_total_score = min_total_score t in
   let max_total_score = max_total_score t in
@@ -127,9 +163,9 @@ let component t graph =
     List.map respondents ~f:(fun respondent ->
       List.Assoc.find_exn cumulative_scores respondent ~equal:[%equal: string])
   in
-  let dygraph_data which cumulative_scores =
-    match which with
-    | `Id ->
+  let dygraph_data (sort_by : Sort_by.t) cumulative_scores =
+    match sort_by with
+    | Event_id ->
       t.events
       |> List.to_array
       |> Array.mapi ~f:(fun i event ->
@@ -141,7 +177,7 @@ let component t graph =
         in
         Array.of_list (event_id_as_float :: row_data))
       |> Dygraph.Data.create
-    | `Date ->
+    | Date ->
       t.events
       |> List.sort ~compare:(fun event event' ->
         [%compare: Date.t option] (Event.date event) (Event.date event'))
@@ -155,7 +191,7 @@ let component t graph =
         date, Array.of_list row_data)
       |> Dygraph.Data.create_date ~zone:(Timezone.of_string "America/New_York")
   in
-  let options which min_finite_score max_finite_score =
+  let options (sort_by : Sort_by.t) min_finite_score max_finite_score =
     let series_options =
       List.map total_scores ~f:(fun (respondent, score) ->
         let color =
@@ -209,9 +245,9 @@ let component t graph =
              ()
              ~drawGrid:false
              ~pixelsPerLabel:
-               (match which with
-                | `Id -> 20
-                | `Date -> 100))
+               (match sort_by with
+                | Event_id -> 20
+                | Date -> 100))
         ~y:
           (Dygraph.Options.Axis_options.create
              ()
@@ -232,9 +268,9 @@ let component t graph =
       ~labelsDiv_string:"my-custom-legend"
       ~legend:`never (* TODO ming *)
       ?dateWindow:
-        (match which with
-         | `Id -> Some Dygraph.Range.{ low = 0.5; high = 20.5 }
-         | `Date -> Some Dygraph.Range.{ low = 1755648000000.; high = 1767139200000. })
+        (match sort_by with
+         | Event_id -> Some Dygraph.Range.{ low = 0.5; high = 20.5 }
+         | Date -> Some Dygraph.Range.{ low = 1755648000000.; high = 1767139200000. })
       ?legendFormatter:None
       ~drawPoints:false
       ~strokeWidth:1.0
@@ -259,32 +295,30 @@ let component t graph =
       ()
       ~key:(return "standings-dygraph")
       ~x_label:
-        (match%arr t.which with
-         | `Date -> "Date"
-         | `Id -> "Event ID")
+        (let%arr sort_by = t.sort_by in
+         Sort_by.to_string sort_by)
       ~per_series_info:(return per_series_info)
       ~options:
-        (let%arr which = t.which
+        (let%arr sort_by = t.sort_by
          and min_finite_score = min_finite_score
          and max_finite_score = max_finite_score in
-         options which min_finite_score max_finite_score)
+         options sort_by min_finite_score max_finite_score)
       ~data:
-        (let%arr which = t.which
+        (let%arr sort_by = t.sort_by
          and cumulative_scores = cumulative_scores in
-         dygraph_data which cumulative_scores)
+         dygraph_data sort_by cumulative_scores)
       ~custom_legend:
         (let%sub model, view, inject =
            Dygraph.Default_legend.create
              ~x_label:
-               (match%arr t.which with
-                | `Date -> "Date"
-                | `Id -> "Event ID")
+               (let%arr sort_by = t.sort_by in
+                Sort_by.to_string sort_by)
              ~per_series_info:(return per_series_info)
              graph
          in
          let model =
            let%map model = model in
-           { Legend_model.visibility =
+           { Dygraph.With_bonsai.Legend_model.visibility =
                List.map model.series ~f:Dygraph.Default_legend.Model.Series.is_visible
            }
          in
@@ -299,6 +333,7 @@ let component t graph =
       ~extra_attr:(return {%css|font-size: 0.8rem;|})
       graph
   in
-  let%arr { graph_view; _ } = dygraph in
-  graph_view
+  let%arr { graph_view; _ } = dygraph
+  and { view; value = _; set = _ } = radio in
+  Vdom.Node.div [ graph_view; view ]
 ;;

@@ -15,11 +15,7 @@ let all graph =
   let plots = Plots.create ~events:Crystal_2025.all ~responses_and_scores in
   let scores = Map.map responses_and_scores ~f:Responses_and_scores.scores in
   (* let standings = Standings.component scores graph in *)
-  let sort_by, set_sort_by = Bonsai.state (`Id :> [ `Date | `Id ]) graph in
-  let standings2 =
-    let standings = Standings2.create Crystal_2025.all scores sort_by in
-    Standings2.component standings graph
-  in
+  let standings2 = Standings2.component Crystal_2025.all scores graph in
   let plots = Plots.component plots graph in
   let explorer =
     Explorer.component
@@ -44,27 +40,13 @@ LIMIT 3|}
     =
     standings2
   and plots = plots
-  and explorer = explorer
-  (* and explorer_winners = explorer_winners  *)
-  and sort_by = sort_by
-  and set_sort_by = set_sort_by in
-  let open Vdom in
-  let sort_by_toggle =
-    let view_for_value value text =
-      let style_attr =
-        if phys_equal sort_by value
-        then [ Attr.style (Css_gen.font_weight `Bold) ]
-        else []
-      in
-      Node.button
-        ~attrs:(Attr.on_click (fun _ -> set_sort_by value) :: style_attr)
-        [ Node.text text ]
-    in
-    Node.div [ view_for_value `Date "Sort by date"; view_for_value `Id "Sort by ID" ]
+  and explorer =
+    explorer
+    (* and explorer_winners = explorer_winners  *)
   in
+  let open Vdom in
   Node.div
     [ Node.h2 [ Node.text "Standings" ] (* ; standings *)
-    ; sort_by_toggle
     ; standings2
     ; Node.h2 [ Node.text "Events" ]
     ; plots
