@@ -14,4 +14,5 @@ val short : t -> string
 val precise : t -> string
 val outcome : t -> Outcome.t option
 val resolution : t -> Resolution.t option
+val date : t -> Date.t option
 val score : t -> probability:Probability.t -> float

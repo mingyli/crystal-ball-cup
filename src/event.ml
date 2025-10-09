@@ -15,6 +15,11 @@ let resolution t =
   Outcome.resolution outcome
 ;;
 
+let date t =
+  let%map.Option outcome = t.outcome in
+  Outcome.date outcome
+;;
+
 let score t ~(probability : Probability.t) =
   match t.outcome with
   | None -> Float.nan

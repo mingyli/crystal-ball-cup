@@ -8,10 +8,11 @@ open Dygraph.With_bonsai
 type t =
   { events : Event.t list
   ; scores : (string, Scores.t) List.Assoc.t
+  ; which : [ `Date | `Id ] Bonsai.t
   }
 [@@deriving fields]
 
-let create events scores =
+let create events scores which =
   let scores =
     String.Map.map_keys_exn scores ~f:(fun respondent ->
       let respondent =
@@ -26,12 +27,12 @@ let create events scores =
       let b = Scores.total b in
       Comparable.reverse [%compare: float] a b)
   in
-  { events; scores }
+  { events; scores; which }
 ;;
 
 let respondents t = List.map t.scores ~f:fst
 
-let cumulative_scores ~events ~scores =
+let cumulative_scores_by_id ~events ~scores =
   List.folding_map events ~init:0. ~f:(fun sum event ->
     let event_id = Event.id event in
     let event_score = Scores.event_score scores event_id in
@@ -41,12 +42,37 @@ let cumulative_scores ~events ~scores =
     new_cumulative_score, new_cumulative_score)
 ;;
 
+let cumulative_scores_by_id t =
+  List.Assoc.map t.scores ~f:(fun scores ->
+    cumulative_scores_by_id ~events:t.events ~scores)
+;;
+
+let cumulative_scores_by_date ~events ~scores =
+  events
+  |> List.sort ~compare:(fun event event' ->
+    [%compare: Date.t option] (Event.date event) (Event.date event'))
+  |> List.folding_map ~init:0. ~f:(fun sum event ->
+    let event_id = Event.id event in
+    let event_score = Scores.event_score scores event_id in
+    let new_cumulative_score =
+      if Float.is_nan event_score then sum else sum +. event_score
+    in
+    new_cumulative_score, new_cumulative_score)
+;;
+
+let cumulative_scores_by_date t =
+  List.Assoc.map t.scores ~f:(fun scores ->
+    cumulative_scores_by_date ~events:t.events ~scores)
+;;
+
 let cumulative_scores t =
-  List.Assoc.map t.scores ~f:(fun scores -> cumulative_scores ~events:t.events ~scores)
+  match%arr t.which with
+  | `Date -> cumulative_scores_by_date t
+  | `Id -> cumulative_scores_by_id t
 ;;
 
 let min_finite_score t =
-  let cumulative_scores = cumulative_scores t in
+  let%arr cumulative_scores = cumulative_scores t in
   let min_finite_score =
     cumulative_scores
     |> List.map ~f:snd
@@ -59,7 +85,7 @@ let min_finite_score t =
 ;;
 
 let max_finite_score t =
-  let cumulative_scores = cumulative_scores t in
+  let%arr cumulative_scores = cumulative_scores t in
   let max_score =
     cumulative_scores
     |> List.map ~f:snd
@@ -90,30 +116,46 @@ let max_total_score t =
 ;;
 
 let component t graph =
-  let cumulative_scores = cumulative_scores t in
   let respondents = respondents t in
-  let min_finite_score = min_finite_score t in
-  let max_finite_score = max_finite_score t in
   let min_total_score = min_total_score t in
   let max_total_score = max_total_score t in
   let total_scores = total_scores t in
-  let all_cumulative_series =
+  let cumulative_scores = cumulative_scores t in
+  let min_finite_score = min_finite_score t in
+  let max_finite_score = max_finite_score t in
+  let all_cumulative_series cumulative_scores =
     List.map respondents ~f:(fun respondent ->
       List.Assoc.find_exn cumulative_scores respondent ~equal:[%equal: string])
   in
-  let dygraph_data =
-    t.events
-    |> List.to_array
-    |> Array.mapi ~f:(fun i event ->
-      let event_id = Event.id event in
-      let event_id_as_float = event_id |> Event_id.to_int |> Int.to_float in
-      let row_data =
-        List.map all_cumulative_series ~f:(fun series -> List.nth_exn series i)
-      in
-      Array.of_list (event_id_as_float :: row_data))
-    |> Dygraph.Data.create
+  let dygraph_data which cumulative_scores =
+    match which with
+    | `Id ->
+      t.events
+      |> List.to_array
+      |> Array.mapi ~f:(fun i event ->
+        let event_id = Event.id event in
+        let event_id_as_float = event_id |> Event_id.to_int |> Int.to_float in
+        let row_data =
+          List.map (all_cumulative_series cumulative_scores) ~f:(fun series ->
+            List.nth_exn series i)
+        in
+        Array.of_list (event_id_as_float :: row_data))
+      |> Dygraph.Data.create
+    | `Date ->
+      t.events
+      |> List.sort ~compare:(fun event event' ->
+        [%compare: Date.t option] (Event.date event) (Event.date event'))
+      |> List.to_array
+      |> Array.filter_mapi ~f:(fun i event ->
+        let%map.Option date = Event.date event in
+        let row_data =
+          List.map (all_cumulative_series cumulative_scores) ~f:(fun series ->
+            List.nth_exn series i)
+        in
+        date, Array.of_list row_data)
+      |> Dygraph.Data.create_date ~zone:(Timezone.of_string "America/New_York")
   in
-  let options =
+  let options which min_finite_score max_finite_score =
     let series_options =
       List.map total_scores ~f:(fun (id, score) ->
         let color =
@@ -152,8 +194,7 @@ let component t graph =
         in
         ( id
         , Dygraph.Options.Series_options.create
-            ()
-            ~strokeWidth:0.75
+            () (* ~strokeWidth:0.8 *)
             ~drawPoints:false
             ~color ))
     in
@@ -166,7 +207,7 @@ let component t graph =
     let axes =
       Dygraph.Options.Axes.create
         ()
-        ~x:(Dygraph.Options.Axis_options.create () ~drawGrid:false)
+        ~x:(Dygraph.Options.Axis_options.create () ~drawGrid:false ~includeZero:true)
         ~y:
           (Dygraph.Options.Axis_options.create
              ()
@@ -181,13 +222,19 @@ let component t graph =
       ~height:600
       ~labelsSeparateLines:false
       ~labelsDiv_string:"my-custom-legend"
-      ~legend:`never
+      ~legend:`never (* TODO ming *)
+      ?dateWindow:
+        (match which with
+         | `Id -> Some Dygraph.Range.{ low = 1.; high = 20. }
+         | `Date -> Some Dygraph.Range.{ low = 1755648000000.; high = 1767139200000. })
       ?legendFormatter:None
       ~drawPoints:false
       ~strokeWidth:1.0
       ~strokeBorderWidth:1.0
       ~series
       ~axes
+      ~xRangePad:10.
+      ~includeZero:true
       ~highlightSeriesOpts:
         (Dygraph.Options.Highlight_series_options.create
            ()
@@ -203,14 +250,27 @@ let component t graph =
     Dygraph.With_bonsai.create
       ()
       ~key:(return "standings-dygraph")
-      ~x_label:(return "Event ID")
+      ~x_label:
+        (match%arr t.which with
+         | `Date -> "Date"
+         | `Id -> "Event ID")
       ~per_series_info:(return per_series_info)
-      ~options:(return options)
-      ~data:(return dygraph_data)
+      ~options:
+        (let%arr which = t.which
+         and min_finite_score = min_finite_score
+         and max_finite_score = max_finite_score in
+         options which min_finite_score max_finite_score)
+      ~data:
+        (let%arr which = t.which
+         and cumulative_scores = cumulative_scores in
+         dygraph_data which cumulative_scores)
       ~custom_legend:
         (let%sub model, view, inject =
            Dygraph.Default_legend.create
-             ~x_label:(Bonsai.return "Event")
+             ~x_label:
+               (match%arr t.which with
+                | `Date -> "Date"
+                | `Id -> "Event ID")
              ~per_series_info:(return per_series_info)
              graph
          in
