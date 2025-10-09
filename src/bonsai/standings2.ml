@@ -157,7 +157,7 @@ let component t graph =
   in
   let options which min_finite_score max_finite_score =
     let series_options =
-      List.map total_scores ~f:(fun (id, score) ->
+      List.map total_scores ~f:(fun (respondent, score) ->
         let color =
           let r_zero, g_zero, b_zero = 128., 128., 128. in
           let r_pos, g_pos, b_pos = 0., 192., 64. in
@@ -184,34 +184,38 @@ let component t graph =
           in
           let clamp_byte = Int.clamp_exn ~min:0 ~max:255 in
           let hex_color =
-            Printf.sprintf
-              "#%02x%02x%02x"
-              (clamp_byte red_val)
-              (clamp_byte green_val)
-              (clamp_byte blue_val)
+            [%string
+              "rgb(%{clamp_byte red_val#Int}, %{clamp_byte green_val#Int}, %{clamp_byte \
+               blue_val#Int})"]
           in
           `Hex hex_color
         in
-        ( id
+        ( respondent
         , Dygraph.Options.Series_options.create
             () (* ~strokeWidth:0.8 *)
             ~drawPoints:false
             ~color ))
     in
     let series = Dygraph.Options.Series.create series_options in
-    let y_axis_range =
-      let upper_bound = max_finite_score *. 1.1 in
-      let lower_bound = min_finite_score *. 1.1 in
-      Dygraph.Range.Spec.Specified { Dygraph.Range.low = lower_bound; high = upper_bound }
-    in
     let axes =
       Dygraph.Options.Axes.create
         ()
-        ~x:(Dygraph.Options.Axis_options.create () ~drawGrid:false ~includeZero:true)
+        ~x:
+          (Dygraph.Options.Axis_options.create
+             ()
+             ~drawGrid:false
+             ~pixelsPerLabel:
+               (match which with
+                | `Id -> 20
+                | `Date -> 100))
         ~y:
           (Dygraph.Options.Axis_options.create
              ()
-             ~valueRange:y_axis_range
+             ~valueRange:
+               (let upper_bound = max_finite_score *. 1.1 in
+                let lower_bound = min_finite_score *. 1.1 in
+                Specified { low = lower_bound; high = upper_bound })
+             ~includeZero:true
              ~drawGrid:false)
     in
     Dygraph.Options.create
@@ -225,7 +229,7 @@ let component t graph =
       ~legend:`never (* TODO ming *)
       ?dateWindow:
         (match which with
-         | `Id -> Some Dygraph.Range.{ low = 1.; high = 20. }
+         | `Id -> Some Dygraph.Range.{ low = 0.5; high = 20.5 }
          | `Date -> Some Dygraph.Range.{ low = 1755648000000.; high = 1767139200000. })
       ?legendFormatter:None
       ~drawPoints:false
