@@ -4,6 +4,7 @@ type t =
   { id : Event_id.t
   ; short : string
   ; precise : string
+  ; label : string
   ; outcome : Outcome.t option
   }
 [@@deriving compare, equal, fields, sexp]
