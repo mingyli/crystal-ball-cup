@@ -43,6 +43,22 @@ let create events scores sort_by =
   { events; scores; sort_by }
 ;;
 
+let cumulative_scores_by_label ~events ~scores =
+  events
+  |> List.folding_map ~init:0. ~f:(fun sum event ->
+    let event_id = Event.id event in
+    let event_score = Scores.event_score scores event_id in
+    let new_cumulative_score =
+      if Float.is_nan event_score then sum else sum +. event_score
+    in
+    new_cumulative_score, new_cumulative_score)
+;;
+
+let cumulative_scores_by_label (t : t) =
+  List.Assoc.map t.scores ~f:(fun scores ->
+    cumulative_scores_by_label ~events:t.events ~scores)
+;;
+
 let cumulative_scores_by_date ~events ~scores =
   events
   |> List.sort ~compare:(fun event event' ->
@@ -59,22 +75,6 @@ let cumulative_scores_by_date ~events ~scores =
 let cumulative_scores_by_date (t : t) =
   List.Assoc.map t.scores ~f:(fun scores ->
     cumulative_scores_by_date ~events:t.events ~scores)
-;;
-
-let cumulative_scores_by_label ~events ~scores =
-  events
-  |> List.folding_map ~init:0. ~f:(fun sum event ->
-    let event_id = Event.id event in
-    let event_score = Scores.event_score scores event_id in
-    let new_cumulative_score =
-      if Float.is_nan event_score then sum else sum +. event_score
-    in
-    new_cumulative_score, new_cumulative_score)
-;;
-
-let cumulative_scores_by_label (t : t) =
-  List.Assoc.map t.scores ~f:(fun scores ->
-    cumulative_scores_by_label ~events:t.events ~scores)
 ;;
 
 let cumulative_scores t =
