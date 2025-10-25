@@ -13,10 +13,8 @@ let responses_and_scores =
 
 let all graph =
   let plots = Plots.create ~events:Crystal_2025.all ~responses_and_scores in
-  let standings =
-    let scores = Map.map responses_and_scores ~f:Responses_and_scores.scores in
-    Standings.component Crystal_2025.all scores graph
-  in
+  let scores = Map.map responses_and_scores ~f:Responses_and_scores.scores in
+  let standings = Standings.component Crystal_2025.all scores graph in
   let plots = Plots.component plots graph in
   let explorer =
     Explorer.component
