@@ -251,7 +251,7 @@ let component events scores graph =
                  ; mode = "lines"
                  ; name =
                      [%string "%{respondent}: %{Float.to_string_hum ~decimals:2 score}"]
-                 ; line = { color }
+                 ; line = { color; width = 1 }
                  }
                in
                Crystal_plotly.Data.Line trace)

@@ -80,7 +80,11 @@ module Violin = struct
 end
 
 module Line = struct
-  type line = { color : string } [@@deriving jsobject]
+  type line =
+    { color : string
+    ; width : int
+    }
+  [@@deriving jsobject]
 
   type t =
     { x : Float_or_string.t array

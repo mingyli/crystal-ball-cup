@@ -77,7 +77,10 @@ module Violin : sig
 end
 
 module Line : sig
-  type line = { color : string }
+  type line =
+    { color : string
+    ; width : int
+    }
 
   type t =
     { x : Float_or_string.t array
