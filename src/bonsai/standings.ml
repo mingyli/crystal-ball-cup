@@ -198,6 +198,15 @@ let component events scores graph =
                let respondent_scores =
                  List.Assoc.find_exn cumulative_scores respondent ~equal:[%equal: string]
                in
+               let text_values =
+                 ""
+                 :: List.map sorted_events ~f:(fun e ->
+                   let date =
+                     Event.date e |> Option.value_map ~default:"" ~f:Date.to_string
+                   in
+                   let label = Event.label e in
+                   [%string "<b>%{respondent}</b><br>%{date}<br>%{label}"])
+               in
                let x_axis_values, y_axis_values =
                  match weight_by with
                  | Weight_by.Event ->
@@ -230,6 +239,8 @@ let component events scores graph =
                  ; name =
                      [%string "%{respondent}: %{Float.to_string_hum ~decimals:2 score}"]
                  ; line = { color; width = 1 }
+                 ; hovertemplate = Some "%{text}<extra></extra>"
+                 ; text = Some (Array.of_list text_values)
                  }
                in
                Crystal_plotly.Data.Line trace)
