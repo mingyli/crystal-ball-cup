@@ -146,6 +146,11 @@ let color_of_score ~score ~min_score ~max_score =
      blue_val#Int})"]
 ;;
 
+let hover_text ~respondent ~date ~label =
+  let date = date |> Option.value_map ~default:"" ~f:Date.to_string in
+  [%string "<b>%{respondent}</b><br>%{date}<br>%{label}"]
+;;
+
 let component events scores graph =
   let weight_by, set_weight_by = Bonsai.state Weight_by.Date graph in
   let radio =
@@ -185,10 +190,7 @@ let component events scores graph =
         (let%arr () = return () in
          fun weight_by ->
            let plotly_data =
-             List.map t.scores ~f:(fun (respondent, _) ->
-               let score =
-                 List.Assoc.find_exn total_scores respondent ~equal:[%equal: string]
-               in
+             List.map total_scores ~f:(fun (respondent, score) ->
                let color =
                  color_of_score
                    ~score
@@ -198,26 +200,39 @@ let component events scores graph =
                let respondent_scores =
                  List.Assoc.find_exn cumulative_scores respondent ~equal:[%equal: string]
                in
-               let x_axis_values, y_axis_values =
+               let x_axis_values, y_axis_values, text_values =
                  match weight_by with
                  | Weight_by.Event ->
                    let x = "" :: List.map sorted_events ~f:Event.label in
                    let y = respondent_scores in
-                   x, y
+                   let text =
+                     ""
+                     :: List.map sorted_events ~f:(fun e ->
+                       hover_text ~respondent ~date:(Event.date e) ~label:(Event.label e))
+                   in
+                   x, y, text
                  | Weight_by.Date ->
                    let scores_for_events =
                      List.zip_exn sorted_events (List.tl_exn respondent_scores)
                    in
                    let dated_scores =
                      List.filter_map scores_for_events ~f:(fun (event, score) ->
-                       Option.map (Event.date event) ~f:(fun date ->
-                         Date.to_string date, score))
+                       Option.map (Event.date event) ~f:(fun date -> date, score, event))
                    in
-                   let x = "2025-08-09" :: List.map dated_scores ~f:fst in
+                   let x =
+                     "2025-08-09"
+                     :: List.map dated_scores ~f:(fun (d, _, _) -> Date.to_string d)
+                   in
                    let y =
-                     List.hd_exn respondent_scores :: List.map dated_scores ~f:snd
+                     List.hd_exn respondent_scores
+                     :: List.map dated_scores ~f:(fun (_, s, _) -> s)
                    in
-                   x, y
+                   let text =
+                     ""
+                     :: List.map dated_scores ~f:(fun (date, _, event) ->
+                       hover_text ~respondent ~date:(Some date) ~label:(Event.label event))
+                   in
+                   x, y, text
                in
                let trace : Crystal_plotly.Data.Line.t =
                  { x =
@@ -230,6 +245,8 @@ let component events scores graph =
                  ; name =
                      [%string "%{respondent}: %{Float.to_string_hum ~decimals:2 score}"]
                  ; line = { color; width = 1 }
+                 ; hovertemplate = Some "%{text}<extra></extra>"
+                 ; text = Some (Array.of_list text_values)
                  }
                in
                Crystal_plotly.Data.Line trace)

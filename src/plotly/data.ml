@@ -93,6 +93,8 @@ module Line = struct
     ; mode : string
     ; name : string
     ; line : line
+    ; hovertemplate : string option [@jsobject.drop_none]
+    ; text : string array option [@jsobject.drop_none]
     }
   [@@deriving jsobject_of]
 end
