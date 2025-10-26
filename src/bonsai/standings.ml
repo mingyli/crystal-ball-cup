@@ -43,38 +43,40 @@ let create events scores sort_by =
   { events; scores; sort_by }
 ;;
 
-let cumulative_scores_by_label ~events ~scores =
-  events
-  |> List.folding_map ~init:0. ~f:(fun sum event ->
-    let event_id = Event.id event in
-    let event_score = Scores.event_score scores event_id in
-    let new_cumulative_score =
-      if Float.is_nan event_score then sum else sum +. event_score
-    in
-    new_cumulative_score, new_cumulative_score)
-;;
-
 let cumulative_scores_by_label (t : t) =
-  List.Assoc.map t.scores ~f:(fun scores ->
-    cumulative_scores_by_label ~events:t.events ~scores)
-;;
-
-let cumulative_scores_by_date ~events ~scores =
-  events
-  |> List.sort ~compare:(fun event event' ->
-    [%compare: Date.t option] (Event.date event) (Event.date event'))
-  |> List.folding_map ~init:0. ~f:(fun sum event ->
-    let event_id = Event.id event in
-    let event_score = Scores.event_score scores event_id in
-    let new_cumulative_score =
-      if Float.is_nan event_score then sum else sum +. event_score
-    in
-    new_cumulative_score, new_cumulative_score)
+  let scores =
+    List.Assoc.map t.scores ~f:(fun scores ->
+      0.
+      :: (t.events
+          |> List.folding_map ~init:0. ~f:(fun sum event ->
+            let event_id = Event.id event in
+            let event_score = Scores.event_score scores event_id in
+            let new_cumulative_score =
+              if Float.is_nan event_score then sum else sum +. event_score
+            in
+            new_cumulative_score, new_cumulative_score)))
+  in
+  scores, t.events
 ;;
 
 let cumulative_scores_by_date (t : t) =
-  List.Assoc.map t.scores ~f:(fun scores ->
-    cumulative_scores_by_date ~events:t.events ~scores)
+  let sorted_events =
+    List.sort t.events ~compare:(fun event event' ->
+      [%compare: Date.t option] (Event.date event) (Event.date event'))
+  in
+  let scores =
+    List.Assoc.map t.scores ~f:(fun scores ->
+      0.
+      :: (sorted_events
+          |> List.folding_map ~init:0. ~f:(fun sum event ->
+            let event_id = Event.id event in
+            let event_score = Scores.event_score scores event_id in
+            let new_cumulative_score =
+              if Float.is_nan event_score then sum else sum +. event_score
+            in
+            new_cumulative_score, new_cumulative_score)))
+  in
+  scores, sorted_events
 ;;
 
 let cumulative_scores t =
@@ -84,7 +86,7 @@ let cumulative_scores t =
 ;;
 
 let min_finite_score t =
-  let%arr cumulative_scores = cumulative_scores t in
+  let%arr cumulative_scores, _ = cumulative_scores t in
   let min_finite_score =
     cumulative_scores
     |> List.map ~f:snd
@@ -97,7 +99,7 @@ let min_finite_score t =
 ;;
 
 let max_finite_score t =
-  let%arr cumulative_scores = cumulative_scores t in
+  let%arr cumulative_scores, _ = cumulative_scores t in
   let max_score =
     cumulative_scores
     |> List.map ~f:snd
@@ -160,7 +162,7 @@ let component events scores graph =
       ~equal:[%equal: Sort_by.t]
       sort_by
       ~callback:
-        (let%arr cumulative_scores = cumulative_scores t
+        (let%arr cumulative_scores, sorted_events = cumulative_scores t
          and max_finite_score = max_finite_score t
          and min_finite_score = min_finite_score t in
          fun sort_by ->
@@ -168,12 +170,9 @@ let component events scores graph =
              let x_axis_data, sorted_events_for_x =
                match sort_by with
                | Sort_by.Date ->
-                 let sorted_events =
-                   List.sort events ~compare:(fun event event' ->
-                     [%compare: Date.t option] (Event.date event) (Event.date event'))
-                 in
                  let dates =
-                   List.filter_map sorted_events ~f:(fun event ->
+                   "2025-08-09"
+                   :: List.filter_map sorted_events ~f:(fun event ->
                      Option.map (Event.date event) ~f:Date.to_string)
                  in
                  let x =
@@ -181,12 +180,12 @@ let component events scores graph =
                  in
                  x, sorted_events
                | Sort_by.Event_label ->
-                 let labels = List.map events ~f:Event.label in
+                 let labels = "" :: List.map events ~f:Event.label in
                  let x =
                    labels
                    |> List.map ~f:(fun s -> Crystal_plotly.Float_or_string.String s)
                  in
-                 x, events
+                 x, sorted_events
              in
              List.map t.scores ~f:(fun (respondent, _) ->
                let score =
@@ -240,9 +239,16 @@ let component events scores graph =
                  match sort_by with
                  | Event_label -> respondent_scores
                  | Date ->
-                   List.zip_exn sorted_events_for_x respondent_scores
-                   |> List.filter ~f:(fun (event, _) -> Option.is_some (Event.date event))
-                   |> List.map ~f:snd
+                   let sentinel, rest_scores =
+                     match respondent_scores with
+                     | sentinel :: rest -> sentinel, rest
+                     | [] -> 0., []
+                   in
+                   sentinel
+                   :: (List.zip_exn sorted_events_for_x rest_scores
+                       |> List.filter ~f:(fun (event, _) ->
+                         Option.is_some (Event.date event))
+                       |> List.map ~f:snd)
                in
                let trace : Crystal_plotly.Data.Line.t =
                  { x = Array.of_list x_axis_data
@@ -267,7 +273,7 @@ let component events scores graph =
                  match sort_by with
                  | Date ->
                    Some
-                     [ Crystal_plotly.Float_or_string.String "2025-08-20"
+                     [ Crystal_plotly.Float_or_string.String "2025-08-09"
                      ; Crystal_plotly.Float_or_string.String "2025-12-31"
                      ]
                  | Event_label -> None
