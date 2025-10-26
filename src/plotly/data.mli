@@ -76,10 +76,28 @@ module Violin : sig
   [@@deriving jsobject]
 end
 
+module Line : sig
+  type line =
+    { color : string
+    ; width : int
+    }
+
+  type t =
+    { x : Float_or_string.t array
+    ; y : float array
+    ; type_ : string
+    ; mode : string
+    ; name : string
+    ; line : line
+    }
+  [@@deriving jsobject_of]
+end
+
 type t =
   | Bar of Bar.t
   | Scatter of Scatter.t
   | Violin of Violin.t
+  | Line of Line.t
 
 val jsobject_of : t -> t Js.t
 val jsobjects_of : t list -> t Js.t Js.js_array Js.t

@@ -224,7 +224,7 @@ let render_plot div_id plotly_data layout =
          (Dom_html.getElementById_exn div_id)
          plotly_data
          layout
-         { display_mode_bar = false })
+         { display_mode_bar = false; displaylogo = false })
     ()
 ;;
 
@@ -359,7 +359,7 @@ let render_plots
             ; showticklabels = true
             ; zeroline = false
             ; fixedrange = true
-            ; range = Some [ 0.; 1. ]
+            ; range = Some [ Float 0.; Float 1. ]
             ; tickvals = Some [ 0.; 0.25; 0.5; 0.75; 1. ]
             ; ticktext = Some [ "0"; "0.25"; "0.5"; "0.75"; "1" ]
             }

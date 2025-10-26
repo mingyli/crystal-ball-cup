@@ -79,15 +79,35 @@ module Violin = struct
   [@@deriving jsobject]
 end
 
+module Line = struct
+  type line =
+    { color : string
+    ; width : int
+    }
+  [@@deriving jsobject]
+
+  type t =
+    { x : Float_or_string.t array
+    ; y : float array
+    ; type_ : string [@jsobject.key "type"]
+    ; mode : string
+    ; name : string
+    ; line : line
+    }
+  [@@deriving jsobject_of]
+end
+
 type t =
   | Bar of Bar.t
   | Scatter of Scatter.t
   | Violin of Violin.t
+  | Line of Line.t
 
 let jsobject_of = function
   | Bar bar -> Bar.jsobject_of bar |> Js.Unsafe.coerce
   | Scatter scatter -> Scatter.jsobject_of scatter |> Js.Unsafe.coerce
   | Violin violin -> Violin.jsobject_of violin |> Js.Unsafe.coerce
+  | Line line -> Line.jsobject_of line |> Js.Unsafe.coerce
 ;;
 
 let jsobjects_of (ts : t list) : t Js.t Js.js_array Js.t =
