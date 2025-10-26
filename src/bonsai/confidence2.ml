@@ -107,7 +107,7 @@ let render_plot div_id plotly_data layout =
          (Dom_html.getElementById_exn div_id)
          plotly_data
          layout
-         { display_mode_bar = false })
+         { display_mode_bar = false; displaylogo = false })
     ()
 ;;
 

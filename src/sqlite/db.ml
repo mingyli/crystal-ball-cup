@@ -7,7 +7,7 @@ module Queries = struct
   let create_events =
     (Caqti_type.unit ->. Caqti_type.unit)
       "CREATE TABLE events ( event_id INTEGER PRIMARY KEY, short TEXT, precise TEXT, \
-       outcome TEXT )"
+       outcome TEXT, label TEXT )"
   ;;
 
   let create_outcomes =
@@ -37,8 +37,8 @@ module Queries = struct
   ;;
 
   let insert_event =
-    (Caqti_type.(t3 Event_id.caqti_type string string) ->. Caqti_type.unit)
-      "INSERT INTO events (event_id, short, precise) VALUES (?, ?, ?)"
+    (Caqti_type.(t4 Event_id.caqti_type string string string) ->. Caqti_type.unit)
+      "INSERT INTO events (event_id, short, precise, label) VALUES (?, ?, ?, ?)"
   ;;
 
   let insert_response =
@@ -100,6 +100,7 @@ module Connection = struct
       let event_id = Event.id event in
       let short = Event.short event in
       let precise = Event.precise event in
+      let label = Event.label event in
       let%bind () =
         match Event.outcome event with
         | None -> Ok ()
@@ -115,7 +116,7 @@ module Connection = struct
           let explanation = Outcome.explanation outcome in
           Conn.exec Queries.insert_outcome (event_id, resolution, date, explanation)
       in
-      Conn.exec Queries.insert_event (event_id, short, precise))
+      Conn.exec Queries.insert_event (event_id, short, precise, label))
   ;;
 
   let make_events t collection = make_events t collection |> caqti_or_error

@@ -17,13 +17,13 @@ type xaxis =
   ; showticklabels : bool
   ; zeroline : bool
   ; fixedrange : bool
-  ; range : float list option [@jsobject.drop_none]
+  ; range : Float_or_string.t list option [@jsobject.drop_none]
   ; tickvals : float list option [@jsobject.drop_none]
   ; ticktext : string list option [@jsobject.drop_none]
   ; type_ : string option [@jsobject.key "type"] [@jsobject.drop_none]
   ; autorange : bool option [@jsobject.drop_none]
   }
-[@@deriving jsobject]
+[@@deriving jsobject_of]
 
 type line =
   { color : string
@@ -58,4 +58,4 @@ type t =
   ; height : int
   ; showlegend : bool
   }
-[@@deriving jsobject]
+[@@deriving jsobject_of]

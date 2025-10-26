@@ -14,13 +14,11 @@ let responses_and_scores =
 let all graph =
   let plots = Plots.create ~events:Crystal_2025.all ~responses_and_scores in
   let responses = Map.map responses_and_scores ~f:Responses_and_scores.responses in
+  let scores = Map.map responses_and_scores ~f:Responses_and_scores.scores in
   let confidence =
     Confidence.component ~collection:(module Crystal_2025) ~responses graph
   in
-  let standings =
-    let scores = Map.map responses_and_scores ~f:Responses_and_scores.scores in
-    Standings.component Crystal_2025.all scores graph
-  in
+  let standings = Standings.component Crystal_2025.all scores graph in
   let plots = Plots.component plots graph in
   let explorer =
     Explorer.component

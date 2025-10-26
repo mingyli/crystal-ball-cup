@@ -17,7 +17,7 @@ type xaxis =
   ; showticklabels : bool
   ; zeroline : bool
   ; fixedrange : bool
-  ; range : float list option
+  ; range : Float_or_string.t list option
   ; tickvals : float list option
   ; ticktext : string list option
   ; type_ : string option
@@ -54,6 +54,6 @@ type t =
   ; height : int
   ; showlegend : bool
   }
-[@@deriving jsobject]
+[@@deriving jsobject_of]
 
 val jsobject_of : t -> t Js.t

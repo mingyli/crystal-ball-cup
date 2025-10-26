@@ -7,7 +7,6 @@
   bonsai.web_ui_multi_select
   bonsai.web_ui_form
   bonsai.web_ui_typeahead
-  bonsai.dygraph
   crystal
   crystal_plotly
   crystal_sqljs

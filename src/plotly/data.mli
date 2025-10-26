@@ -77,11 +77,20 @@ module Violin : sig
 end
 
 module Line : sig
-  type t =
-    { x : float array
-    ; y : float array
+  type line =
+    { color : string
+    ; width : int
     }
-  [@@deriving jsobject]
+
+  type t =
+    { x : Float_or_string.t array
+    ; y : float array
+    ; type_ : string
+    ; mode : string
+    ; name : string
+    ; line : line
+    }
+  [@@deriving jsobject_of]
 end
 
 type t =

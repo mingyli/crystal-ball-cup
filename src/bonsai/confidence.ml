@@ -11,7 +11,7 @@ let render_plot div_id plotly_data layout =
          (Js_of_ocaml.Dom_html.getElementById_exn div_id)
          plotly_data
          layout
-         { display_mode_bar = false })
+         { display_mode_bar = false; displaylogo = false })
     ()
 ;;
 
@@ -42,11 +42,15 @@ let go collection responses =
           { x =
               Array.map confidence_scaling ~f:(fun confidence ->
                 if Float.is_inf confidence
-                then 100.
+                then Crystal_plotly.Float_or_string.Float 100.
                 else if Float.equal confidence 0.
-                then 1e-4
-                else confidence)
+                then Crystal_plotly.Float_or_string.Float 1e-4
+                else Crystal_plotly.Float_or_string.Float confidence)
           ; y = scores
+          ; type_ = "scatter"
+          ; mode = "lines"
+          ; name = ""
+          ; line = { color = ""; width = 1 }
           }
       in
       line)
@@ -65,7 +69,7 @@ let go collection responses =
         ; showticklabels = true
         ; zeroline = false
         ; fixedrange = true
-        ; range = Some [ Float.log10 0.1; Float.log10 2. ]
+        ; range = Some [ Float (Float.log10 0.1); Float (Float.log10 2.) ]
         ; autorange = None
         ; tickvals = Some [ 0.; 0.5; 1.; 2.; Float.infinity ]
         ; ticktext = Some [ "0"; "0.5"; "1"; "2"; "∞" ]
