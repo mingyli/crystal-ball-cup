@@ -89,6 +89,8 @@ module Line : sig
     ; mode : string
     ; name : string
     ; line : line
+    ; hovertemplate : string option
+    ; text : string array option
     }
   [@@deriving jsobject_of]
 end

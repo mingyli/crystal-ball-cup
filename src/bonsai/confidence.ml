@@ -51,6 +51,8 @@ let go collection responses =
           ; mode = "lines"
           ; name = ""
           ; line = { color = ""; width = 1 }
+          ; hovertemplate = None
+          ; text = None
           }
       in
       line)
