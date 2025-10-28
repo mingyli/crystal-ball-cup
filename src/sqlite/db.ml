@@ -58,6 +58,7 @@ module Queries = struct
              e.event_id,
              e.short,
              e.precise,
+             e.label,
              o.resolution,
              o.date,
              o.explanation
