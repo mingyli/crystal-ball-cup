@@ -170,7 +170,7 @@ let all =
            race results published by the Breeders’ Cup or other recognized racing \
            authority."
         ~label:"horse race"
-        ~outcome:None
+        ~outcome:(Some (Outcome.create No (Date.of_string "2025-11-01") "TODO"))
     ; Event.create
         ~short:"New York City has a white Christmas"
         ~precise:
