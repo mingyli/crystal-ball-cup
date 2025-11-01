@@ -20,6 +20,8 @@ type xaxis =
   ; range : Float_or_string.t list option
   ; tickvals : float list option
   ; ticktext : string list option
+  ; type_ : string option
+  ; autorange : bool option
   }
 
 type line =
