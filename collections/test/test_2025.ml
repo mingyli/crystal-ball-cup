@@ -194,11 +194,11 @@ let%expect_test _ =
     │    │                    │ d the live event on 20 │                │            │            │                        │
     │    │                    │ 25-08-09.              │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 19 │ The winner of the  │ The winner of the 2025 │ horse race     │            │            │                        │
-    │    │ 2025 Breeders' Cup │  Breeders' Cup Classic │                │            │            │                        │
-    │    │  Classic has previ │  is a horse that has p │                │            │            │                        │
-    │    │ ously won a Breede │ reviously won any Bree │                │            │            │                        │
-    │    │ rs' Cup race       │ ders' Cup race in an e │                │            │            │                        │
+    │ 19 │ The winner of the  │ The winner of the 2025 │ horse race     │ No         │ 2025-11-01 │ Forever Young won the  │
+    │    │ 2025 Breeders' Cup │  Breeders' Cup Classic │                │            │            │ 2025 Breeders' Cup Cla │
+    │    │  Classic has previ │  is a horse that has p │                │            │            │ ssic, but had not prev │
+    │    │ ously won a Breede │ reviously won any Bree │                │            │            │ iously won any Breeder │
+    │    │ rs' Cup race       │ ders' Cup race in an e │                │            │            │ s' Cup race.           │
     │    │                    │ arlier year, as confir │                │            │            │                        │
     │    │                    │ med by the official ra │                │            │            │                        │
     │    │                    │ ce results published b │                │            │            │                        │
