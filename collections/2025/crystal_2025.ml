@@ -18,7 +18,12 @@ let all =
           "Zohran Mamdani is elected Mayor of New York City in the 2025 election, as \
            confirmed by certified election results or a consensus of credible reporting."
         ~label:"zohran"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                Yes
+                (Date.of_string "2025-11-04")
+                "Zohran Mamdani won the New York City mayoral election."))
     ; Event.create
         ~short:
           "The top grossing domestic film of Q4 2025 is based on an original screenplay"

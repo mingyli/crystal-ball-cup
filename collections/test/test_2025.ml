@@ -40,9 +40,9 @@ let%expect_test _ =
     │    │  Bros. game        │ ame on or before 2025- │                │            │            │                        │
     │    │                    │ 12-31.                 │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 2  │ Zohran Mamdani win │ Zohran Mamdani is elec │ zohran         │            │            │                        │
-    │    │ s the NYC mayoral  │ ted Mayor of New York  │                │            │            │                        │
-    │    │ election           │ City in the 2025 elect │                │            │            │                        │
+    │ 2  │ Zohran Mamdani win │ Zohran Mamdani is elec │ zohran         │ Yes        │ 2025-11-04 │ Zohran Mamdani won the │
+    │    │ s the NYC mayoral  │ ted Mayor of New York  │                │            │            │  New York City mayoral │
+    │    │ election           │ City in the 2025 elect │                │            │            │  election.             │
     │    │                    │ ion, as confirmed by c │                │            │            │                        │
     │    │                    │ ertified election resu │                │            │            │                        │
     │    │                    │ lts or a consensus of  │                │            │            │                        │
