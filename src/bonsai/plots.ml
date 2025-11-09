@@ -63,23 +63,19 @@ module Style =
       }
 
       .query-box-container {
-        display: flex;
-        justify-content: space-around;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: 1rem;
         align-items: center;
         width: 100%;
-        margin-bottom: 1rem;
+        margin: 0 0 0.5rem 0;
         padding: 0;
       }
 
       .query-box-item {
-        flex: 1;
-        margin: 0 0.5rem;
         padding: 0.5rem;
-        border: 1px solid #ced4da;
-        border-radius: 0.25rem;
+        margin: 0;
         justify-content: center;
-        align-items: stretch;
-        height: 100%;
       }
 
       @media (max-width: 768px) {
@@ -98,11 +94,12 @@ module Style =
         }
 
         .query-box-container {
-          flex-direction: column;
+          grid-template-columns: 1fr;
+          grid-gap: 0;
         }
 
         .query-box-item {
-          margin: 0.25rem 0;
+          margin: 0;
           max-width: none;
         }
       }
@@ -114,49 +111,12 @@ let create_resolutions_checkboxes which_resolutions set_which_resolutions graph 
       (module Resolution.Option)
       ~layout:`Horizontal
       ~to_string:Resolution.Option.to_string
-      ~style:(Bonsai.return E.Selectable_style.Button_like)
-      ~extra_checkbox_attrs:
-        (Bonsai.return (fun ~checked ->
-           [ {%css|
-           font-size: 0.8em;
-           padding: 0.2em 0.4em;
-           margin: 0.4em;
-           cursor: pointer;
-         |}
-           ]
-           @
-           if checked
-           then
-             [ {%css|
-            background-color: %{Colors.burgundy};
-            color: %{Colors.white};
-            border: 3px solid %{Colors.light_gray}
-            |}
-             ; {%css| &:active {
-                        background-color: %{Colors.transparent};
-                        color: %{Colors.black};
-                        border: 3px solid %{Colors.dark_gray}
-                        }
-                        |}
-             ]
-           else
-             [ {%css|
-               background-color: %{Colors.transparent};
-               color: %{Colors.black};
-               transform: translate(3px, 3px);
-               border: 3px solid %{Colors.light_gray}
-            |}
-             ; {%css|
-              &:active {
-              background-color: %{Colors.burgundy};
-              color: %{Colors.white};
-              border: 3px solid %{Colors.dark_gray}
-              }
-            |}
-             ]))
+      ~style:(Bonsai.return E.Selectable_style.Native)
       ~extra_container_attrs:
         (Bonsai.return
-           [ Style.query_box_item; {%css| display: flex; flex-direction: row; |} ])
+           [ Style.query_box_item
+           ; {%css| display: flex; flex-direction: row; gap: 1rem; |}
+           ])
       (Bonsai.return Resolution.Option.all)
       graph
   in
@@ -460,14 +420,19 @@ let component (t : t) graph =
           ]
         [ Node.text (Resolution.Option.to_string resolution) ]
     in
+    (* TODO: I think there's something brittle in the code below where bonsai
+       expects the plot div to be the third child of the div in all the branches
+       below. If you try to add divs such that the plot div is not the third
+       child, bonsai will not render the plot correctly after you switch between
+       views. *)
     match which_events with
     | One event ->
       [ Node.div
           ~attrs:[]
-          [ Node.div
+          [ Node.div [ Node.text (Event.precise event) ]
+          ; Node.div
               ~attrs:[ Style.resolution_chip_wrapper ]
               [ render_resolution_chip event ]
-          ; Node.div [ Node.text (Event.precise event) ]
           ; Node.div ~attrs:[ Attr.id "plot-single" ] []
           ]
       ]
