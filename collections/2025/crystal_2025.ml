@@ -112,7 +112,9 @@ let all =
         ~precise:
           "Lee \"Faker\" Sang-hyeok wins the 2025 League of Legends World Championship."
         ~label:"faker"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create Yes (Date.of_string "2025-11-09") "T1 beat KT Rolster 3-2."))
     ; Event.create
         ~short:"California experiences a large earthquake"
         ~precise:

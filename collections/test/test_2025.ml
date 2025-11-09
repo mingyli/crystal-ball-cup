@@ -137,8 +137,8 @@ let%expect_test _ =
     │    │                    │ tements or major news  │                │            │            │                        │
     │    │                    │ outlets.               │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 12 │ Faker wins 2025 Le │ Lee "Faker" Sang-hyeok │ faker          │            │            │                        │
-    │    │ ague of Legends Wo │  wins the 2025 League  │                │            │            │                        │
+    │ 12 │ Faker wins 2025 Le │ Lee "Faker" Sang-hyeok │ faker          │ Yes        │ 2025-11-09 │ T1 beat KT Rolster 3-2 │
+    │    │ ague of Legends Wo │  wins the 2025 League  │                │            │            │ .                      │
     │    │ rld Championship   │ of Legends World Champ │                │            │            │                        │
     │    │                    │ ionship.               │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
