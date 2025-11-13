@@ -33,3 +33,10 @@ let of_csv csv =
       respondent, { probabilities })
     |> String.Map.of_alist_exn
 ;;
+
+let scale_by_confidence t ~confidence =
+  let probabilities =
+    Map.map t.probabilities ~f:(fun p -> Probability.scale_by_confidence p ~confidence)
+  in
+  { probabilities }
+;;

@@ -271,6 +271,8 @@ let component events scores graph =
                ; showticklabels = true
                ; zeroline = false
                ; fixedrange = false
+               ; autorange = None
+               ; type_ = None
                ; range
                ; tickvals = None
                ; ticktext = None
