@@ -21,6 +21,11 @@ let of_string = function
   | s -> Error [%string "unknown outcome %{s}"]
 ;;
 
+let to_float = function
+  | Yes -> 1.0
+  | No -> 0.0
+;;
+
 let score t ~probability =
   let probability = Probability.to_float probability in
   let ln = Float.log in

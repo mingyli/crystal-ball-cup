@@ -10,7 +10,7 @@ let%expect_test "of_csv" =
   let responses = Responses.of_csv csv in
   print_s [%sexp (responses : Responses.t String.Map.t)];
   [%expect
-    {| 
-    ((abc@gmail.com ((probabilities ((1 0.75) (2 0.9))))) 
+    {|
+    ((abc@gmail.com ((probabilities ((1 0.75) (2 0.9)))))
      (def@gmail.com ((probabilities ((1 0.32) (2 0.999))))))    |}]
 ;;
