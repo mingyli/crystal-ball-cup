@@ -62,7 +62,7 @@ let all =
            on that date. Participants are those who attended the live event on \
            2025-08-09."
         ~label:"chess"
-        ~outcome:None
+        ~outcome:(Some (Outcome.create No))
     ; Event.create
         ~short:"There is an unplanned market closure"
         ~precise:
