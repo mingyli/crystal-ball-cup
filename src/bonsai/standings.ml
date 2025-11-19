@@ -244,7 +244,8 @@ let component events scores graph =
                  ; mode = "lines"
                  ; name =
                      [%string "%{respondent}: %{Float.to_string_hum ~decimals:2 score}"]
-                 ; line = { color; width = 1 }
+                 ; line =
+                     { color; width = 1; shape = Some "spline"; smoothing = Some 0.3 }
                  ; hovertemplate = Some "%{text}<extra></extra>"
                  ; text = Some (Array.of_list text_values)
                  }
