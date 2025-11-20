@@ -76,8 +76,8 @@ let%expect_test _ =
     │    │                    │ rdon on or before 2025 │                │            │            │                        │
     │    │                    │ -12-31.                │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 6  │ More than five par │ On a randomly selected │ chess          │            │            │                        │
-    │    │ ticipants play che │  date in November 2025 │                │            │            │                        │
+    │ 6  │ More than five par │ On a randomly selected │ chess          │ No         │ 2025-11-18 │ One participant played │
+    │    │ ticipants play che │  date in November 2025 │                │            │            │  chess on 2025-11-18.  │
     │    │ ss on a random Nov │ , more than five parti │                │            │            │                        │
     │    │ ember date         │ cipants confirm via gr │                │            │            │                        │
     │    │                    │ oup poll that they pla │                │            │            │                        │
