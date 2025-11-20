@@ -67,7 +67,7 @@ let all =
              (Outcome.create
                 No
                 (Date.of_string "2025-11-18")
-                "No participants played chess on 2025-11-18."))
+                "One participant played chess on 2025-11-18."))
     ; Event.create
         ~short:"There is an unplanned market closure"
         ~precise:
