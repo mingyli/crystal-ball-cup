@@ -135,7 +135,12 @@ let all =
            Wrapped Top Artists lists is a solo female artist. Participants are those who \
            attended the live event on 2025-08-09."
         ~label:"spotify"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                Yes
+                (Date.of_string "2025-12-03")
+                "Taylor Swift had the most appearances across our Top Artists lists."))
     ; Event.create
         ~short:"Jerome Powell remains Chair of the Federal Reserve"
         ~precise:
