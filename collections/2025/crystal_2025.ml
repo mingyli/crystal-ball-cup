@@ -103,7 +103,12 @@ let all =
            unreleased documents related to Jeffrey Epstein on or before 2025-12-31, with \
            release confirmed by official sources or major media coverage."
         ~label:"epstein"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                Yes
+                (Date.of_string "2025-12-19")
+                "The DOJ released 3 GB of data."))
     ; Event.create
         ~short:"The Neom construction project is canceled"
         ~precise:

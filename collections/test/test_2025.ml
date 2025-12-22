@@ -117,8 +117,8 @@ let%expect_test _ =
     │    │                    │ ensus of scientific or │                │            │            │                        │
     │    │                    │  governmental sources. │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 10 │ The Epstein files  │ The U.S. Department of │ epstein        │            │            │                        │
-    │    │ are released       │  Justice releases a co │                │            │            │                        │
+    │ 10 │ The Epstein files  │ The U.S. Department of │ epstein        │ Yes        │ 2025-12-19 │ The DOJ released 3 GB  │
+    │    │ are released       │  Justice releases a co │                │            │            │ of data.               │
     │    │                    │ llection of sealed or  │                │            │            │                        │
     │    │                    │ previously unreleased  │                │            │            │                        │
     │    │                    │ documents related to J │                │            │            │                        │
