@@ -48,8 +48,8 @@ let%expect_test _ =
     │    │                    │ lts or a consensus of  │                │            │            │                        │
     │    │                    │ credible reporting.    │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 3  │ The top grossing d │ The top grossing domes │ box office     │            │            │                        │
-    │    │ omestic film of Q4 │ tic film of Q4 2025 (O │                │            │            │                        │
+    │ 3  │ The top grossing d │ The top grossing domes │ box office     │ No         │ 2025-12-31 │ The top grossing film  │
+    │    │ omestic film of Q4 │ tic film of Q4 2025 (O │                │            │            │ was Wicked: For Good.  │
     │    │  2025 is based on  │ ctober through Decembe │                │            │            │                        │
     │    │ an original screen │ r), according to Box O │                │            │            │                        │
     │    │ play               │ ffice Mojo, is based o │                │            │            │                        │
