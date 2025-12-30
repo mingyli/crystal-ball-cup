@@ -53,7 +53,12 @@ let all =
         ~precise:
           "Sam Bankman-Fried receives a presidential pardon on or before 2025-12-31."
         ~label:"sbf"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "Sam Bankman-Fried was not pardoned."))
     ; Event.create
         ~short:"More than five participants play chess on a random November date"
         ~precise:

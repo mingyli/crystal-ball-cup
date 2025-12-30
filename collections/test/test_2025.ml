@@ -71,8 +71,8 @@ let%expect_test _ =
     │    │                    │ ermined by official AT │                │            │            │ urnament.              │
     │    │                    │ P birthdate records.   │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 5  │ Sam Bankman-Fried  │ Sam Bankman-Fried rece │ sbf            │            │            │                        │
-    │    │ is pardoned        │ ives a presidential pa │                │            │            │                        │
+    │ 5  │ Sam Bankman-Fried  │ Sam Bankman-Fried rece │ sbf            │ No         │ 2025-12-31 │ Sam Bankman-Fried was  │
+    │    │ is pardoned        │ ives a presidential pa │                │            │            │ not pardoned.          │
     │    │                    │ rdon on or before 2025 │                │            │            │                        │
     │    │                    │ -12-31.                │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
