@@ -11,7 +11,12 @@ let all =
         ~precise:
           "Nintendo announces a new Super Smash Bros. game on or before 2025-12-31."
         ~label:"smash"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "Nintendo did not announce a new Super Smash Bros. game."))
     ; Event.create
         ~short:"Zohran Mamdani wins the NYC mayoral election"
         ~precise:
