@@ -88,8 +88,8 @@ let%expect_test _ =
     │    │                    │ d the live event on 20 │                │            │            │                        │
     │    │                    │ 25-08-09.              │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 7  │ There is an unplan │ A National Market Syst │ stock market   │            │            │                        │
-    │    │ ned market closure │ em stock exchange (e.g │                │            │            │                        │
+    │ 7  │ There is an unplan │ A National Market Syst │ stock market   │ No         │ 2025-12-31 │ There was no unplanned │
+    │    │ ned market closure │ em stock exchange (e.g │                │            │            │  market closure.       │
     │    │                    │ ., NYSE or Nasdaq) is  │                │            │            │                        │
     │    │                    │ closed for an unschedu │                │            │            │                        │
     │    │                    │ led full-day trading h │                │            │            │                        │
