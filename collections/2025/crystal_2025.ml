@@ -205,7 +205,8 @@ let all =
           "At least one inch of snow is on the ground in Central Park on December 25, as \
            measured by the National Weather Service."
         ~label:"christmas"
-        ~outcome:(Some (Outcome.create No (Date.of_string "2025-12-25") "It did not snow."))
+        ~outcome:
+          (Some (Outcome.create No (Date.of_string "2025-12-25") "It did not snow."))
     ]
 ;;
 
