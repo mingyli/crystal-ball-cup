@@ -206,7 +206,7 @@ let%expect_test _ =
     │    │                    │  other recognized raci │                │            │            │                        │
     │    │                    │ ng authority.          │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 20 │ New York City has  │ At least one inch of s │ christmas      │            │            │                        │
+    │ 20 │ New York City has  │ At least one inch of s │ christmas      │ No         │ 2025-12-25 │ It did not snow.       │
     │    │ a white Christmas  │ now is on the ground i │                │            │            │                        │
     │    │                    │ n Central Park on Dece │                │            │            │                        │
     │    │                    │ mber 25, as measured b │                │            │            │                        │
