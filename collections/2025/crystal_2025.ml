@@ -137,7 +137,12 @@ let all =
            California occurs on or before 2025-12-31, as reported by the U.S. Geological \
            Survey (USGS)."
         ~label:"earthquake"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "California did not experience a large earthquake."))
     ; Event.create
         ~short:"Our most listened-to artist is a solo female artist"
         ~precise:

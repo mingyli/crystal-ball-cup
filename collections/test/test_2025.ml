@@ -142,9 +142,9 @@ let%expect_test _ =
     │    │ rld Championship   │ of Legends World Champ │                │            │            │                        │
     │    │                    │ ionship.               │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 13 │ California experie │ An earthquake with mag │ earthquake     │            │            │                        │
-    │    │ nces a large earth │ nitude 7.0 or greater  │                │            │            │                        │
-    │    │ quake              │ and an epicenter withi │                │            │            │                        │
+    │ 13 │ California experie │ An earthquake with mag │ earthquake     │ No         │ 2025-12-31 │ California did not exp │
+    │    │ nces a large earth │ nitude 7.0 or greater  │                │            │            │ erience a large earthq │
+    │    │ quake              │ and an epicenter withi │                │            │            │ uake.                  │
     │    │                    │ n California occurs on │                │            │            │                        │
     │    │                    │  or before 2025-12-31, │                │            │            │                        │
     │    │                    │  as reported by the U. │                │            │            │                        │
