@@ -226,7 +226,12 @@ let all =
            employers, becoming unemployed, or gaining employment. Participants are those \
            who attended the live event on 2025-08-09."
         ~label:"jobs"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "Few participants changed employment statuses."))
     ; Event.create
         ~short:
           "The winner of the 2025 Breeders' Cup Classic has previously won a Breeders' \

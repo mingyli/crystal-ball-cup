@@ -180,9 +180,9 @@ let%expect_test _ =
     │    │                    │ letics.                │                │            │            │ his third world champi │
     │    │                    │                        │                │            │            │ onship.                │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 18 │ More than three pa │ More than three partic │ jobs           │            │            │                        │
-    │    │ rticipants change  │ ipants hold different  │                │            │            │                        │
-    │    │ employment status  │ employment statuses on │                │            │            │                        │
+    │ 18 │ More than three pa │ More than three partic │ jobs           │ No         │ 2025-12-31 │ Few participants chang │
+    │    │ rticipants change  │ ipants hold different  │                │            │            │ ed employment statuses │
+    │    │ employment status  │ employment statuses on │                │            │            │ .                      │
     │    │                    │  September 1 compared  │                │            │            │                        │
     │    │                    │ to December 31. A chan │                │            │            │                        │
     │    │                    │ ge in employment statu │                │            │            │                        │
