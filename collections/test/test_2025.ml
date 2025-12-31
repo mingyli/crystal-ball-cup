@@ -128,9 +128,9 @@ let%expect_test _ =
     │    │                    │ official sources or ma │                │            │            │                        │
     │    │                    │ jor media coverage.    │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 11 │ The Neom construct │ The Saudi government a │ neom           │            │            │                        │
-    │    │ ion project is can │ nnounces the cancellat │                │            │            │                        │
-    │    │ celed              │ ion of the Neom constr │                │            │            │                        │
+    │ 11 │ The Neom construct │ The Saudi government a │ neom           │ No         │ 2025-12-31 │ The Neom construction  │
+    │    │ ion project is can │ nnounces the cancellat │                │            │            │ project was not cancel │
+    │    │ celed              │ ion of the Neom constr │                │            │            │ ed.                    │
     │    │                    │ uction project on or b │                │            │            │                        │
     │    │                    │ efore 2025-12-31, conf │                │            │            │                        │
     │    │                    │ irmed via official sta │                │            │            │                        │
@@ -161,9 +161,9 @@ let%expect_test _ =
     │    │                    │ ttended the live event │                │            │            │                        │
     │    │                    │  on 2025-08-09.        │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 15 │ Jerome Powell rema │ Jerome Powell is Chair │ jerome powell  │            │            │                        │
-    │    │ ins Chair of the F │  of the Board of Gover │                │            │            │                        │
-    │    │ ederal Reserve     │ nors of the Federal Re │                │            │            │                        │
+    │ 15 │ Jerome Powell rema │ Jerome Powell is Chair │ jerome powell  │ Yes        │ 2025-12-31 │ Jerome Powell remains  │
+    │    │ ins Chair of the F │  of the Board of Gover │                │            │            │ Chair of the Federal R │
+    │    │ ederal Reserve     │ nors of the Federal Re │                │            │            │ eserve.                │
     │    │                    │ serve System on 2025-1 │                │            │            │                        │
     │    │                    │ 2-31.                  │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤

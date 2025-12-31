@@ -121,7 +121,12 @@ let all =
            project on or before 2025-12-31, confirmed via official statements or major \
            news outlets."
         ~label:"neom"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "The Neom construction project was not canceled."))
     ; Event.create
         ~short:"Faker wins 2025 League of Legends World Championship"
         ~precise:
@@ -157,7 +162,12 @@ let all =
           "Jerome Powell is Chair of the Board of Governors of the Federal Reserve \
            System on 2025-12-31."
         ~label:"jerome powell"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                Yes
+                (Date.of_string "2025-12-31")
+                "Jerome Powell remains Chair of the Federal Reserve."))
     ; Event.create
         ~short:"Steve Harrington dies in the final season of Stranger Things"
         ~precise:
