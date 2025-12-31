@@ -81,7 +81,7 @@ end
 
 module Line = struct
   type line =
-    { color : string
+    { color : string option [@jsobject.drop_none]
     ; width : int
     ; shape : string option [@jsobject.drop_none]
     ; smoothing : float option [@jsobject.drop_none]

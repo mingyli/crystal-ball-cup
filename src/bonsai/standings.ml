@@ -96,56 +96,6 @@ let max_finite_score t =
 
 let total_scores t = List.Assoc.map t.scores ~f:Scores.total
 
-let min_total_score t =
-  total_scores t
-  |> List.map ~f:snd
-  |> List.filter ~f:Float.is_finite
-  |> List.min_elt ~compare:Float.compare
-  |> Option.value ~default:0.
-;;
-
-let max_total_score t =
-  total_scores t
-  |> List.map ~f:snd
-  |> List.filter ~f:Float.is_finite
-  |> List.max_elt ~compare:Float.compare
-  |> Option.value ~default:0.
-;;
-
-let color_of_score ~score ~min_score ~max_score =
-  let r_zero, g_zero, b_zero = 128., 128., 128. in
-  let r_pos, g_pos, b_pos = 0., 192., 64. in
-  let r_neg, g_neg, b_neg = 192., 0., 64. in
-  let red_val, green_val, blue_val =
-    if Float.is_inf score && Float.is_positive score
-    then r_pos, g_pos, b_pos
-    else if Float.is_inf score && Float.is_negative score
-    then r_neg, g_neg, b_neg
-    else if Float.(score > 0.0)
-    then (
-      let ratio = if Float.equal max_score 0.0 then 0.0 else score /. max_score in
-      let r = r_zero +. ((r_pos -. r_zero) *. ratio) in
-      let g = g_zero +. ((g_pos -. g_zero) *. ratio) in
-      let b = b_zero +. ((b_pos -. b_zero) *. ratio) in
-      r, g, b)
-    else if Float.(score < 0.0)
-    then (
-      let ratio = if Float.equal min_score 0.0 then 0.0 else score /. min_score in
-      let r = r_zero +. ((r_neg -. r_zero) *. ratio) in
-      let g = g_zero +. ((g_neg -. g_zero) *. ratio) in
-      let b = b_zero +. ((b_neg -. b_zero) *. ratio) in
-      r, g, b)
-    else r_zero, g_zero, b_zero
-  in
-  let red_val, green_val, blue_val =
-    int_of_float red_val, int_of_float green_val, int_of_float blue_val
-  in
-  let clamp_byte = Int.clamp_exn ~min:0 ~max:255 in
-  [%string
-    "rgb(%{clamp_byte red_val#Int}, %{clamp_byte green_val#Int}, %{clamp_byte \
-     blue_val#Int})"]
-;;
-
 let hover_text ~respondent ~date ~label =
   let date = date |> Option.value_map ~default:"" ~f:Date.to_string in
   [%string "<b>%{respondent}</b><br>%{date}<br>%{label}"]
@@ -178,8 +128,6 @@ let component ~start_date ~end_date events scores graph =
   let t = create events scores in
   let total_scores = total_scores t in
   let cumulative_scores, sorted_events = cumulative_scores t in
-  let min_total_score = min_total_score t in
-  let max_total_score = max_total_score t in
   let min_finite_score = min_finite_score t in
   let max_finite_score = max_finite_score t in
   let () =
@@ -191,12 +139,6 @@ let component ~start_date ~end_date events scores graph =
          fun weight_by ->
            let plotly_data =
              List.map total_scores ~f:(fun (respondent, score) ->
-               let color =
-                 color_of_score
-                   ~score
-                   ~min_score:min_total_score
-                   ~max_score:max_total_score
-               in
                let respondent_scores =
                  List.Assoc.find_exn cumulative_scores respondent ~equal:[%equal: string]
                in
@@ -245,7 +187,11 @@ let component ~start_date ~end_date events scores graph =
                  ; name =
                      [%string "%{respondent}: %{Float.to_string_hum ~decimals:2 score}"]
                  ; line =
-                     { color; width = 1; shape = Some "spline"; smoothing = Some 0.3 }
+                     { color = None
+                     ; width = 1
+                     ; shape = Some "spline"
+                     ; smoothing = Some 0.3
+                     }
                  ; hovertemplate = Some "%{text}<extra></extra>"
                  ; text = Some (Array.of_list text_values)
                  }
