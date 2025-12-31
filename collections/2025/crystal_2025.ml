@@ -39,7 +39,12 @@ let all =
            consensus (e.g., Writer's Branch of the Academy of Motion Picture Arts and \
            Sciences)."
         ~label:"box office"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "The top grossing film was Wicked: For Good."))
     ; Event.create
         ~short:"A young man wins the 2025 US Open Men's Singles tournament"
         ~precise:
@@ -167,7 +172,12 @@ let all =
           "Jerome Powell is Chair of the Board of Governors of the Federal Reserve \
            System on 2025-12-31."
         ~label:"jerome powell"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                Yes
+                (Date.of_string "2025-12-31")
+                "Jerome Powell remains Chair of the Federal Reserve."))
     ; Event.create
         ~short:"Steve Harrington dies in the final season of Stranger Things"
         ~precise:

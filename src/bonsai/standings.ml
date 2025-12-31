@@ -151,7 +151,7 @@ let hover_text ~respondent ~date ~label =
   [%string "<b>%{respondent}</b><br>%{date}<br>%{label}"]
 ;;
 
-let component events scores graph =
+let component ~start_date ~end_date events scores graph =
   let weight_by, set_weight_by = Bonsai.state Weight_by.Date graph in
   let radio =
     let radio =
@@ -220,7 +220,7 @@ let component events scores graph =
                        Option.map (Event.date event) ~f:(fun date -> date, score, event))
                    in
                    let x =
-                     "2025-08-09"
+                     Date.to_string start_date
                      :: List.map dated_scores ~f:(fun (d, _, _) -> Date.to_string d)
                    in
                    let y =
@@ -262,9 +262,11 @@ let component events scores graph =
                let range =
                  match weight_by with
                  | Date ->
+                   let start_date = Date.add_days start_date (-3) |> Date.to_string in
+                   let end_date = Date.add_days end_date 3 |> Date.to_string in
                    Some
-                     [ Crystal_plotly.Float_or_string.String "2025-08-09"
-                     ; Crystal_plotly.Float_or_string.String "2025-12-31"
+                     [ Crystal_plotly.Float_or_string.String start_date
+                     ; Crystal_plotly.Float_or_string.String end_date
                      ]
                  | Event -> None
                in
