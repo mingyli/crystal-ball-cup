@@ -75,7 +75,12 @@ let all =
            an unscheduled full-day trading halt on or before 2025-12-31, due to an \
            extraordinary event (e.g., natural disaster or death of a political figure)."
         ~label:"stock market"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "There was no unplanned market closure."))
     ; Event.create
         ~short:"Travis Kelce and Taylor Swift are engaged"
         ~precise:
