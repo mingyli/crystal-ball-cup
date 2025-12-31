@@ -100,7 +100,12 @@ let all =
            beyond Earth on or before 2025-12-31, as reported by a consensus of \
            scientific or governmental sources."
         ~label:"aliens"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "No credible space agency discovered life beyond Earth."))
     ; Event.create
         ~short:"The Epstein files are released"
         ~precise:

@@ -108,9 +108,9 @@ let%expect_test _ =
     │    │                    │ media reporting or pri │                │            │            │                        │
     │    │                    │ mary sources.          │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 9  │ Life is discovered │ A credible space agenc │ aliens         │            │            │                        │
-    │    │  beyond Earth      │ y (e.g., NASA, ESA) co │                │            │            │                        │
-    │    │                    │ nfirms the discovery o │                │            │            │                        │
+    │ 9  │ Life is discovered │ A credible space agenc │ aliens         │ No         │ 2025-12-31 │ No credible space agen │
+    │    │  beyond Earth      │ y (e.g., NASA, ESA) co │                │            │            │ cy discovered life bey │
+    │    │                    │ nfirms the discovery o │                │            │            │ ond Earth.             │
     │    │                    │ f life beyond Earth on │                │            │            │                        │
     │    │                    │  or before 2025-12-31, │                │            │            │                        │
     │    │                    │  as reported by a cons │                │            │            │                        │
