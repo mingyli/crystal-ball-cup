@@ -167,10 +167,10 @@ let%expect_test _ =
     │    │                    │ serve System on 2025-1 │                │            │            │                        │
     │    │                    │ 2-31.                  │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 16 │ Steve Harrington d │ The character Steve Ha │ stranger thing │            │            │                        │
-    │    │ ies in the final s │ rrington dies in the f │ s              │            │            │                        │
-    │    │ eason of Stranger  │ ifth season of Strange │                │            │            │                        │
-    │    │ Things             │ r Things.              │                │            │            │                        │
+    │ 16 │ Steve Harrington d │ The character Steve Ha │ stranger thing │ No         │ 2025-12-31 │ Steve Harrington did n │
+    │    │ ies in the final s │ rrington dies in the f │ s              │            │            │ ot die in the final se │
+    │    │ eason of Stranger  │ ifth season of Strange │                │            │            │ ason of Stranger Thing │
+    │    │ Things             │ r Things.              │                │            │            │ s.                     │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
     │ 17 │ A record is broken │ At least one world rec │ world record   │ Yes        │ 2025-09-15 │ Armand "Mondo" Duplant │
     │    │  at the 2025 World │ ord is broken at the 2 │                │            │            │ is broke the pole vaul │

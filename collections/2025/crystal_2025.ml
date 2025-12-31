@@ -178,7 +178,12 @@ let all =
         ~precise:
           "The character Steve Harrington dies in the fifth season of Stranger Things."
         ~label:"stranger things"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "Steve Harrington did not die in the final season of Stranger Things."))
     ; Event.create
         ~short:"A record is broken at the 2025 World Athletics Championships"
         ~precise:
