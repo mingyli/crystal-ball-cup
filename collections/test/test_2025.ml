@@ -161,9 +161,9 @@ let%expect_test _ =
     │    │                    │ ttended the live event │                │            │            │                        │
     │    │                    │  on 2025-08-09.        │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 15 │ Jerome Powell rema │ Jerome Powell is Chair │ jerome powell  │            │            │                        │
-    │    │ ins Chair of the F │  of the Board of Gover │                │            │            │                        │
-    │    │ ederal Reserve     │ nors of the Federal Re │                │            │            │                        │
+    │ 15 │ Jerome Powell rema │ Jerome Powell is Chair │ jerome powell  │ Yes        │ 2025-12-31 │ Jerome Powell remains  │
+    │    │ ins Chair of the F │  of the Board of Gover │                │            │            │ Chair of the Federal R │
+    │    │ ederal Reserve     │ nors of the Federal Re │                │            │            │ eserve.                │
     │    │                    │ serve System on 2025-1 │                │            │            │                        │
     │    │                    │ 2-31.                  │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
