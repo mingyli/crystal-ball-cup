@@ -121,7 +121,12 @@ let all =
            project on or before 2025-12-31, confirmed via official statements or major \
            news outlets."
         ~label:"neom"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "The Neom construction project was not canceled."))
     ; Event.create
         ~short:"Faker wins 2025 League of Legends World Championship"
         ~precise:
