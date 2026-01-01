@@ -35,9 +35,9 @@ let%expect_test _ =
     ┌────┬────────────────────┬────────────────────────┬────────────────┬────────────┬────────────┬────────────────────────┐
     │ id │ short              │ precise                │ label          │ resolution │ date       │ explanation            │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 1  │ Nintendo announces │ Nintendo announces a n │ smash          │            │            │                        │
-    │    │  a new Super Smash │ ew Super Smash Bros. g │                │            │            │                        │
-    │    │  Bros. game        │ ame on or before 2025- │                │            │            │                        │
+    │ 1  │ Nintendo announces │ Nintendo announces a n │ smash          │ No         │ 2025-12-31 │ Nintendo did not annou │
+    │    │  a new Super Smash │ ew Super Smash Bros. g │                │            │            │ nce a new Super Smash  │
+    │    │  Bros. game        │ ame on or before 2025- │                │            │            │ Bros. game.            │
     │    │                    │ 12-31.                 │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
     │ 2  │ Zohran Mamdani win │ Zohran Mamdani is elec │ zohran         │ Yes        │ 2025-11-04 │ Zohran Mamdani won the │
@@ -71,8 +71,8 @@ let%expect_test _ =
     │    │                    │ ermined by official AT │                │            │            │ urnament.              │
     │    │                    │ P birthdate records.   │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 5  │ Sam Bankman-Fried  │ Sam Bankman-Fried rece │ sbf            │            │            │                        │
-    │    │ is pardoned        │ ives a presidential pa │                │            │            │                        │
+    │ 5  │ Sam Bankman-Fried  │ Sam Bankman-Fried rece │ sbf            │ No         │ 2025-12-31 │ Sam Bankman-Fried was  │
+    │    │ is pardoned        │ ives a presidential pa │                │            │            │ not pardoned.          │
     │    │                    │ rdon on or before 2025 │                │            │            │                        │
     │    │                    │ -12-31.                │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
