@@ -35,9 +35,9 @@ let%expect_test _ =
     ┌────┬────────────────────┬────────────────────────┬────────────────┬────────────┬────────────┬────────────────────────┐
     │ id │ short              │ precise                │ label          │ resolution │ date       │ explanation            │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 1  │ Nintendo announces │ Nintendo announces a n │ smash          │            │            │                        │
-    │    │  a new Super Smash │ ew Super Smash Bros. g │                │            │            │                        │
-    │    │  Bros. game        │ ame on or before 2025- │                │            │            │                        │
+    │ 1  │ Nintendo announces │ Nintendo announces a n │ smash          │ No         │ 2025-12-31 │ Nintendo did not annou │
+    │    │  a new Super Smash │ ew Super Smash Bros. g │                │            │            │ nce a new Super Smash  │
+    │    │  Bros. game        │ ame on or before 2025- │                │            │            │ Bros. game.            │
     │    │                    │ 12-31.                 │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
     │ 2  │ Zohran Mamdani win │ Zohran Mamdani is elec │ zohran         │ Yes        │ 2025-11-04 │ Zohran Mamdani won the │
@@ -48,8 +48,8 @@ let%expect_test _ =
     │    │                    │ lts or a consensus of  │                │            │            │                        │
     │    │                    │ credible reporting.    │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 3  │ The top grossing d │ The top grossing domes │ box office     │            │            │                        │
-    │    │ omestic film of Q4 │ tic film of Q4 2025 (O │                │            │            │                        │
+    │ 3  │ The top grossing d │ The top grossing domes │ box office     │ No         │ 2025-12-31 │ The top grossing film  │
+    │    │ omestic film of Q4 │ tic film of Q4 2025 (O │                │            │            │ was Wicked: For Good.  │
     │    │  2025 is based on  │ ctober through Decembe │                │            │            │                        │
     │    │ an original screen │ r), according to Box O │                │            │            │                        │
     │    │ play               │ ffice Mojo, is based o │                │            │            │                        │
@@ -161,9 +161,9 @@ let%expect_test _ =
     │    │                    │ ttended the live event │                │            │            │                        │
     │    │                    │  on 2025-08-09.        │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 15 │ Jerome Powell rema │ Jerome Powell is Chair │ jerome powell  │            │            │                        │
-    │    │ ins Chair of the F │  of the Board of Gover │                │            │            │                        │
-    │    │ ederal Reserve     │ nors of the Federal Re │                │            │            │                        │
+    │ 15 │ Jerome Powell rema │ Jerome Powell is Chair │ jerome powell  │ Yes        │ 2025-12-31 │ Jerome Powell remains  │
+    │    │ ins Chair of the F │  of the Board of Gover │                │            │            │ Chair of the Federal R │
+    │    │ ederal Reserve     │ nors of the Federal Re │                │            │            │ eserve.                │
     │    │                    │ serve System on 2025-1 │                │            │            │                        │
     │    │                    │ 2-31.                  │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
