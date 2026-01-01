@@ -8,13 +8,13 @@ module Form = Bonsai_web_ui_form.With_manual_view
 
 module Weight_by = struct
   type t =
-    | Date
     | Event
+    | Date
   [@@deriving compare, enumerate, equal, sexp_of]
 
   let to_string = function
-    | Date -> "Date"
     | Event -> "Event"
+    | Date -> "Date"
   ;;
 end
 
@@ -152,7 +152,7 @@ let hover_text ~respondent ~date ~label =
 ;;
 
 let component ~start_date ~end_date events scores graph =
-  let weight_by, set_weight_by = Bonsai.state Weight_by.Date graph in
+  let weight_by, set_weight_by = Bonsai.state Weight_by.Event graph in
   let radio =
     let radio =
       Form.Elements.Radio_buttons.enumerable
