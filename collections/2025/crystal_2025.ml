@@ -11,7 +11,12 @@ let all =
         ~precise:
           "Nintendo announces a new Super Smash Bros. game on or before 2025-12-31."
         ~label:"smash"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "Nintendo did not announce a new Super Smash Bros. game."))
     ; Event.create
         ~short:"Zohran Mamdani wins the NYC mayoral election"
         ~precise:
@@ -34,7 +39,12 @@ let all =
            consensus (e.g., Writer's Branch of the Academy of Motion Picture Arts and \
            Sciences)."
         ~label:"box office"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "The top grossing film was Wicked: For Good."))
     ; Event.create
         ~short:"A young man wins the 2025 US Open Men's Singles tournament"
         ~precise:
@@ -53,7 +63,12 @@ let all =
         ~precise:
           "Sam Bankman-Fried receives a presidential pardon on or before 2025-12-31."
         ~label:"sbf"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "Sam Bankman-Fried was not pardoned."))
     ; Event.create
         ~short:"More than five participants play chess on a random November date"
         ~precise:
@@ -100,7 +115,12 @@ let all =
            beyond Earth on or before 2025-12-31, as reported by a consensus of \
            scientific or governmental sources."
         ~label:"aliens"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "No credible space agency discovered life beyond Earth."))
     ; Event.create
         ~short:"The Epstein files are released"
         ~precise:
@@ -167,13 +187,23 @@ let all =
           "Jerome Powell is Chair of the Board of Governors of the Federal Reserve \
            System on 2025-12-31."
         ~label:"jerome powell"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                Yes
+                (Date.of_string "2025-12-31")
+                "Jerome Powell remains Chair of the Federal Reserve."))
     ; Event.create
         ~short:"Steve Harrington dies in the final season of Stranger Things"
         ~precise:
           "The character Steve Harrington dies in the fifth season of Stranger Things."
         ~label:"stranger things"
-        ~outcome:None
+        ~outcome:
+          (Some
+             (Outcome.create
+                No
+                (Date.of_string "2025-12-31")
+                "Steve Harrington did not die in the final season of Stranger Things."))
     ; Event.create
         ~short:"A record is broken at the 2025 World Athletics Championships"
         ~precise:
