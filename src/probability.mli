@@ -11,3 +11,4 @@ val odds : t -> float
 val logit : t -> float
 val of_odds : float -> t
 val of_logit : float -> t
+val scale_by_confidence : t -> confidence:float -> t

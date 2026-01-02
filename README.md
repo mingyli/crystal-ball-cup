@@ -20,3 +20,19 @@ running `dune build`.
     directory. You can serve it locally by running `python3 -m http.server`
     from this directory.
 *   **`etc/`**: Stores miscellaneous assets for this project.
+
+### Confidence Methodology
+
+If a user submits prediction $p$, then we say that the prediction scaled by 
+confidence $c$ is 
+
+$$
+\frac{\left(\frac{p}{1-p}\right)^{c}}{1+\left(\frac{p}{1-p}\right)^{c}}
+$$
+
+This has the following properties:
+- Scaling by a confidence of one produces the same prediction $p$.
+- Scaling by a confidence of zero produces a prediction of $0.5$. 
+- Scaling by a confidence of infinity produces $0.5$ if $p$ is $0.5$, zero if 
+$p$ is less than $0.5$, and one if $p$ is greater than $0.5$.
+

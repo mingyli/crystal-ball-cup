@@ -322,6 +322,8 @@ let render_plots
             ; range = Some [ Float 0.; Float 1. ]
             ; tickvals = Some [ 0.; 0.25; 0.5; 0.75; 1. ]
             ; ticktext = Some [ "0"; "0.25"; "0.5"; "0.75"; "1" ]
+            ; type_ = None
+            ; autorange = None
             }
         ; shapes = []
         ; margin = layout_margin

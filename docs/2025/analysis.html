@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crystal Ball Cup Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-3.0.3.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 2em;
+        }
+        #controls {
+            margin-bottom: 1em;
+        }
+        #predictions-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        #predictions-table th, #predictions-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        #predictions-table th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Crystal Ball Cup Analysis</h1>
+    <div id="controls">
+        <label for="user-select">Select User:</label>
+        <select id="user-select"></select>
+        <label for="confidence-slider">Confidence:</label>
+        <input type="range" id="confidence-slider" min="0" max="10" value="1" step="0.1">
+        <span id="confidence-value">1.0</span>
+    </div>
+    <h2>Predictions</h2>
+    <table id="predictions-table">
+        <thead>
+            <tr>
+                <th>Event</th>
+                <th>Original Prediction</th>
+                <th>Confidence-Adjusted Prediction</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <h2>Mean Score: <span id="mean-score"></span></h2>
+
+    <div id="confidence-plot"></div>
+
+    <script>
+        const userSelect = document.getElementById('user-select');
+        const confidenceSlider = document.getElementById('confidence-slider');
+        const confidenceValue = document.getElementById('confidence-value');
+        const predictionsTableBody = document.querySelector('#predictions-table tbody');
+        const meanScoreSpan = document.getElementById('mean-score');
+
+        let events = {};
+        let responses = [];
+
+        async function fetchData() {
+            const eventsResponse = await fetch('events.json');
+            const eventsData = await eventsResponse.json();
+            events = eventsData.reduce((acc, event) => {
+                acc[event.id] = event;
+                return acc;
+            }, {});
+
+            const responsesResponse = await fetch('responses.csv');
+            const responsesCsv = await responsesResponse.text();
+            responses = parseCsv(responsesCsv);
+
+            populateUserSelect();
+            update();
+            renderConfidencePlot();
+        }
+
+        function parseCsv(csv) {
+            const lines = csv.split('\n');
+            const header = lines[0].split(',');
+            const emailIndex = header.findIndex(h => h.trim() === 'Email Address');
+            const eventIds = header.map((h, i) => ({ id: parseInt(h.trim(), 10), index: i }))
+                                  .filter(h => !isNaN(h.id));
+
+            return lines.slice(1).map(line => {
+                const values = line.split(',');
+                if (values.length <= emailIndex) return null;
+                const email = values[emailIndex].trim();
+                const probabilities = eventIds.reduce((acc, eventId) => {
+                    acc[eventId.id] = parseFloat(values[eventId.index]);
+                    return acc;
+                }, {});
+                return { email, probabilities };
+            }).filter(r => r && r.email);
+        }
+
+        function populateUserSelect() {
+            responses.forEach(response => {
+                const option = document.createElement('option');
+                option.value = response.email;
+                option.textContent = response.email;
+                userSelect.appendChild(option);
+            });
+        }
+
+        function applyConfidence(probabilities, confidence) {
+            const newProbabilities = {};
+            for (const eventId in probabilities) {
+                const p = probabilities[eventId];
+                const odds = p / (1 - p);
+                const newOdds = Math.pow(odds, confidence);
+                newProbabilities[eventId] = newOdds / (1 + newOdds);
+            }
+            return newProbabilities;
+        }
+
+        function calculateScore(outcome, probability) {
+            if (outcome === 'Pending') {
+                return NaN;
+            }
+            if (isNaN(probability)) {
+                return NaN;
+            }
+            if (outcome === 'Yes') {
+                return Math.log(probability) - Math.log(0.5);
+            }
+            if (outcome === 'No') {
+                return Math.log(1 - probability) - Math.log(0.5);
+            }
+            return NaN;
+        }
+
+        function update() {
+            const selectedUser = userSelect.value;
+            const confidence = parseFloat(confidenceSlider.value);
+            confidenceValue.textContent = confidence.toFixed(1);
+
+            const userResponse = responses.find(r => r.email === selectedUser);
+            if (!userResponse) {
+                predictionsTableBody.innerHTML = '';
+                meanScoreSpan.textContent = 'N/A';
+                return;
+            }
+
+            const adjustedProbabilities = applyConfidence(userResponse.probabilities, confidence);
+
+            predictionsTableBody.innerHTML = '';
+            let totalScore = 0;
+            let scoreCount = 0;
+
+            for (const eventId in userResponse.probabilities) {
+                const event = events[eventId];
+                if (!event) continue;
+
+                const originalPrediction = userResponse.probabilities[eventId];
+                const adjustedPrediction = adjustedProbabilities[eventId];
+                const score = calculateScore(event.outcome, adjustedPrediction);
+
+                if (!isNaN(score)) {
+                    totalScore += score;
+                    scoreCount++;
+                }
+
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${event.short}</td><td>${originalPrediction.toFixed(3)}</td><td>${adjustedPrediction.toFixed(3)}</td>`;
+                predictionsTableBody.appendChild(row);
+            }
+
+            const meanScore = scoreCount > 0 ? totalScore / scoreCount : NaN;
+            meanScoreSpan.textContent = isNaN(meanScore) ? 'N/A' : meanScore.toFixed(3);
+        }
+
+        function renderConfidencePlot() {
+            const p_values = [];
+            for (let p = 0.01; p < 1; p += 0.01) {
+                p_values.push(p);
+            }
+
+            const c_values = [];
+            for (let c = 0; c < 10; c += 0.1) {
+                c_values.push(c);
+            }
+
+            const z_values = [];
+            for (let c of c_values) {
+                const row_z = [];
+                for (let p of p_values) {
+                    const odds = p / (1 - p);
+                    const new_odds = Math.pow(odds, c);
+                    const new_p = new_odds / (1 + new_odds);
+                    row_z.push(new_p);
+                }
+                z_values.push(row_z);
+            }
+
+            const data = [{
+                z: z_values,
+                x: p_values,
+                y: c_values,
+                type: 'heatmap',
+                colorscale: [[0, 'red'], [0.5, 'white'], [1, 'green']]
+            }];
+
+            const layout = {
+                title: 'Confidence Scaling',
+                xaxis: {title: 'prediction'},
+                yaxis: {title: 'confidence scaling', type: 'log'}
+            };
+
+            Plotly.newPlot('confidence-plot', data, layout);
+        }
+
+        userSelect.addEventListener('change', update);
+        confidenceSlider.addEventListener('input', update);
+
+        fetchData();
+    </script>
+</body>
+</html>
