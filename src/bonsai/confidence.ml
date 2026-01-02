@@ -50,7 +50,7 @@ let go collection responses =
           ; type_ = "scatter"
           ; mode = "lines"
           ; name = ""
-          ; line = { color = ""; width = 1 }
+          ; line = { color = None; width = 1; shape = None; smoothing = None }
           ; hovertemplate = None
           ; text = None
           }

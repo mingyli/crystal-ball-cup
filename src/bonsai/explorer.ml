@@ -120,39 +120,55 @@ let component ~db_path ~initial_query graph =
   and results = results
   and set_results = set_results in
   let open Vdom in
+  let rows = String.split_lines query |> List.length |> Int.max 1 in
   match db with
   | None -> Node.div [ Node.text "Database not loaded yet" ]
   | Some db ->
     Node.div
-      [ Node.textarea
-          ~attrs:
-            [ Attr.on_input (fun _event -> set_query)
-            ; Attr.on_keydown (fun event ->
-                if
-                  Js.to_bool event##.ctrlKey
-                  && [%equal: string option]
-                       (Some "Enter")
-                       (event##.key |> Js.Optdef.to_option |> Option.map ~f:Js.to_string)
-                then (
-                  Dom.preventDefault event;
-                  execute_query db query set_results)
-                else Effect.Ignore)
-            ; {%css|
-          margin: auto;
-          width: 100%;
-          height: 50px;
-          font-family: monospace;
-          |}
-            ]
-          [ Node.text query ]
-      ; Node.button
+      [ Node.div
           ~attrs:
             [ {%css|
-          font_family: "monospace"
-          |}
-            ; Attr.on_click (fun _event -> execute_query db query set_results)
+              display: grid;
+              grid-template-columns: 4fr 1fr;
+              grid-gap: 5px;
+              align-items: stretch;
+              margin-bottom: 10px;
+            |}
             ]
-          [ Node.text "Run (ctrl+enter)" ]
+          [ Node.textarea
+              ~attrs:
+                [ Attr.rows rows
+                ; Attr.on_input (fun _event -> set_query)
+                ; Attr.on_keydown (fun event ->
+                    if
+                      Js.to_bool event##.ctrlKey
+                      && [%equal: string option]
+                           (Some "Enter")
+                           (event##.key
+                            |> Js.Optdef.to_option
+                            |> Option.map ~f:Js.to_string)
+                    then (
+                      Dom.preventDefault event;
+                      execute_query db query set_results)
+                    else Effect.Ignore)
+                ; {%css|
+                    font-family: monospace;
+                    width: 100%;
+                    box-sizing: border-box;
+                  |}
+                ]
+              [ Node.text query ]
+          ; Node.button
+              ~attrs:
+                [ {%css|
+                    font-family: "monospace";
+                    width: 100%;
+                    box-sizing: border-box;
+                  |}
+                ; Attr.on_click (fun _event -> execute_query db query set_results)
+                ]
+              [ Node.text "Run (ctrl+enter)" ]
+          ]
       ; Node.div results
       ]
 ;;

@@ -18,12 +18,25 @@ let all graph =
   let confidence =
     Confidence.component ~collection:(module Crystal_2025) ~responses graph
   in
-  let standings = Standings.component Crystal_2025.all scores graph in
+  let standings =
+    Standings.component
+      ~start_date:(Date.of_string "2025-08-09")
+      ~end_date:(Date.of_string "2025-12-31")
+      Crystal_2025.all
+      scores
+      graph
+  in
   let plots = Plots.component plots graph in
   let explorer =
     Explorer.component
       ~db_path:"./crystal.db"
-      ~initial_query:"SELECT name, sql FROM sqlite_master WHERE type IN ('table', 'view')"
+      ~initial_query:
+        {|SELECT
+  name, sql
+FROM
+  sqlite_master
+WHERE
+  type IN ('table', 'view')|}
       graph
   in
   (* let%sub explorer_winners =

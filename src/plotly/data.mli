@@ -78,8 +78,10 @@ end
 
 module Line : sig
   type line =
-    { color : string
+    { color : string option
     ; width : int
+    ; shape : string option
+    ; smoothing : float option
     }
 
   type t =

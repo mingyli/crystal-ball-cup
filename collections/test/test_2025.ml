@@ -35,21 +35,21 @@ let%expect_test _ =
     ┌────┬────────────────────┬────────────────────────┬────────────────┬────────────┬────────────┬────────────────────────┐
     │ id │ short              │ precise                │ label          │ resolution │ date       │ explanation            │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 1  │ Nintendo announces │ Nintendo announces a n │ smash          │            │            │                        │
-    │    │  a new Super Smash │ ew Super Smash Bros. g │                │            │            │                        │
-    │    │  Bros. game        │ ame on or before 2025- │                │            │            │                        │
+    │ 1  │ Nintendo announces │ Nintendo announces a n │ smash          │ No         │ 2025-12-31 │ Nintendo did not annou │
+    │    │  a new Super Smash │ ew Super Smash Bros. g │                │            │            │ nce a new Super Smash  │
+    │    │  Bros. game        │ ame on or before 2025- │                │            │            │ Bros. game.            │
     │    │                    │ 12-31.                 │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 2  │ Zohran Mamdani win │ Zohran Mamdani is elec │ zohran         │            │            │                        │
-    │    │ s the NYC mayoral  │ ted Mayor of New York  │                │            │            │                        │
-    │    │ election           │ City in the 2025 elect │                │            │            │                        │
+    │ 2  │ Zohran Mamdani win │ Zohran Mamdani is elec │ zohran         │ Yes        │ 2025-11-04 │ Zohran Mamdani won the │
+    │    │ s the NYC mayoral  │ ted Mayor of New York  │                │            │            │  New York City mayoral │
+    │    │ election           │ City in the 2025 elect │                │            │            │  election.             │
     │    │                    │ ion, as confirmed by c │                │            │            │                        │
     │    │                    │ ertified election resu │                │            │            │                        │
     │    │                    │ lts or a consensus of  │                │            │            │                        │
     │    │                    │ credible reporting.    │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 3  │ The top grossing d │ The top grossing domes │ box office     │            │            │                        │
-    │    │ omestic film of Q4 │ tic film of Q4 2025 (O │                │            │            │                        │
+    │ 3  │ The top grossing d │ The top grossing domes │ box office     │ No         │ 2025-12-31 │ The top grossing film  │
+    │    │ omestic film of Q4 │ tic film of Q4 2025 (O │                │            │            │ was Wicked: For Good.  │
     │    │  2025 is based on  │ ctober through Decembe │                │            │            │                        │
     │    │ an original screen │ r), according to Box O │                │            │            │                        │
     │    │ play               │ ffice Mojo, is based o │                │            │            │                        │
@@ -71,13 +71,13 @@ let%expect_test _ =
     │    │                    │ ermined by official AT │                │            │            │ urnament.              │
     │    │                    │ P birthdate records.   │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 5  │ Sam Bankman-Fried  │ Sam Bankman-Fried rece │ sbf            │            │            │                        │
-    │    │ is pardoned        │ ives a presidential pa │                │            │            │                        │
+    │ 5  │ Sam Bankman-Fried  │ Sam Bankman-Fried rece │ sbf            │ No         │ 2025-12-31 │ Sam Bankman-Fried was  │
+    │    │ is pardoned        │ ives a presidential pa │                │            │            │ not pardoned.          │
     │    │                    │ rdon on or before 2025 │                │            │            │                        │
     │    │                    │ -12-31.                │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 6  │ More than five par │ On a randomly selected │ chess          │            │            │                        │
-    │    │ ticipants play che │  date in November 2025 │                │            │            │                        │
+    │ 6  │ More than five par │ On a randomly selected │ chess          │ No         │ 2025-11-18 │ One participant played │
+    │    │ ticipants play che │  date in November 2025 │                │            │            │  chess on 2025-11-18.  │
     │    │ ss on a random Nov │ , more than five parti │                │            │            │                        │
     │    │ ember date         │ cipants confirm via gr │                │            │            │                        │
     │    │                    │ oup poll that they pla │                │            │            │                        │
@@ -88,8 +88,8 @@ let%expect_test _ =
     │    │                    │ d the live event on 20 │                │            │            │                        │
     │    │                    │ 25-08-09.              │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 7  │ There is an unplan │ A National Market Syst │ stock market   │            │            │                        │
-    │    │ ned market closure │ em stock exchange (e.g │                │            │            │                        │
+    │ 7  │ There is an unplan │ A National Market Syst │ stock market   │ No         │ 2025-12-31 │ There was no unplanned │
+    │    │ ned market closure │ em stock exchange (e.g │                │            │            │  market closure.       │
     │    │                    │ ., NYSE or Nasdaq) is  │                │            │            │                        │
     │    │                    │ closed for an unschedu │                │            │            │                        │
     │    │                    │ led full-day trading h │                │            │            │                        │
@@ -108,17 +108,17 @@ let%expect_test _ =
     │    │                    │ media reporting or pri │                │            │            │                        │
     │    │                    │ mary sources.          │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 9  │ Life is discovered │ A credible space agenc │ aliens         │            │            │                        │
-    │    │  beyond Earth      │ y (e.g., NASA, ESA) co │                │            │            │                        │
-    │    │                    │ nfirms the discovery o │                │            │            │                        │
+    │ 9  │ Life is discovered │ A credible space agenc │ aliens         │ No         │ 2025-12-31 │ No credible space agen │
+    │    │  beyond Earth      │ y (e.g., NASA, ESA) co │                │            │            │ cy discovered life bey │
+    │    │                    │ nfirms the discovery o │                │            │            │ ond Earth.             │
     │    │                    │ f life beyond Earth on │                │            │            │                        │
     │    │                    │  or before 2025-12-31, │                │            │            │                        │
     │    │                    │  as reported by a cons │                │            │            │                        │
     │    │                    │ ensus of scientific or │                │            │            │                        │
     │    │                    │  governmental sources. │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 10 │ The Epstein files  │ The U.S. Department of │ epstein        │            │            │                        │
-    │    │ are released       │  Justice releases a co │                │            │            │                        │
+    │ 10 │ The Epstein files  │ The U.S. Department of │ epstein        │ Yes        │ 2025-12-19 │ The DOJ released 3 GB  │
+    │    │ are released       │  Justice releases a co │                │            │            │ of data.               │
     │    │                    │ llection of sealed or  │                │            │            │                        │
     │    │                    │ previously unreleased  │                │            │            │                        │
     │    │                    │ documents related to J │                │            │            │                        │
@@ -128,49 +128,49 @@ let%expect_test _ =
     │    │                    │ official sources or ma │                │            │            │                        │
     │    │                    │ jor media coverage.    │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 11 │ The Neom construct │ The Saudi government a │ neom           │            │            │                        │
-    │    │ ion project is can │ nnounces the cancellat │                │            │            │                        │
-    │    │ celed              │ ion of the Neom constr │                │            │            │                        │
+    │ 11 │ The Neom construct │ The Saudi government a │ neom           │ No         │ 2025-12-31 │ The Neom construction  │
+    │    │ ion project is can │ nnounces the cancellat │                │            │            │ project was not cancel │
+    │    │ celed              │ ion of the Neom constr │                │            │            │ ed.                    │
     │    │                    │ uction project on or b │                │            │            │                        │
     │    │                    │ efore 2025-12-31, conf │                │            │            │                        │
     │    │                    │ irmed via official sta │                │            │            │                        │
     │    │                    │ tements or major news  │                │            │            │                        │
     │    │                    │ outlets.               │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 12 │ Faker wins 2025 Le │ Lee "Faker" Sang-hyeok │ faker          │            │            │                        │
-    │    │ ague of Legends Wo │  wins the 2025 League  │                │            │            │                        │
+    │ 12 │ Faker wins 2025 Le │ Lee "Faker" Sang-hyeok │ faker          │ Yes        │ 2025-11-09 │ T1 beat KT Rolster 3-2 │
+    │    │ ague of Legends Wo │  wins the 2025 League  │                │            │            │ .                      │
     │    │ rld Championship   │ of Legends World Champ │                │            │            │                        │
     │    │                    │ ionship.               │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 13 │ California experie │ An earthquake with mag │ earthquake     │            │            │                        │
-    │    │ nces a large earth │ nitude 7.0 or greater  │                │            │            │                        │
-    │    │ quake              │ and an epicenter withi │                │            │            │                        │
+    │ 13 │ California experie │ An earthquake with mag │ earthquake     │ No         │ 2025-12-31 │ California did not exp │
+    │    │ nces a large earth │ nitude 7.0 or greater  │                │            │            │ erience a large earthq │
+    │    │ quake              │ and an epicenter withi │                │            │            │ uake.                  │
     │    │                    │ n California occurs on │                │            │            │                        │
     │    │                    │  or before 2025-12-31, │                │            │            │                        │
     │    │                    │  as reported by the U. │                │            │            │                        │
     │    │                    │ S. Geological Survey ( │                │            │            │                        │
     │    │                    │ USGS).                 │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 14 │ Our most listened- │ The artist with the mo │ spotify        │            │            │                        │
-    │    │ to artist is a sol │ st appearances across  │                │            │            │                        │
-    │    │ o female artist    │ all participants' 2025 │                │            │            │                        │
-    │    │                    │  Spotify Wrapped Top A │                │            │            │                        │
+    │ 14 │ Our most listened- │ The artist with the mo │ spotify        │ Yes        │ 2025-12-03 │ Taylor Swift had the m │
+    │    │ to artist is a sol │ st appearances across  │                │            │            │ ost appearances across │
+    │    │ o female artist    │ all participants' 2025 │                │            │            │  our Top Artists lists │
+    │    │                    │  Spotify Wrapped Top A │                │            │            │ .                      │
     │    │                    │ rtists lists is a solo │                │            │            │                        │
     │    │                    │  female artist. Partic │                │            │            │                        │
     │    │                    │ ipants are those who a │                │            │            │                        │
     │    │                    │ ttended the live event │                │            │            │                        │
     │    │                    │  on 2025-08-09.        │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 15 │ Jerome Powell rema │ Jerome Powell is Chair │ jerome powell  │            │            │                        │
-    │    │ ins Chair of the F │  of the Board of Gover │                │            │            │                        │
-    │    │ ederal Reserve     │ nors of the Federal Re │                │            │            │                        │
+    │ 15 │ Jerome Powell rema │ Jerome Powell is Chair │ jerome powell  │ Yes        │ 2025-12-31 │ Jerome Powell remains  │
+    │    │ ins Chair of the F │  of the Board of Gover │                │            │            │ Chair of the Federal R │
+    │    │ ederal Reserve     │ nors of the Federal Re │                │            │            │ eserve.                │
     │    │                    │ serve System on 2025-1 │                │            │            │                        │
     │    │                    │ 2-31.                  │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 16 │ Steve Harrington d │ The character Steve Ha │ stranger thing │            │            │                        │
-    │    │ ies in the final s │ rrington dies in the f │ s              │            │            │                        │
-    │    │ eason of Stranger  │ ifth season of Strange │                │            │            │                        │
-    │    │ Things             │ r Things.              │                │            │            │                        │
+    │ 16 │ Steve Harrington d │ The character Steve Ha │ stranger thing │ No         │ 2025-12-31 │ Steve Harrington did n │
+    │    │ ies in the final s │ rrington dies in the f │ s              │            │            │ ot die in the final se │
+    │    │ eason of Stranger  │ ifth season of Strange │                │            │            │ ason of Stranger Thing │
+    │    │ Things             │ r Things.              │                │            │            │ s.                     │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
     │ 17 │ A record is broken │ At least one world rec │ world record   │ Yes        │ 2025-09-15 │ Armand "Mondo" Duplant │
     │    │  at the 2025 World │ ord is broken at the 2 │                │            │            │ is broke the pole vaul │
@@ -194,11 +194,11 @@ let%expect_test _ =
     │    │                    │ d the live event on 20 │                │            │            │                        │
     │    │                    │ 25-08-09.              │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 19 │ The winner of the  │ The winner of the 2025 │ horse race     │            │            │                        │
-    │    │ 2025 Breeders' Cup │  Breeders' Cup Classic │                │            │            │                        │
-    │    │  Classic has previ │  is a horse that has p │                │            │            │                        │
-    │    │ ously won a Breede │ reviously won any Bree │                │            │            │                        │
-    │    │ rs' Cup race       │ ders' Cup race in an e │                │            │            │                        │
+    │ 19 │ The winner of the  │ The winner of the 2025 │ horse race     │ No         │ 2025-11-01 │ Forever Young won the  │
+    │    │ 2025 Breeders' Cup │  Breeders' Cup Classic │                │            │            │ 2025 Breeders' Cup Cla │
+    │    │  Classic has previ │  is a horse that has p │                │            │            │ ssic, but had not prev │
+    │    │ ously won a Breede │ reviously won any Bree │                │            │            │ iously won any Breeder │
+    │    │ rs' Cup race       │ ders' Cup race in an e │                │            │            │ s' Cup race.           │
     │    │                    │ arlier year, as confir │                │            │            │                        │
     │    │                    │ med by the official ra │                │            │            │                        │
     │    │                    │ ce results published b │                │            │            │                        │
@@ -206,7 +206,7 @@ let%expect_test _ =
     │    │                    │  other recognized raci │                │            │            │                        │
     │    │                    │ ng authority.          │                │            │            │                        │
     ├────┼────────────────────┼────────────────────────┼────────────────┼────────────┼────────────┼────────────────────────┤
-    │ 20 │ New York City has  │ At least one inch of s │ christmas      │            │            │                        │
+    │ 20 │ New York City has  │ At least one inch of s │ christmas      │ No         │ 2025-12-25 │ It did not snow.       │
     │    │ a white Christmas  │ now is on the ground i │                │            │            │                        │
     │    │                    │ n Central Park on Dece │                │            │            │                        │
     │    │                    │ mber 25, as measured b │                │            │            │                        │
