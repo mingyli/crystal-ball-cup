@@ -83,7 +83,7 @@ let execute_query db query set_results =
     set_results [ error ]
 ;;
 
-let component ~db_path ~initial_query graph =
+let component ~db_path ~initial_query ?(interactive = true) graph =
   let db, set_db = Bonsai.state None graph in
   let query, set_query = Bonsai.state initial_query graph in
   let results, set_results = Bonsai.state [] graph in
@@ -124,51 +124,63 @@ let component ~db_path ~initial_query graph =
   match db with
   | None -> Node.div [ Node.text "Database not loaded yet" ]
   | Some db ->
+    let textarea =
+      Node.textarea
+        ~attrs:
+          [ Attr.rows rows
+          ; (if interactive then Attr.empty else Attr.create "readonly" "")
+          ; Attr.on_input (fun _event -> set_query)
+          ; Attr.on_keydown (fun event ->
+              if
+                Js.to_bool event##.ctrlKey
+                && [%equal: string option]
+                     (Some "Enter")
+                     (event##.key |> Js.Optdef.to_option |> Option.map ~f:Js.to_string)
+              then (
+                Dom.preventDefault event;
+                execute_query db query set_results)
+              else Effect.Ignore)
+          ; {%css|
+                        font-family: monospace;
+                        width: 100%;
+                        box-sizing: border-box;
+                      |}
+          ]
+        [ Node.text query ]
+    in
+    let run_button =
+      Node.button
+        ~attrs:
+          [ {%css|
+                                   font-family: "monospace";
+                                   width: 100%;
+                                   box-sizing: border-box;
+                                 |}
+          ; Attr.on_click (fun _event -> execute_query db query set_results)
+          ]
+        [ Node.text "Run (ctrl+enter)" ]
+    in
     Node.div
       [ Node.div
           ~attrs:
-            [ {%css|
+            [ (if interactive
+               then
+                 {%css|
               display: grid;
               grid-template-columns: 4fr 1fr;
               grid-gap: 5px;
               align-items: stretch;
               margin-bottom: 10px;
             |}
+               else
+                 {%css|
+              display: grid;
+              grid-template-columns: 1fr;
+              margin-bottom: 10px;
+            |})
             ]
-          [ Node.textarea
-              ~attrs:
-                [ Attr.rows rows
-                ; Attr.on_input (fun _event -> set_query)
-                ; Attr.on_keydown (fun event ->
-                    if
-                      Js.to_bool event##.ctrlKey
-                      && [%equal: string option]
-                           (Some "Enter")
-                           (event##.key
-                            |> Js.Optdef.to_option
-                            |> Option.map ~f:Js.to_string)
-                    then (
-                      Dom.preventDefault event;
-                      execute_query db query set_results)
-                    else Effect.Ignore)
-                ; {%css|
-                    font-family: monospace;
-                    width: 100%;
-                    box-sizing: border-box;
-                  |}
-                ]
-              [ Node.text query ]
-          ; Node.button
-              ~attrs:
-                [ {%css|
-                    font-family: "monospace";
-                    width: 100%;
-                    box-sizing: border-box;
-                  |}
-                ; Attr.on_click (fun _event -> execute_query db query set_results)
-                ]
-              [ Node.text "Run (ctrl+enter)" ]
-          ]
+          (List.filter_opt
+             [ Some textarea; (if interactive then Some run_button else None) ])
       ; Node.div results
       ]
 ;;
