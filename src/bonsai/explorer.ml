@@ -4,6 +4,44 @@ open Bonsai.Let_syntax
 open Bonsai_web.Cont
 open Js_of_ocaml
 
+let init_codemirror ~id ~on_change ~on_execute ~read_only =
+  let _req_id =
+    Dom_html.window##requestAnimationFrame
+      (Js.wrap_callback (fun _ ->
+         let doc = Dom_html.document in
+         match doc##getElementById (Js.string id) |> Js.Opt.to_option with
+         | None -> print_endline ("Could not find element " ^ id)
+         | Some element ->
+           let cm =
+             Js.Unsafe.global##.CodeMirror##fromTextArea
+               element
+               (Js.Unsafe.obj
+                  [| "mode", Js.Unsafe.inject (Js.string "text/x-sql")
+                   ; "lineNumbers", Js.Unsafe.inject Js._false
+                   ; "readOnly", Js.Unsafe.inject (Js.bool read_only)
+                   ; ( "viewportMargin"
+                     , Js.Unsafe.inject (Js.number_of_float Float.infinity) )
+                   ; ( "extraKeys"
+                     , Js.Unsafe.obj
+                         [| ( "Ctrl-Enter"
+                            , Js.Unsafe.inject
+                                (Js.wrap_callback (fun cm ->
+                                   let value = cm##getValue |> Js.to_string in
+                                   Effect.Expert.handle_non_dom_event_exn
+                                     (on_execute value))) )
+                         |] )
+                  |])
+           in
+           let _ = cm##setSize Js.null (Js.string "auto") in
+           cm##on
+             (Js.string "change")
+             (Js.wrap_callback (fun _ ->
+                let value = cm##getValue |> Js.to_string in
+                Effect.Expert.handle_non_dom_event_exn (on_change value)))))
+  in
+  Effect.Ignore
+;;
+
 let execute_query db query set_results =
   let open Vdom in
   try
@@ -87,6 +125,7 @@ let component ~db_path ~initial_query ?(interactive = true) graph =
   let db, set_db = Bonsai.state None graph in
   let query, set_query = Bonsai.state initial_query graph in
   let results, set_results = Bonsai.state [] graph in
+  let path = Bonsai.path_id graph in
   let () =
     Bonsai.Edge.lifecycle
       ~on_activate:
@@ -102,60 +141,62 @@ let component ~db_path ~initial_query ?(interactive = true) graph =
          Effect.Ignore)
       graph
   in
-  let () =
-    Bonsai.Edge.on_change
-      db
-      ~equal:[%equal: Crystal_sqljs.Db.t option]
-      ~callback:
-        (let%map set_results = set_results
-         and query = query in
-         function
-         | None -> Effect.print_s [%message "Database not loaded yet"]
-         | Some db -> execute_query db query set_results)
-      graph
-  in
-  let%arr query = query
-  and set_query = set_query
-  and db = db
-  and results = results
-  and set_results = set_results in
-  let open Vdom in
-  let rows = String.split_lines query |> List.length |> Int.max 1 in
-  match db with
-  | None -> Node.div [ Node.text "Database not loaded yet" ]
+  match%sub db with
+  | None -> Bonsai.return (Vdom.Node.div [ Vdom.Node.text "Database not loaded yet" ])
   | Some db ->
+    let () =
+      Bonsai.Edge.on_change
+        db
+        ~equal:[%equal: Crystal_sqljs.Db.t]
+        ~callback:
+          (let%map set_results = set_results
+           and query = query in
+           fun db -> execute_query db query set_results)
+        graph
+    in
+    let () =
+      Bonsai.Edge.lifecycle
+        ~on_activate:
+          (let%map set_query = set_query
+           and db = db
+           and set_results = set_results
+           and path = path in
+           init_codemirror
+             ~id:path
+             ~on_change:set_query
+             ~on_execute:(fun query -> execute_query db query set_results)
+             ~read_only:(not interactive))
+        graph
+    in
+    let%arr query = query
+    and db = db
+    and results = results
+    and set_results = set_results
+    and path = path in
+    let open Vdom in
+    let rows = String.split_lines query |> List.length |> Int.max 1 in
     let textarea =
       Node.textarea
         ~attrs:
-          [ Attr.rows rows
+          [ Attr.id path
+          ; Attr.rows rows
           ; (if interactive then Attr.empty else Attr.create "readonly" "")
-          ; Attr.on_input (fun _event -> set_query)
-          ; Attr.on_keydown (fun event ->
-              if
-                Js.to_bool event##.ctrlKey
-                && [%equal: string option]
-                     (Some "Enter")
-                     (event##.key |> Js.Optdef.to_option |> Option.map ~f:Js.to_string)
-              then (
-                Dom.preventDefault event;
-                execute_query db query set_results)
-              else Effect.Ignore)
           ; {%css|
-                        font-family: monospace;
-                        width: 100%;
-                        box-sizing: border-box;
-                      |}
+              font-family: monospace;
+              width: 100%;
+              box-sizing: border-box;
+             |}
           ]
-        [ Node.text query ]
+        [ Node.text initial_query ]
     in
     let run_button =
       Node.button
         ~attrs:
           [ {%css|
-                                   font-family: "monospace";
-                                   width: 100%;
-                                   box-sizing: border-box;
-                                 |}
+              font-family: "monospace";
+              width: 100%;
+              box-sizing: border-box;
+            |}
           ; Attr.on_click (fun _event -> execute_query db query set_results)
           ]
         [ Node.text "Run (ctrl+enter)" ]
