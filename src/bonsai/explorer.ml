@@ -22,7 +22,7 @@ let execute_query db query set_results =
             border: 1px solid #ddd;
             text-align: left;
             padding: 4px;
-            font-size: 0.8em;
+            font-size: 0.6rem;
             font-family: monospace;
             |}
                 ]
@@ -38,7 +38,7 @@ let execute_query db query set_results =
             border: 1px solid #ddd;
             text-align: left;
             padding: 4px;
-            font-size: 0.8em;
+            font-size: 0.6rem;
             font-family: monospace;
             |}
                     ]

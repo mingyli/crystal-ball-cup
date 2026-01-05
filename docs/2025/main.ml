@@ -20,7 +20,7 @@ let writeup graph =
       ~initial_query:
         {|SELECT
   e.short AS least_surprising,
-  SUM(s.score) AS total_score
+  ROUND(SUM(s.score), 2) AS total_score
 FROM scores as s
 JOIN events as e
   ON s.event_id = e.event_id
@@ -36,7 +36,7 @@ LIMIT 5|}
       ~initial_query:
         {|SELECT
   e.short AS most_surprising,
-  SUM(s.score) AS total_score
+  ROUND(SUM(s.score), 2) AS total_score
 FROM scores as s
 JOIN events as e
   ON s.event_id = e.event_id
@@ -58,7 +58,7 @@ LIMIT 5|}
 )
 SELECT
   r.respondent,
-  AVG(ABS(r.probability - ea.avg_prob)) as nonconformity
+  ROUND(AVG(ABS(r.probability - ea.avg_prob)), 2) as nonconformity
 FROM responses r
 JOIN event_averages ea ON r.event_id = ea.event_id
 GROUP BY r.respondent
@@ -73,7 +73,7 @@ LIMIT 3|}
       ~initial_query:
         {|SELECT
   respondent,
-  AVG(ABS(probability - 0.5)) as boldness
+  ROUND(AVG(ABS(probability - 0.5)), 3) as boldness
 FROM responses
 GROUP BY respondent
 ORDER BY boldness ASC
@@ -128,7 +128,7 @@ LIMIT 3|}
       ~initial_query:
         {|SELECT
   respondent AS winner,
-  SUM(score) AS total_score
+  ROUND(SUM(score), 2) AS total_score
 FROM scores
 GROUP BY respondent
 ORDER BY total_score DESC
@@ -142,7 +142,7 @@ LIMIT 3|}
       ~initial_query:
         {|SELECT
   respondent AS loser,
-  SUM(score) AS total_score,
+  ROUND(SUM(score), 2) AS total_score,
   SUM(
     CASE
       WHEN CAST(score AS TEXT) = '-Inf'
