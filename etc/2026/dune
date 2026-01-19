@@ -1,0 +1,8 @@
+
+(rule
+ (target events.md)
+ (deps %{project_root}/bin/main.exe)
+ (action
+  (with-stdout-to
+   events.md
+   (run %{project_root}/bin/main.exe 2026 markdown))))

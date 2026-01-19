@@ -6,6 +6,7 @@
   core_unix.filename_unix
   crystal
   crystal_2025
+  crystal_2026
   crystal_sqlite)
  (preprocess
   (pps ppx_jane)))

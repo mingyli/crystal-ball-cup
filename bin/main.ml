@@ -79,7 +79,9 @@ module Make (Collection : Collection.S) = struct
 end
 
 let command =
-  let collections : Collection.t list = [ (module Crystal_2025) ] in
+  let collections : Collection.t list =
+    [ (module Crystal_2025); (module Crystal_2026) ]
+  in
   Command.group ~summary:"Crystal Ball Cup"
   @@ List.map collections ~f:(fun (module Collection) ->
     let module Commands = Make (Collection) in
