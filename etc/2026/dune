@@ -1,4 +1,3 @@
-
 (rule
  (target events.md)
  (deps %{project_root}/bin/main.exe)
@@ -6,3 +5,26 @@
   (with-stdout-to
    events.md
    (run %{project_root}/bin/main.exe 2026 markdown))))
+
+(rule
+ (targets slides.md)
+ (deps rules.md events.md)
+ (action
+  (with-stdout-to
+   slides.md
+   (run bash -c "(cat rules.md; echo; cat events.md)"))))
+
+(rule
+ (targets slides.pdf)
+ (deps slides.md header.tex)
+ (mode promote)
+ (action
+  (run
+   pandoc
+   -t
+   beamer
+   slides.md
+   -o
+   slides.pdf
+   --pdf-engine=xelatex
+   --include-in-header=header.tex)))

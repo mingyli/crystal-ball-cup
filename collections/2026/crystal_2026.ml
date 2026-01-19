@@ -13,7 +13,7 @@ let all =
         "Rockstar Games releases GTA VI for sale to the public."
     ; pending
         "senate"
-        "The GOP holds 52 or more Senate Seats"
+        "The GOP holds 52 or more Senate seats"
         "After the 2026 Midterms, the Republican party holds 52 or more seats in the \
          U.S. Senate."
     ; pending
