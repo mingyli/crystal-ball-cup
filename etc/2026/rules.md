@@ -52,3 +52,7 @@ On some day early next year we will reconvene to evaluate our 2026 predictions
 and make predictions for 2027.
 
 ## Form
+
+\begin{center}
+\includegraphics[width=0.3\linewidth]{form.png}
+\end{center}

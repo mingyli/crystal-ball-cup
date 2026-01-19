@@ -16,7 +16,7 @@
 
 (rule
  (targets slides.pdf)
- (deps slides.md header.tex)
+ (deps slides.md form.png header.tex)
  (mode promote)
  (action
   (run
