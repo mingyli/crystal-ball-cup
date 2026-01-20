@@ -27,6 +27,8 @@ MathJax = {
 
 [2025](./2025/)
 
+[2026](./2026/)
+
 ## Format
 
 You will be presented with a series of hypothetical events. For each event, you

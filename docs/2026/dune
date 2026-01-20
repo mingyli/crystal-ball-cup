@@ -1,0 +1,32 @@
+(rule
+ (target index.html)
+ (deps index.md ../style.css)
+ (mode promote)
+ (action
+  (run pandoc -s -t html5 --css ../style.css index.md -o %{target})))
+
+(executable
+ (name main)
+ (modes js)
+ (promote)
+ (libraries
+  core
+  crystal
+  crystal_2026
+  crystal_plotly
+  crystal_sqljs
+  crystal_bonsai
+  bonsai
+  bonsai.web
+  bonsai.web_ui_multi_select
+  bonsai.web_ui_form
+  promise_jsoo
+  js_of_ocaml)
+ (preprocess
+  (pps
+   ppx_jane
+   ppx_css
+   ppx_typed_fields
+   ppx_blob
+   bonsai.ppx_bonsai
+   js_of_ocaml-ppx)))

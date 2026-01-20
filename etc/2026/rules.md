@@ -1,4 +1,4 @@
-# 2026 Crystal Ball Cup
+# Crystal Ball Cup 2026
 
 ## Format
 
