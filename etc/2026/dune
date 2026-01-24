@@ -28,3 +28,16 @@
    slides.pdf
    --pdf-engine=xelatex
    --include-in-header=header.tex)))
+
+(rule
+ (target responses_and_scores.sexp)
+ (deps %{project_root}/bin/main.exe responses.csv)
+ (action
+  (with-stdout-to
+   responses_and_scores.sexp
+   (run
+    %{project_root}/bin/main.exe
+    2026
+    responses-and-scores
+    -responses
+    responses.csv))))

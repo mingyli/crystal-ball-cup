@@ -1,4 +1,18 @@
 (rule
+ (target crystal.db)
+ (deps %{project_root}/bin/main.exe %{project_root}/etc/2026/responses.csv)
+ (mode promote)
+ (action
+  (run
+   %{project_root}/bin/main.exe
+   2026
+   create-db
+   -responses
+   %{project_root}/etc/2026/responses.csv
+   -output
+   %{target})))
+
+(rule
  (target index.html)
  (deps index.md ../style.css)
  (mode promote)
@@ -22,6 +36,7 @@
   bonsai.web_ui_form
   promise_jsoo
   js_of_ocaml)
+ (preprocessor_deps %{project_root}/etc/2026/responses_and_scores.sexp)
  (preprocess
   (pps
    ppx_jane

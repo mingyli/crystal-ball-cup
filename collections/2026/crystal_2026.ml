@@ -10,7 +10,7 @@ let all =
     [ pending
         "gta"
         "Grand Theft Auto VI is released"
-        "Rockstar Games releases GTA VI for sale to the public."
+        "Rockstar Games releases GTA VI for sale and is playable to the public."
     ; pending
         "senate"
         "The GOP holds 52 or more Senate seats"
@@ -80,10 +80,10 @@ let all =
         "strava"
         "We record 10,000 miles run on Strava"
         "The collective running distance recorded by all participants on Strava in 2026 \
-         exceeds 10,000 miles."
+         is at least 10,000 miles."
     ; pending
         "semiquincentennial"
-        "The US President attends the Semiquincentennial in Philly"
+        "The US President attends the Semiquincentennial"
         "On July 4, 2026 (the 250th anniversary of the US), the sitting US President \
          delivers a speech at Independence Hall in Philadelphia."
     ; pending
@@ -92,7 +92,7 @@ let all =
         "George R. R. Martin announces the release date for The Winds of Winter."
     ; pending
         "medals"
-        "USA wins more silver medals than gold medals at the 2026 Winter Olympics"
+        "USA wins more silver medals than gold medals"
         "The number of silver medals the United States of America wins exceeds the \
          number of gold medals the country wins at the 2026 Winter Olympics."
     ; pending
