@@ -83,7 +83,7 @@ let all =
          is at least 10,000 miles."
     ; pending
         "semiquincentennial"
-        "The US President attends the Semiquincentennial"
+        "The US President attends the 250th anniversary"
         "On July 4, 2026 (the 250th anniversary of the US), the sitting US President \
          delivers a speech at Independence Hall in Philadelphia."
     ; pending

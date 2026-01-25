@@ -104,8 +104,8 @@ let%expect_test _ =
     ├────┼────────────────┼─────────────────────────────────────────────┼────────────────┼────────────┼──────┼─────────────┤
     │ 17 │ The US Preside │ On July 4, 2026 (the 250th anniversary of t │ semiquincenten │            │      │             │
     │    │ nt attends the │ he US), the sitting US President delivers a │ nial           │            │      │             │
-    │    │  Semiquincente │  speech at Independence Hall in Philadelphi │                │            │      │             │
-    │    │ nnial          │ a.                                          │                │            │      │             │
+    │    │  250th anniver │  speech at Independence Hall in Philadelphi │                │            │      │             │
+    │    │ sary           │ a.                                          │                │            │      │             │
     ├────┼────────────────┼─────────────────────────────────────────────┼────────────────┼────────────┼──────┼─────────────┤
     │ 18 │ A release date │ George R. R. Martin announces the release d │ game of throne │            │      │             │
     │    │  for The Winds │ ate for The Winds of Winter.                │ s              │            │      │             │
