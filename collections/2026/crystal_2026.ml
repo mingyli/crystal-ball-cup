@@ -5,6 +5,13 @@ let name = "2026"
 
 let all =
   let pending label short precise = Event.create ~short ~precise ~label ~outcome:None in
+  let no label short precise date explanation =
+    Event.create
+      ~label
+      ~short
+      ~precise
+      ~outcome:(Some (Outcome.create No (Date.of_string date) explanation))
+  in
   List.mapi
     ~f:(fun i f -> f ~id:(Event_id.of_int (i + 1)))
     [ pending
@@ -90,11 +97,13 @@ let all =
         "game of thrones"
         "A release date for The Winds of Winter is announced"
         "George R. R. Martin announces the release date for The Winds of Winter."
-    ; pending
+    ; no
         "medals"
         "USA wins more silver medals than gold medals"
         "The number of silver medals the United States of America wins exceeds the \
          number of gold medals the country wins at the 2026 Winter Olympics."
+        "2026-02-22"
+        "USA won twelve gold medals and twelve silver medals."
     ; pending
         "korea"
         "Participants visit Korea more than six times"
