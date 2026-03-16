@@ -32,102 +32,120 @@ let%expect_test _ =
        ~bars:`Unicode);
   [%expect
     {|
-    ┌────┬────────────────┬────────────────────────────────────┬────────────────┬────────────┬────────────┬────────────────┐
-    │ id │ short          │ precise                            │ label          │ resolution │ date       │ explanation    │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 1  │ Grand Theft Au │ Rockstar Games releases GTA VI for │ gta            │            │            │                │
-    │    │ to VI is relea │  sale and is playable to the publi │                │            │            │                │
-    │    │ sed            │ c.                                 │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 2  │ The GOP holds  │ After the 2026 Midterms, the Repub │ senate         │            │            │                │
-    │    │ 52 or more Sen │ lican party holds 52 or more seats │                │            │            │                │
-    │    │ ate seats      │  in the U.S. Senate.               │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 3  │ Lionel Messi p │ Lionel Messi plays (starts or subs │ messi          │            │            │                │
-    │    │ lays in the Wo │ titutes) in at least one match for │                │            │            │                │
-    │    │ rld Cup        │  Argentina in the 2026 FIFA World  │                │            │            │                │
-    │    │                │ Cup.                               │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 4  │ Artemis II suc │ NASA’s Artemis II mission launches │ moon           │            │            │                │
-    │    │ cessfully flie │ , carries a crew around the moon,  │                │            │            │                │
-    │    │ s around the m │ and returns safely to Earth.       │                │            │            │                │
-    │    │ oon            │                                    │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 5  │ A participant  │ At least one participant is notifi │ stan           │            │            │                │
-    │    │ is a Top 0.05% │ ed in their Spotify Wrapped that t │                │            │            │                │
-    │    │  Stan          │ hey are in the Top 0.05% (or highe │                │            │            │                │
-    │    │                │ r) of listeners for a specific art │                │            │            │                │
-    │    │                │ ist.                               │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 6  │ Avengers: Doom │ The film Avengers: Doomsday earns  │ avengers       │            │            │                │
-    │    │ sday opens to  │ more than $250 million at the dome │                │            │            │                │
-    │    │ $250M Domestic │ stic box office in its opening wee │                │            │            │                │
-    │    │                │ kend.                              │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 7  │ The U.S. econo │ The National Bureau of Economic Re │ recession      │            │            │                │
-    │    │ my enters a re │ search declares a recession.       │                │            │            │                │
-    │    │ cession        │                                    │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 8  │ The Sagrada Fa │ The central "Tower of Jesus Christ │ jesus          │            │            │                │
-    │    │ mília complete │ " is declared structurally complet │                │            │            │                │
-    │    │ s the "Jesus T │ e.                                 │                │            │            │                │
-    │    │ ower"          │                                    │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 9  │ Apple announce │ Apple officially reveals a foldabl │ iphone         │            │            │                │
-    │    │ s a foldable i │ e smartphone model during their an │                │            │            │                │
-    │    │ Phone          │ nual September keynote.            │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 10 │ BTS performs a │ The K-pop group BTS performs live  │ bts            │            │            │                │
-    │    │  reunion conce │ together as a full group (seven me │                │            │            │                │
-    │    │ rt             │ mbers) following their military se │                │            │            │                │
-    │    │                │ rvice.                             │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 11 │ The President  │ The House of Representatives votes │ impeach        │            │            │                │
-    │    │ is impeached   │  to impeach the President.         │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 12 │ LeBron James r │ LeBron James announces his retirem │ lebron         │            │            │                │
-    │    │ etires         │ ent from professional basketball.  │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 13 │ The Guggenheim │ The Guggenheim Abu Dhabi museum of │ guggenheim     │            │            │                │
-    │    │  Abu Dhabi ope │ ficially opens its doors to the pu │                │            │            │                │
-    │    │ ns             │ blic.                              │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 14 │ Oscars Best Pi │ The winner of Best Picture at the  │ oscars         │            │            │                │
-    │    │ cture is a str │ 98th Academy Awards is a film dist │                │            │            │                │
-    │    │ eaming movie   │ ributed primarily by a streaming s │                │            │            │                │
-    │    │                │ ervice (e.g., Apple, Netflix, Amaz │                │            │            │                │
-    │    │                │ on).                               │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 15 │ Eli Lilly's we │ The FDA officially approves Eli Li │ orforglipron   │            │            │                │
-    │    │ ight loss pill │ lly's oral GLP-1 agonist, orforgli │                │            │            │                │
-    │    │  is FDA approv │ pron, for chronic weight managemen │                │            │            │                │
-    │    │ ed             │ t.                                 │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 16 │ We record 10,0 │ The collective running distance re │ strava         │            │            │                │
-    │    │ 00 miles run o │ corded by all participants on Stra │                │            │            │                │
-    │    │ n Strava       │ va in 2026 is at least 10,000 mile │                │            │            │                │
-    │    │                │ s.                                 │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 17 │ The US Preside │ On July 4, 2026 (the 250th anniver │ semiquincenten │            │            │                │
-    │    │ nt attends the │ sary of the US), the sitting US Pr │ nial           │            │            │                │
-    │    │  250th anniver │ esident delivers a speech at Indep │                │            │            │                │
-    │    │ sary           │ endence Hall in Philadelphia.      │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 18 │ A release date │ George R. R. Martin announces the  │ game of throne │            │            │                │
-    │    │  for The Winds │ release date for The Winds of Wint │ s              │            │            │                │
-    │    │  of Winter is  │ er.                                │                │            │            │                │
-    │    │ announced      │                                    │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 19 │ USA wins more  │ The number of silver medals the Un │ medals         │ No         │ 2026-02-22 │ USA won twelve │
-    │    │ silver medals  │ ited States of America wins exceed │                │            │            │  gold medals a │
-    │    │ than gold meda │ s the number of gold medals the co │                │            │            │ nd twelve silv │
-    │    │ ls             │ untry wins at the 2026 Winter Olym │                │            │            │ er medals.     │
-    │    │                │ pics.                              │                │            │            │                │
-    ├────┼────────────────┼────────────────────────────────────┼────────────────┼────────────┼────────────┼────────────────┤
-    │ 20 │ Participants v │ The group takes a collective total │ korea          │            │            │                │
-    │    │ isit Korea mor │  of more than six round-trips to S │                │            │            │                │
-    │    │ e than six tim │ outh Korea in 2026.                │                │            │            │                │
-    │    │ es             │                                    │                │            │            │                │
-    └────┴────────────────┴────────────────────────────────────┴────────────────┴────────────┴────────────┴────────────────┘
+    ┌────┬────────────────┬──────────────────────────┬────────────────┬────────────┬────────────┬──────────────────────────┐
+    │ id │ short          │ precise                  │ label          │ resolution │ date       │ explanation              │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 1  │ Grand Theft Au │ Rockstar Games releases  │ gta            │            │            │                          │
+    │    │ to VI is relea │ GTA VI for sale and is p │                │            │            │                          │
+    │    │ sed            │ layable to the public.   │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 2  │ The GOP holds  │ After the 2026 Midterms, │ senate         │            │            │                          │
+    │    │ 52 or more Sen │  the Republican party ho │                │            │            │                          │
+    │    │ ate seats      │ lds 52 or more seats in  │                │            │            │                          │
+    │    │                │ the U.S. Senate.         │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 3  │ Lionel Messi p │ Lionel Messi plays (star │ messi          │            │            │                          │
+    │    │ lays in the Wo │ ts or substitutes) in at │                │            │            │                          │
+    │    │ rld Cup        │  least one match for Arg │                │            │            │                          │
+    │    │                │ entina in the 2026 FIFA  │                │            │            │                          │
+    │    │                │ World Cup.               │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 4  │ Artemis II suc │ NASA’s Artemis II missio │ moon           │            │            │                          │
+    │    │ cessfully flie │ n launches, carries a cr │                │            │            │                          │
+    │    │ s around the m │ ew around the moon, and  │                │            │            │                          │
+    │    │ oon            │ returns safely to Earth. │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 5  │ A participant  │ At least one participant │ stan           │            │            │                          │
+    │    │ is a Top 0.05% │  is notified in their Sp │                │            │            │                          │
+    │    │  Stan          │ otify Wrapped that they  │                │            │            │                          │
+    │    │                │ are in the Top 0.05% (or │                │            │            │                          │
+    │    │                │  higher) of listeners fo │                │            │            │                          │
+    │    │                │ r a specific artist.     │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 6  │ Avengers: Doom │ The film Avengers: Dooms │ avengers       │            │            │                          │
+    │    │ sday opens to  │ day earns more than $250 │                │            │            │                          │
+    │    │ $250M Domestic │  million at the domestic │                │            │            │                          │
+    │    │                │  box office in its openi │                │            │            │                          │
+    │    │                │ ng weekend.              │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 7  │ The U.S. econo │ The National Bureau of E │ recession      │            │            │                          │
+    │    │ my enters a re │ conomic Research declare │                │            │            │                          │
+    │    │ cession        │ s a recession.           │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 8  │ The Sagrada Fa │ The central "Tower of Je │ jesus          │ Yes        │ 2026-02-20 │ The central tower was co │
+    │    │ mília complete │ sus Christ" is declared  │                │            │            │ mpleted: https://www.vat │
+    │    │ s the "Jesus T │ structurally complete.   │                │            │            │ icannews.va/en/church/ne │
+    │    │ ower"          │                          │                │            │            │ ws/2026-02/basilica-sagr │
+    │    │                │                          │                │            │            │ ada-familia-cross-comple │
+    │    │                │                          │                │            │            │ ted-tower-of-jesus-chris │
+    │    │                │                          │                │            │            │ t.html                   │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 9  │ Apple announce │ Apple officially reveals │ iphone         │            │            │                          │
+    │    │ s a foldable i │  a foldable smartphone m │                │            │            │                          │
+    │    │ Phone          │ odel during their annual │                │            │            │                          │
+    │    │                │  September keynote.      │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 10 │ BTS performs a │ The K-pop group BTS perf │ bts            │            │            │                          │
+    │    │  reunion conce │ orms live together as a  │                │            │            │                          │
+    │    │ rt             │ full group (seven member │                │            │            │                          │
+    │    │                │ s) following their milit │                │            │            │                          │
+    │    │                │ ary service.             │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 11 │ The President  │ The House of Representat │ impeach        │            │            │                          │
+    │    │ is impeached   │ ives votes to impeach th │                │            │            │                          │
+    │    │                │ e President.             │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 12 │ LeBron James r │ LeBron James announces h │ lebron         │            │            │                          │
+    │    │ etires         │ is retirement from profe │                │            │            │                          │
+    │    │                │ ssional basketball.      │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 13 │ The Guggenheim │ The Guggenheim Abu Dhabi │ guggenheim     │            │            │                          │
+    │    │  Abu Dhabi ope │  museum officially opens │                │            │            │                          │
+    │    │ ns             │  its doors to the public │                │            │            │                          │
+    │    │                │ .                        │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 14 │ Oscars Best Pi │ The winner of Best Pictu │ oscars         │ No         │ 2026-03-15 │ One Battle After Another │
+    │    │ cture is a str │ re at the 98th Academy A │                │            │            │  won the Oscar for best  │
+    │    │ eaming movie   │ wards is a film distribu │                │            │            │ picture                  │
+    │    │                │ ted primarily by a strea │                │            │            │                          │
+    │    │                │ ming service (e.g., Appl │                │            │            │                          │
+    │    │                │ e, Netflix, Amazon).     │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 15 │ Eli Lilly's we │ The FDA officially appro │ orforglipron   │            │            │                          │
+    │    │ ight loss pill │ ves Eli Lilly's oral GLP │                │            │            │                          │
+    │    │  is FDA approv │ -1 agonist, orforglipron │                │            │            │                          │
+    │    │ ed             │ , for chronic weight man │                │            │            │                          │
+    │    │                │ agement.                 │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 16 │ We record 10,0 │ The collective running d │ strava         │            │            │                          │
+    │    │ 00 miles run o │ istance recorded by all  │                │            │            │                          │
+    │    │ n Strava       │ participants on Strava i │                │            │            │                          │
+    │    │                │ n 2026 is at least 10,00 │                │            │            │                          │
+    │    │                │ 0 miles.                 │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 17 │ The US Preside │ On July 4, 2026 (the 250 │ semiquincenten │            │            │                          │
+    │    │ nt attends the │ th anniversary of the US │ nial           │            │            │                          │
+    │    │  250th anniver │ ), the sitting US Presid │                │            │            │                          │
+    │    │ sary           │ ent delivers a speech at │                │            │            │                          │
+    │    │                │  Independence Hall in Ph │                │            │            │                          │
+    │    │                │ iladelphia.              │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 18 │ A release date │ George R. R. Martin anno │ game of throne │            │            │                          │
+    │    │  for The Winds │ unces the release date f │ s              │            │            │                          │
+    │    │  of Winter is  │ or The Winds of Winter.  │                │            │            │                          │
+    │    │ announced      │                          │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 19 │ USA wins more  │ The number of silver med │ medals         │ No         │ 2026-02-22 │ USA won twelve gold meda │
+    │    │ silver medals  │ als the United States of │                │            │            │ ls and twelve silver med │
+    │    │ than gold meda │  America wins exceeds th │                │            │            │ als.                     │
+    │    │ ls             │ e number of gold medals  │                │            │            │                          │
+    │    │                │ the country wins at the  │                │            │            │                          │
+    │    │                │ 2026 Winter Olympics.    │                │            │            │                          │
+    ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
+    │ 20 │ Participants v │ The group takes a collec │ korea          │            │            │                          │
+    │    │ isit Korea mor │ tive total of more than  │                │            │            │                          │
+    │    │ e than six tim │ six round-trips to South │                │            │            │                          │
+    │    │ es             │  Korea in 2026.          │                │            │            │                          │
+    └────┴────────────────┴──────────────────────────┴────────────────┴────────────┴────────────┴──────────────────────────┘
     |}]
 ;;
