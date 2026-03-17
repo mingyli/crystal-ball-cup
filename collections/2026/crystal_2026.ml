@@ -12,8 +12,8 @@ let all =
       ~precise
       ~outcome:(Some (Outcome.create No (Date.of_string date) explanation))
   in
-  let yes label short precise date explanation = 
-    Event.create 
+  let yes label short precise date explanation =
+    Event.create
       ~label
       ~short
       ~precise
@@ -58,8 +58,9 @@ let all =
         "jesus"
         "The Sagrada Família completes the \"Jesus Tower\""
         "The central \"Tower of Jesus Christ\" is declared structurally complete."
- 	"2026-02-20"
-        "The central tower was completed: https://www.vaticannews.va/en/church/news/2026-02/basilica-sagrada-familia-cross-completed-tower-of-jesus-christ.html"
+        "2026-02-20"
+        "The central tower was completed: \
+         https://www.vaticannews.va/en/church/news/2026-02/basilica-sagrada-familia-cross-completed-tower-of-jesus-christ.html"
     ; pending
         "iphone"
         "Apple announces a foldable iPhone"
@@ -82,12 +83,12 @@ let all =
         "guggenheim"
         "The Guggenheim Abu Dhabi opens"
         "The Guggenheim Abu Dhabi museum officially opens its doors to the public."
-    ;no 
+    ; no
         "oscars"
         "Oscars Best Picture is a streaming movie"
         "The winner of Best Picture at the 98th Academy Awards is a film distributed \
          primarily by a streaming service (e.g., Apple, Netflix, Amazon)."
-        "2026-03-15" 
+        "2026-03-15"
         "One Battle After Another won the Oscar for best picture"
     ; pending
         "orforglipron"
