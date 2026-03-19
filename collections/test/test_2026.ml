@@ -108,8 +108,8 @@ let%expect_test _ =
     │    │                │ ming service (e.g., Appl │                │            │            │                          │
     │    │                │ e, Netflix, Amazon).     │                │            │            │                          │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
-    │ 15 │ Eli Lilly’s we │ The FDA officially appro │ orforglipron   │            │            │                          │
-    │    │ ight loss pill │ ves Eli Lilly’s oral GLP │                │            │            │                          │
+    │ 15 │ Eli Lilly's we │ The FDA officially appro │ orforglipron   │            │            │                          │
+    │    │ ight loss pill │ ves Eli Lilly's oral GLP │                │            │            │                          │
     │    │  is FDA approv │ -1 agonist, orforglipron │                │            │            │                          │
     │    │ ed             │ , for chronic weight man │                │            │            │                          │
     │    │                │ agement.                 │                │            │            │                          │
