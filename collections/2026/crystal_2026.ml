@@ -73,11 +73,13 @@ let all =
         "guggenheim"
         "The Guggenheim Abu Dhabi opens"
         "The Guggenheim Abu Dhabi museum officially opens its doors to the public."
-    ; pending
+    ; no
         "oscars"
         "Oscars Best Picture is a streaming movie"
         "The winner of Best Picture at the 98th Academy Awards is a film distributed \
          primarily by a streaming service (e.g., Apple, Netflix, Amazon)."
+        "2026-03-15"
+        "The Best Picture winner, One Battle After Another, is distributed by Warners Bros. Pictures"
     ; pending
         "orforglipron"
         "Eli Lilly's weight loss pill is FDA approved"
