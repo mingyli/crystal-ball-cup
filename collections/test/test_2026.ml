@@ -82,11 +82,12 @@ let%expect_test _ =
     │    │ Phone          │ odel during their annual │                │            │            │                          │
     │    │                │  September keynote.      │                │            │            │                          │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
-    │ 10 │ BTS performs a │ The K-pop group BTS perf │ bts            │            │            │                          │
-    │    │  reunion conce │ orms live together as a  │                │            │            │                          │
-    │    │ rt             │ full group (seven member │                │            │            │                          │
-    │    │                │ s) following their milit │                │            │            │                          │
-    │    │                │ ary service.             │                │            │            │                          │
+    │ 10 │ BTS performs a │ The K-pop group BTS perf │ bts            │ Yes        │ 2026-03-21 │ BTS returned as a full g │
+    │    │  reunion conce │ orms live together as a  │                │            │            │ roup with a globally str │
+    │    │ rt             │ full group (seven member │                │            │            │ eamed concert on Netflix │
+    │    │                │ s) following their milit │                │            │            │  from Gwanghwamun Square │
+    │    │                │ ary service.             │                │            │            │  in Seoul on March 21, 2 │
+    │    │                │                          │                │            │            │ 026.                     │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
     │ 11 │ The President  │ The House of Representat │ impeach        │            │            │                          │
     │    │ is impeached   │ ives votes to impeach th │                │            │            │                          │

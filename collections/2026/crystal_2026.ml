@@ -5,6 +5,13 @@ let name = "2026"
 
 let all =
   let pending label short precise = Event.create ~short ~precise ~label ~outcome:None in
+  let yes label short precise date explanation =
+    Event.create
+      ~label
+      ~short
+      ~precise
+      ~outcome:(Some (Outcome.create Yes (Date.of_string date) explanation))
+  in
   let no label short precise date explanation =
     Event.create
       ~label
@@ -56,11 +63,14 @@ let all =
         "Apple announces a foldable iPhone"
         "Apple officially reveals a foldable smartphone model during their annual \
          September keynote."
-    ; pending
+    ; yes
         "bts"
         "BTS performs a reunion concert"
         "The K-pop group BTS performs live together as a full group (seven members) \
          following their military service."
+        "2026-03-21"
+        "BTS returned as a full group with a globally streamed concert on Netflix from \
+         Gwanghwamun Square in Seoul on March 21, 2026."
     ; pending
         "impeach"
         "The President is impeached"
