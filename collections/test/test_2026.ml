@@ -50,10 +50,15 @@ let%expect_test _ =
     │    │                │ entina in the 2026 FIFA  │                │            │            │                          │
     │    │                │ World Cup.               │                │            │            │                          │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
-    │ 4  │ Artemis II suc │ NASA’s Artemis II missio │ moon           │            │            │                          │
-    │    │ cessfully flie │ n launches, carries a cr │                │            │            │                          │
-    │    │ s around the m │ ew around the moon, and  │                │            │            │                          │
-    │    │ oon            │ returns safely to Earth. │                │            │            │                          │
+    │ 4  │ Artemis II suc │ NASA’s Artemis II missio │ moon           │ Yes        │ 2026-04-10 │ The mission concluded wi │
+    │    │ cessfully flie │ n launches, carries a cr │                │            │            │ th a splashdown in the P │
+    │    │ s around the m │ ew around the moon, and  │                │            │            │ acific at 5:07 p.m. PDT  │
+    │    │ oon            │ returns safely to Earth. │                │            │            │ on April 10, 2026. The c │
+    │    │                │                          │                │            │            │ rew set a new record for │
+    │    │                │                          │                │            │            │  the farthest distance h │
+    │    │                │                          │                │            │            │ umans have traveled from │
+    │    │                │                          │                │            │            │  Earth, reaching 252,756 │
+    │    │                │                          │                │            │            │  miles.                  │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
     │ 5  │ A participant  │ At least one participant │ stan           │            │            │                          │
     │    │ is a Top 0.05% │  is notified in their Sp │                │            │            │                          │

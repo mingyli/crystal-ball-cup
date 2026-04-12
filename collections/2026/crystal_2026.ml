@@ -35,11 +35,15 @@ let all =
         "Lionel Messi plays in the World Cup"
         "Lionel Messi plays (starts or substitutes) in at least one match for Argentina \
          in the 2026 FIFA World Cup."
-    ; pending
+    ; yes
         "moon"
         "Artemis II successfully flies around the moon"
         "NASA’s Artemis II mission launches, carries a crew around the moon, and returns \
          safely to Earth."
+        "2026-04-10"
+        "The mission concluded with a splashdown in the Pacific at 5:07 p.m. PDT on \
+         April 10, 2026. The crew set a new record for the farthest distance humans have \
+         traveled from Earth, reaching 252,756 miles."
     ; pending
         "stan"
         "A participant is a Top 0.05% Stan"
