@@ -203,9 +203,25 @@ jobs:
           gcp_service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
           use_vertex_ai: '${{ vars.GOOGLE_GENAI_USE_VERTEXAI }}'
           use_gemini_code_assist: '${{ vars.GOOGLE_GENAI_USE_GCA }}'
+          model: 'gemini-3'
           settings: |-
             {
               "maxSessionTurns": 50,
+              "coreTools": [
+                "run_shell_command(echo)",
+                "run_shell_command(gh issue view)",
+                "run_shell_command(gh issue comment)",
+                "run_shell_command(gh pr view)",
+                "run_shell_command(gh pr comment)",
+                "run_shell_command(gh pr diff)",
+                "run_shell_command(gh pr create)",
+                "run_shell_command(cat)",
+                "run_shell_command(head)",
+                "run_shell_command(tail)",
+                "run_shell_command(grep)",
+                "run_shell_command(git)",
+                "write_file"
+              ],
               "telemetry": {
                 "enabled": false,
                 "target": "gcp"
