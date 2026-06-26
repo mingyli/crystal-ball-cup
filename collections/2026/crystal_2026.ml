@@ -61,10 +61,12 @@ let all =
         "recession"
         "The U.S. economy enters a recession"
         "The National Bureau of Economic Research declares a recession."
-    ; pending
+    ; yes
         "jesus"
         "The Sagrada Família completes the \"Jesus Tower\""
         "The central \"Tower of Jesus Christ\" is declared structurally complete."
+        "2026-06-10"
+        "The Tower of Jesus Christ was blessed and inaugurated on June 10, 2026."
     ; pending
         "iphone"
         "Apple announces a foldable iPhone"

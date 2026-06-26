@@ -77,9 +77,9 @@ let%expect_test _ =
     │    │ my enters a re │ conomic Research declare │                │            │            │                          │
     │    │ cession        │ s a recession.           │                │            │            │                          │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
-    │ 8  │ The Sagrada Fa │ The central "Tower of Je │ jesus          │            │            │                          │
-    │    │ mília complete │ sus Christ" is declared  │                │            │            │                          │
-    │    │ s the "Jesus T │ structurally complete.   │                │            │            │                          │
+    │ 8  │ The Sagrada Fa │ The central "Tower of Je │ jesus          │ Yes        │ 2026-06-10 │ The Tower of Jesus Chris │
+    │    │ mília complete │ sus Christ" is declared  │                │            │            │ t was blessed and inaugu │
+    │    │ s the "Jesus T │ structurally complete.   │                │            │            │ rated on June 10, 2026.  │
     │    │ ower"          │                          │                │            │            │                          │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
     │ 9  │ Apple announce │ Apple officially reveals │ iphone         │            │            │                          │
