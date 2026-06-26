@@ -30,11 +30,14 @@ let all =
         "The GOP holds 52 or more Senate seats"
         "After the 2026 Midterms, the Republican party holds 52 or more seats in the \
          U.S. Senate."
-    ; pending
+    ; yes
         "messi"
         "Lionel Messi plays in the World Cup"
         "Lionel Messi plays (starts or substitutes) in at least one match for Argentina \
          in the 2026 FIFA World Cup."
+        "2026-06-16"
+        "Lionel Messi played in Argentina's opening group stage game against Algeria on \
+         June 16, 2026."
     ; yes
         "moon"
         "Artemis II successfully flies around the moon"
