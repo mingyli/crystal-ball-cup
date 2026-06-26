@@ -44,10 +44,10 @@ let%expect_test _ =
     │    │ ate seats      │ lds 52 or more seats in  │                │            │            │                          │
     │    │                │ the U.S. Senate.         │                │            │            │                          │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
-    │ 3  │ Lionel Messi p │ Lionel Messi plays (star │ messi          │            │            │                          │
-    │    │ lays in the Wo │ ts or substitutes) in at │                │            │            │                          │
-    │    │ rld Cup        │  least one match for Arg │                │            │            │                          │
-    │    │                │ entina in the 2026 FIFA  │                │            │            │                          │
+    │ 3  │ Lionel Messi p │ Lionel Messi plays (star │ messi          │ Yes        │ 2026-06-16 │ Lionel Messi played in A │
+    │    │ lays in the Wo │ ts or substitutes) in at │                │            │            │ rgentina's opening group │
+    │    │ rld Cup        │  least one match for Arg │                │            │            │  stage game against Alge │
+    │    │                │ entina in the 2026 FIFA  │                │            │            │ ria on June 16, 2026.    │
     │    │                │ World Cup.               │                │            │            │                          │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
     │ 4  │ Artemis II suc │ NASA’s Artemis II missio │ moon           │ Yes        │ 2026-04-10 │ The mission concluded wi │
