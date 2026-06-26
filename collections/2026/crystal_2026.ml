@@ -100,11 +100,14 @@ let all =
         "2026-03-15"
         "The Best Picture winner, One Battle After Another, is distributed by Warners \
          Bros. Pictures"
-    ; pending
+    ; yes
         "orforglipron"
         "Eli Lilly's weight loss pill is FDA approved"
         "The FDA officially approves Eli Lilly's oral GLP-1 agonist, orforglipron, for \
          chronic weight management."
+        "2026-04-01"
+        "The FDA approved Eli Lilly's once-daily oral weight-loss pill, Foundayo \
+         (orforglipron), on April 1, 2026."
     ; pending
         "strava"
         "We record 10,000 miles run on Strava"

@@ -114,11 +114,11 @@ let%expect_test _ =
     │    │                │ ming service (e.g., Appl │                │            │            │                          │
     │    │                │ e, Netflix, Amazon).     │                │            │            │                          │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
-    │ 15 │ Eli Lilly's we │ The FDA officially appro │ orforglipron   │            │            │                          │
-    │    │ ight loss pill │ ves Eli Lilly's oral GLP │                │            │            │                          │
-    │    │  is FDA approv │ -1 agonist, orforglipron │                │            │            │                          │
-    │    │ ed             │ , for chronic weight man │                │            │            │                          │
-    │    │                │ agement.                 │                │            │            │                          │
+    │ 15 │ Eli Lilly's we │ The FDA officially appro │ orforglipron   │ Yes        │ 2026-04-01 │ The FDA approved Eli Lil │
+    │    │ ight loss pill │ ves Eli Lilly's oral GLP │                │            │            │ ly's once-daily oral wei │
+    │    │  is FDA approv │ -1 agonist, orforglipron │                │            │            │ ght-loss pill, Foundayo  │
+    │    │ ed             │ , for chronic weight man │                │            │            │ (orforglipron), on April │
+    │    │                │ agement.                 │                │            │            │  1, 2026.                │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
     │ 16 │ We record 10,0 │ The collective running d │ strava         │            │            │                          │
     │    │ 00 miles run o │ istance recorded by all  │                │            │            │                          │
