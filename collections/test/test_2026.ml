@@ -126,9 +126,9 @@ let%expect_test _ =
     │    │                │ n 2026 is at least 10,00 │                │            │            │                          │
     │    │                │ 0 miles.                 │                │            │            │                          │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
-    │ 17 │ The US Preside │ On July 4, 2026 (the 250 │ semiquincenten │            │            │                          │
-    │    │ nt attends the │ th anniversary of the US │ nial           │            │            │                          │
-    │    │  250th anniver │ ), the sitting US Presid │                │            │            │                          │
+    │ 17 │ The US Preside │ On July 4, 2026 (the 250 │ semiquincenten │ No         │ 2026-07-04 │ The President gave a spe │
+    │    │ nt attends the │ th anniversary of the US │ nial           │            │            │ ech in Washington D.C. i │
+    │    │  250th anniver │ ), the sitting US Presid │                │            │            │ nstead.                  │
     │    │ sary           │ ent delivers a speech at │                │            │            │                          │
     │    │                │  Independence Hall in Ph │                │            │            │                          │
     │    │                │ iladelphia.              │                │            │            │                          │

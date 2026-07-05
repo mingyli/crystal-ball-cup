@@ -113,11 +113,13 @@ let all =
         "We record 10,000 miles run on Strava"
         "The collective running distance recorded by all participants on Strava in 2026 \
          is at least 10,000 miles."
-    ; pending
+    ; no
         "semiquincentennial"
         "The US President attends the 250th anniversary"
         "On July 4, 2026 (the 250th anniversary of the US), the sitting US President \
          delivers a speech at Independence Hall in Philadelphia."
+        "2026-07-04"
+        "The President gave a speech in Washington D.C. instead."
     ; pending
         "game of thrones"
         "A release date for The Winds of Winter is announced"
