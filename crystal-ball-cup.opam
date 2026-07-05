@@ -8,7 +8,7 @@ homepage: "https://github.com/mingyli/crystal-ball-cup"
 bug-reports: "https://github.com/mingyli/crystal-ball-cup/issues"
 depends: [
   "ocaml" {= "5.1.1"}
-  "dune"
+  "dune" {= "3.20.2"}
   "core"
   "ppx_jane"
   "ppx_inline_test"
