@@ -13,18 +13,31 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up OCaml
-        uses: ocaml/setup-ocaml@v2
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: "5.1.1"
+          dune-cache: true
 
-      - name: Install system dependencies (Pandoc)
+      - name: Install system dependencies (XeTeX and wget)
         run: |
           sudo apt-get update
           sudo apt-get install -y texlive-xetex wget
-          # Pandoc is needed to build index.html, which is part of the default dune build target
+
+      - name: Cache Pandoc
+        id: cache-pandoc
+        uses: actions/cache@v4
+        with:
+          path: pandoc-3.7.0.2-1-amd64.deb
+          key: pandoc-3.7.0.2
+
+      - name: Download Pandoc
+        if: steps.cache-pandoc.outputs.cache-hit != 'true'
+        run: |
           wget https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-1-amd64.deb
+
+      - name: Install Pandoc
+        run: |
           sudo dpkg -i pandoc-3.7.0.2-1-amd64.deb
-          # Install any missing dependencies for pandoc
           sudo apt-get -f install -y
 
       - name: Install dependencies and build
