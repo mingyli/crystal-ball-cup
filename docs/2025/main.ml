@@ -11,12 +11,12 @@ let responses_and_scores =
   |> [%of_sexp: Responses_and_scores.t String.Map.t]
 ;;
 
-let writeup graph =
+let writeup ~db graph =
   let open Vdom in
   let%sub explorer_least_surprising =
     Explorer.component
       graph
-      ~db_path:"../2025/crystal.db"
+      ~db
       ~initial_query:
         {|SELECT
   e.short AS least_surprising,
@@ -32,7 +32,7 @@ LIMIT 5|}
   let%sub explorer_most_surprising =
     Explorer.component
       graph
-      ~db_path:"../2025/crystal.db"
+      ~db
       ~initial_query:
         {|SELECT
   e.short AS most_surprising,
@@ -48,7 +48,7 @@ LIMIT 5|}
   let%sub explorer_maverick =
     Explorer.component
       graph
-      ~db_path:"../2025/crystal.db"
+      ~db
       ~interactive:false
       ~initial_query:
         {|WITH event_averages AS (
@@ -68,7 +68,7 @@ LIMIT 3|}
   let%sub explorer_fence_sitter =
     Explorer.component
       graph
-      ~db_path:"../2025/crystal.db"
+      ~db
       ~interactive:false
       ~initial_query:
         {|SELECT
@@ -82,7 +82,7 @@ LIMIT 3|}
   let%sub explorer_binary_champion =
     Explorer.component
       graph
-      ~db_path:"../2025/crystal.db"
+      ~db
       ~interactive:false
       ~initial_query:
         {|SELECT
@@ -103,7 +103,7 @@ LIMIT 5|}
   let%sub explorer_directionally_challenged =
     Explorer.component
       graph
-      ~db_path:"../2025/crystal.db"
+      ~db
       ~interactive:false
       ~initial_query:
         {|SELECT
@@ -124,7 +124,7 @@ LIMIT 3|}
   let%sub explorer_winners =
     Explorer.component
       graph
-      ~db_path:"../2025/crystal.db"
+      ~db
       ~initial_query:
         {|SELECT
   respondent AS winner,
@@ -138,7 +138,7 @@ LIMIT 3|}
   let%sub explorer_losers =
     Explorer.component
       graph
-      ~db_path:"../2025/crystal.db"
+      ~db
       ~initial_query:
         {|SELECT
   respondent AS loser,
@@ -250,44 +250,63 @@ LIMIT 3|}
 ;;
 
 let all graph =
-  let plots = Plots.create ~events:Crystal_2025.all ~responses_and_scores in
-  let scores = Map.map responses_and_scores ~f:Responses_and_scores.scores in
-  let writeup = writeup graph in
-  let standings =
-    Standings.component
-      ~start_date:(Date.of_string "2025-08-09")
-      ~end_date:(Date.of_string "2025-12-31")
-      Crystal_2025.all
-      scores
+  let db, set_db = Bonsai.state None graph in
+  let () =
+    Bonsai.Edge.lifecycle
+      ~on_activate:
+        (let%map set_db = set_db in
+         let (_promise : unit Promise.t) =
+           let open Promise.Syntax in
+           let* db' = Crystal_sqljs.Db.load ~db_path:"./crystal.db" in
+           (* We need the expert api here because we can't otherwise
+              schedule the set_db effect from within this promise. *)
+           Effect.Expert.handle_non_dom_event_exn (set_db (Some db'));
+           Promise.resolve ()
+         in
+         Effect.Ignore)
       graph
   in
-  let plots = Plots.component plots graph in
-  let explorer =
-    Explorer.component
-      ~db_path:"./crystal.db"
-      ~initial_query:
-        {|SELECT
+  let plots = Plots.create ~events:Crystal_2025.all ~responses_and_scores in
+  let scores = Map.map responses_and_scores ~f:Responses_and_scores.scores in
+  match%sub db with
+  | None -> Bonsai.return (Vdom.Node.div [ Vdom.Node.text "Loading..." ])
+  | Some db ->
+    let writeup = writeup ~db graph in
+    let standings =
+      Standings.component
+        ~start_date:(Date.of_string "2025-08-09")
+        ~end_date:(Date.of_string "2025-12-31")
+        Crystal_2025.all
+        scores
+        graph
+    in
+    let plots = Plots.component plots graph in
+    let explorer =
+      Explorer.component
+        graph
+        ~db
+        ~initial_query:
+          {|SELECT
   name, sql
 FROM
   sqlite_master
 WHERE
   type IN ('table', 'view')|}
-      graph
-  in
-  let%arr writeup = writeup
-  and standings = standings
-  and plots = plots
-  and explorer = explorer in
-  let open Vdom in
-  Node.div
-    [ writeup
-    ; Node.h2 [ Node.text "Standings" ]
-    ; standings
-    ; Node.h2 [ Node.text "Events" ]
-    ; plots
-    ; Node.h2 [ Node.text "Explorer" ]
-    ; explorer
-    ]
+    in
+    let%arr writeup = writeup
+    and standings = standings
+    and plots = plots
+    and explorer = explorer in
+    let open Vdom in
+    Node.div
+      [ writeup
+      ; Node.h2 [ Node.text "Standings" ]
+      ; standings
+      ; Node.h2 [ Node.text "Events" ]
+      ; plots
+      ; Node.h2 [ Node.text "Explorer" ]
+      ; explorer
+      ]
 ;;
 
 let () = Bonsai_web.Start.start ~bind_to_element_with_id:"app" all
