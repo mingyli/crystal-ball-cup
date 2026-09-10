@@ -26,6 +26,10 @@ depends: [
   "js_of_ocaml-compiler"
   "promise_jsoo"
   "metaquot"
+  "metapp" {= "0.4.4"}
+]
+pin-depends: [
+  [ "metapp.0.4.4" "git+https://github.com/ocamllibs/metapp.git#v0.4.4" ]
 ]
 build: [
   ["dune" "build" "-p" name "-j" jobs]
