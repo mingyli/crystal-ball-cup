@@ -67,11 +67,14 @@ let all =
         "The central \"Tower of Jesus Christ\" is declared structurally complete."
         "2026-06-10"
         "The Tower of Jesus Christ was blessed and inaugurated on June 10, 2026."
-    ; pending
+    ; yes
         "iphone"
         "Apple announces a foldable iPhone"
         "Apple officially reveals a foldable smartphone model during their annual \
          September keynote."
+        "2026-09-09"
+        "Apple officially revealed the iPhone Duo, its first foldable smartphone, during \
+         their annual September keynote on September 9, 2026."
     ; yes
         "bts"
         "BTS performs a reunion concert"

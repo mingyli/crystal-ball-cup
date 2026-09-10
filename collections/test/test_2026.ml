@@ -82,10 +82,12 @@ let%expect_test _ =
     │    │ s the "Jesus T │ structurally complete.   │                │            │            │ rated on June 10, 2026.  │
     │    │ ower"          │                          │                │            │            │                          │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
-    │ 9  │ Apple announce │ Apple officially reveals │ iphone         │            │            │                          │
-    │    │ s a foldable i │  a foldable smartphone m │                │            │            │                          │
-    │    │ Phone          │ odel during their annual │                │            │            │                          │
-    │    │                │  September keynote.      │                │            │            │                          │
+    │ 9  │ Apple announce │ Apple officially reveals │ iphone         │ Yes        │ 2026-09-09 │ Apple officially reveale │
+    │    │ s a foldable i │  a foldable smartphone m │                │            │            │ d the iPhone Duo, its fi │
+    │    │ Phone          │ odel during their annual │                │            │            │ rst foldable smartphone, │
+    │    │                │  September keynote.      │                │            │            │  during their annual Sep │
+    │    │                │                          │                │            │            │ tember keynote on Septem │
+    │    │                │                          │                │            │            │ ber 9, 2026.             │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
     │ 10 │ BTS performs a │ The K-pop group BTS perf │ bts            │ Yes        │ 2026-03-21 │ BTS returned as a full g │
     │    │  reunion conce │ orms live together as a  │                │            │            │ roup with a globally str │
