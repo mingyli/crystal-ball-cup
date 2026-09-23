@@ -11,6 +11,16 @@ module E = Form.Elements
 module Resolution = struct
   include Resolution
 
+  let color = function
+    | Yes -> Colors.blue
+    | No -> Colors.orange
+  ;;
+
+  let accent_color = function
+    | Yes -> Colors.light_blue
+    | No -> Colors.light_orange
+  ;;
+
   module Option = struct
     module T = struct
       type nonrec t = t option [@@deriving compare, equal, sexp, enumerate]
@@ -20,20 +30,17 @@ module Resolution = struct
     include Comparable.Make (T)
 
     let to_string = function
-      | Some Yes -> "Yes"
-      | Some No -> "No"
+      | Some r -> to_string r
       | None -> "Pending"
     ;;
 
     let color = function
-      | Some Yes -> Colors.blue
-      | Some No -> Colors.orange
+      | Some r -> color r
       | None -> Colors.gray
     ;;
 
     let accent_color = function
-      | Some Yes -> Colors.light_blue
-      | Some No -> Colors.light_orange
+      | Some r -> accent_color r
       | None -> Colors.light_gray
     ;;
   end
@@ -399,8 +406,7 @@ let component (t : t) graph =
     and set_which_events = set_which_events
     and query_box_which_events = query_box_which_events
     and which_resolutions = which_resolutions in
-    let render_resolution_chip event =
-      let resolution = Event.resolution event in
+    let render_resolution_chip resolution =
       let resolution_style =
         {%css| background-color: %{Resolution.Option.accent_color resolution}; color: %{Resolution.Option.color resolution}; |}
       in
@@ -420,19 +426,76 @@ let component (t : t) graph =
           ]
         [ Node.text (Resolution.Option.to_string resolution) ]
     in
-    (* TODO: I think there's something brittle in the code below where bonsai
-       expects the plot div to be the third child of the div in all the branches
-       below. If you try to add divs such that the plot div is not the third
-       child, bonsai will not render the plot correctly after you switch between
-       views. *)
+    let render_outcome_details event =
+      match Event.outcome event with
+      | None ->
+        let border_color = Resolution.Option.color None in
+        Node.div
+          ~attrs:
+            [ {%css|
+              margin-top: 10px;
+              margin-bottom: 10px;
+              padding: 8px 12px;
+              border-left: 4px solid %{border_color};
+              border-radius: 4px;
+            |}
+            ]
+          [ Node.div
+              ~attrs:
+                [ {%css|
+                  font-weight: bold;
+                  display: flex;
+                  align-items: center;
+                  gap: 0.4em;
+                |}
+                ]
+              [ render_resolution_chip None; Node.text "resolution" ]
+          ]
+      | Some outcome ->
+        let resolution = Outcome.resolution outcome in
+        let border_color = Resolution.color resolution in
+        Node.div
+          ~attrs:
+            [ {%css|
+              margin-top: 10px;
+              margin-bottom: 10px;
+              padding: 8px 12px;
+              border-left: 4px solid %{border_color};
+              border-radius: 4px;
+            |}
+            ]
+          [ Node.div
+              ~attrs:
+                [ {%css|
+                  font-weight: bold;
+                  margin-bottom: 4px;
+                  display: flex;
+                  align-items: center;
+                  gap: 0.4em;
+                |}
+                ]
+              [ Node.text "Resolved"
+              ; render_resolution_chip (Some resolution)
+              ; Node.text [%string "on %{Outcome.date outcome#Date}"]
+              ]
+          ; Node.div [ Node.text (Outcome.explanation outcome) ]
+          ]
+    in
+    (* Note: Virtual DOM diffing matches children by index position between views
+       and events. The outer container in both `All` and `One` views must maintain
+       the plot div as the third child (index 2). Any additional content in `One`
+       view (such as outcome details) should be nested inside preceding children
+       so the top-level child count remains constant at 3 children. *)
     match which_events with
     | One event ->
+      let precise_and_outcome =
+        Node.div
+          [ Node.div [ Node.text (Event.precise event) ]; render_outcome_details event ]
+      in
       [ Node.div
           ~attrs:[]
-          [ Node.div [ Node.text (Event.precise event) ]
-          ; Node.div
-              ~attrs:[ Style.resolution_chip_wrapper ]
-              [ render_resolution_chip event ]
+          [ precise_and_outcome
+          ; Node.div []
           ; Node.div ~attrs:[ Attr.id "plot-single" ] []
           ]
       ]
@@ -460,7 +523,7 @@ let component (t : t) graph =
           ~attrs:[ Style.plots_container ]
           [ Node.div
               ~attrs:[ Style.resolution_chip_wrapper ]
-              [ render_resolution_chip event ]
+              [ render_resolution_chip resolution ]
           ; Node.a
               ~attrs:
                 [ {%css|
