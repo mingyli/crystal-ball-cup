@@ -1,11 +1,39 @@
-# This workflow runs on pull requests to check the build, tests, and formatting.
+# This workflow runs on pull requests to check formatting, build, and tests.
 name: CI Checks
 
 on:
   pull_request:
 
 jobs:
-  build-and-check:
+  check-format:
+    name: Check Formatting
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: "5.1.1"
+          dune-cache: true
+
+      - name: Install ocamlformat
+        run: |
+          opam install ocamlformat
+          eval $(opam env)
+
+      - name: Format code with dune fmt
+        run: |
+          eval $(opam env)
+          dune fmt
+
+      - name: Verify clean git diff
+        run: git diff --exit-code
+
+  build-and-test:
+    name: Build and Test
     runs-on: ubuntu-22.04
 
     steps:
@@ -40,17 +68,17 @@ jobs:
           sudo dpkg -i pandoc-3.7.0.2-1-amd64.deb
           sudo apt-get -f install -y
 
-      - name: Install dependencies and build
+      - name: Install project dependencies
         run: |
           opam install . --deps-only --with-test
           eval $(opam env)
-          dune build
-          dune runtest
 
-      - name: Check formatting with ocamlformat
+      - name: Build project
         run: |
           eval $(opam env)
-          dune fmt
+          dune build
 
-      - name: Check for unclean workspace
-        run: git diff --exit-code
+      - name: Run tests
+        run: |
+          eval $(opam env)
+          dune runtest
