@@ -39,9 +39,9 @@ let%expect_test _ =
     │    │ to VI is relea │ GTA VI for sale and is p │                │            │            │                          │
     │    │ sed            │ layable to the public.   │                │            │            │                          │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
-    │ 2  │ The GOP holds  │ After the 2026 Midterms, │ senate         │            │            │                          │
-    │    │ 52 or more Sen │  the Republican party ho │                │            │            │                          │
-    │    │ ate seats      │ lds 52 or more seats in  │                │            │            │                          │
+    │ 2  │ The GOP holds  │ After the 2026 Midterms, │ senate         │ No         │ 2026-11-03 │ The Democrats won the ma │
+    │    │ 52 or more Sen │  the Republican party ho │                │            │            │ jority in the U.S. Senat │
+    │    │ ate seats      │ lds 52 or more seats in  │                │            │            │ e.                       │
     │    │                │ the U.S. Senate.         │                │            │            │                          │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
     │ 3  │ Lionel Messi p │ Lionel Messi plays (star │ messi          │ Yes        │ 2026-06-16 │ Lionel Messi played in A │

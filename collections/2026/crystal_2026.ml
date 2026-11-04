@@ -25,11 +25,13 @@ let all =
         "gta"
         "Grand Theft Auto VI is released"
         "Rockstar Games releases GTA VI for sale and is playable to the public."
-    ; pending
+    ; no
         "senate"
         "The GOP holds 52 or more Senate seats"
         "After the 2026 Midterms, the Republican party holds 52 or more seats in the \
          U.S. Senate."
+        "2026-11-03"
+        "The Democrats won the majority in the U.S. Senate."
     ; yes
         "messi"
         "Lionel Messi plays in the World Cup"
