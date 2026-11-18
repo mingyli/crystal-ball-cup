@@ -35,9 +35,10 @@ let%expect_test _ =
     ┌────┬────────────────┬──────────────────────────┬────────────────┬────────────┬────────────┬──────────────────────────┐
     │ id │ short          │ precise                  │ label          │ resolution │ date       │ explanation              │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
-    │ 1  │ Grand Theft Au │ Rockstar Games releases  │ gta            │            │            │                          │
-    │    │ to VI is relea │ GTA VI for sale and is p │                │            │            │                          │
-    │    │ sed            │ layable to the public.   │                │            │            │                          │
+    │ 1  │ Grand Theft Au │ Rockstar Games releases  │ gta            │ Yes        │ 2026-11-18 │ Grand Theft Auto VI was  │
+    │    │ to VI is relea │ GTA VI for sale and is p │                │            │            │ released and became play │
+    │    │ sed            │ layable to the public.   │                │            │            │ able on November 18, 202 │
+    │    │                │                          │                │            │            │ 6.                       │
     ├────┼────────────────┼──────────────────────────┼────────────────┼────────────┼────────────┼──────────────────────────┤
     │ 2  │ The GOP holds  │ After the 2026 Midterms, │ senate         │ No         │ 2026-11-03 │ The Democrats won the ma │
     │    │ 52 or more Sen │  the Republican party ho │                │            │            │ jority in the U.S. Senat │
