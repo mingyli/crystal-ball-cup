@@ -21,10 +21,12 @@ let all =
   in
   List.mapi
     ~f:(fun i f -> f ~id:(Event_id.of_int (i + 1)))
-    [ pending
+    [ yes
         "gta"
         "Grand Theft Auto VI is released"
         "Rockstar Games releases GTA VI for sale and is playable to the public."
+        "2026-11-18"
+        "Grand Theft Auto VI was released and became playable on November 18, 2026."
     ; no
         "senate"
         "The GOP holds 52 or more Senate seats"
